@@ -1,0 +1,16 @@
+services:
+  web:
+    build: ./docker
+    ports:
+      - "8080:80"
+    volumes:
+      - ./site:/var/www/site
+      - sanggar_data:/var/www/site/data
+      - sanggar_uploads:/var/www/site/public/uploads
+    environment:
+      APP_ENV: development
+      APP_DEBUG: "1"
+
+volumes:
+  sanggar_data:
+  sanggar_uploads:

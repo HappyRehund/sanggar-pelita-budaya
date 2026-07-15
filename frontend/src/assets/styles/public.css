@@ -1,0 +1,239 @@
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.app-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.app-header nav {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: center;
+}
+
+.app-header nav a {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.app-header nav a:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.lang-toggle {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.lang-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-10) var(--sp-6);
+  text-align: center;
+}
+
+.app-main h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--sp-3);
+}
+
+.app-main p {
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
+  max-width: 36rem;
+}
+
+.app-footer {
+  padding: var(--sp-4) var(--sp-6);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.admin-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--sp-6);
+}
+
+.login-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--sp-8);
+  width: 100%;
+  max-width: 24rem;
+}
+
+.login-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--sp-1);
+}
+
+.login-card .subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin-bottom: var(--sp-6);
+}
+
+.form-field {
+  margin-bottom: var(--sp-4);
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--sp-2);
+}
+
+.form-field input {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 4px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 4px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: opacity 150ms ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-error {
+  background: rgba(232, 168, 124, 0.1);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  margin-bottom: var(--sp-4);
+}
+
+.login-back {
+  display: block;
+  text-align: center;
+  margin-top: var(--sp-5);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--sp-6);
+}
+
+.admin-page h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: var(--sp-3);
+}
+
+.admin-page p {
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--sp-6);
+}
+
+.admin-actions {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.admin-actions a {
+  font-size: 0.875rem;
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+}
+
+.admin-actions a:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--sp-6);
+  text-align: center;
+}
+
+.not-found h2 {
+  font-size: 1.5rem;
+  margin-bottom: var(--sp-2);
+}
+
+.not-found p {
+  color: var(--color-text-muted);
+  margin-bottom: var(--sp-5);
+}

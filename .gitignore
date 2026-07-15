@@ -1,0 +1,25 @@
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Playwright MCP session artifacts
+.playwright-mcp/
+
+# Logs
+*.log
+
+# Env files (per-project .env.example remains tracked)
+.env
+.env.local
+.env.*.local
+
+# Docker overrides / local state
+docker-compose.override.yml
+
+# Deployment zip
+deployment/

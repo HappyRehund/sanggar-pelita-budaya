@@ -1,0 +1,41 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@sveltejs/opencode"],
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ]
+    },
+    "svelte": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@sveltejs/mcp"
+      ]
+    },
+    "i18n": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "i18n-mcp",
+        "--dir",
+        "frontend/src/lib/i18n",
+        "--base-language",
+        "en",
+        "--src-dir",
+        "frontend/src",
+        "--project-root",
+        ".",
+        "--frameworks",
+        "svelte",
+        "--key-style",
+        "flat"
+      ]
+    }
+  }
+}
