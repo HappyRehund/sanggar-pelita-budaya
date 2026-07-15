@@ -26,6 +26,8 @@ function autoload_backend_class(string $class): void
 
 spl_autoload_register('autoload_backend_class');
 
+require_once __DIR__ . '/helpers/formatters.php';
+
 /**
  * Parse the JSON body of the current request into an array.
  * Returns an empty array if body is missing or invalid.

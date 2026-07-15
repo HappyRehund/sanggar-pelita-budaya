@@ -55,6 +55,7 @@ function apply_cors(): void
 /* ---- Controllers (autoloader resolves class files) --------------- */
 $authController = new AuthController();
 $csrfController = new CsrfController();
+$portfolioController = new PortfolioController();
 
 /* ---- Health & info (no auth) ------------------------------------- */
 route('GET', '/api/health', function () {
@@ -90,3 +91,19 @@ route('GET', '/api/session', [$authController, 'session']);
 route('POST', '/api/auth/login', [$authController, 'login']);
 route('POST', '/api/auth/logout', [$authController, 'logout']);
 route('GET', '/api/auth/me', [$authController, 'session']);
+
+/* ---- Portfolio (public + admin) --------------------------------- */
+route('GET',    '/api/portfolio',              [$portfolioController, 'list']);
+route('GET',    '/api/portfolio/featured',     [$portfolioController, 'featured']);
+route('GET',    '/api/portfolio/gallery',       [$portfolioController, 'galleryImages']);
+route('GET',    '/api/portfolio/slug/{slug}',   [$portfolioController, 'getBySlug']);
+route('GET',    '/api/portfolio/{id}',         [$portfolioController, 'getById']);
+route('POST',   '/api/portfolio',              [$portfolioController, 'create']);
+route('PUT',    '/api/portfolio/{id}',         [$portfolioController, 'update']);
+route('DELETE', '/api/portfolio/{id}',         [$portfolioController, 'delete']);
+
+/* ---- Portfolio Media --------------------------------------------- */
+route('GET',    '/api/portfolio/{id}/media',      [$portfolioController, 'listMedia']);
+route('POST',   '/api/portfolio/{id}/media',      [$portfolioController, 'uploadMedia']);
+route('DELETE', '/api/portfolio/media/{id}',      [$portfolioController, 'deleteMedia']);
+route('PUT',    '/api/portfolio/media/reorder',   [$portfolioController, 'reorderMedia']);

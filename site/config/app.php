@@ -26,6 +26,11 @@ define('UPLOAD_FOLDERS', [
     'documents' => 'documents',
 ]);
 
+define('PORTFOLIO_PER_PAGE', 12);
+define('FEATURED_PORTFOLIO_LIMIT', 6);
+define('RELATED_PORTFOLIO_LIMIT', 4);
+define('GALLERY_IMAGE_LIMIT', 10);
+
 $directories = [
     BASE_PATH . '/data',
 ];
