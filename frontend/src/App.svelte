@@ -3,11 +3,15 @@
   import { gsap } from 'gsap';
   import { router, defineRoute } from '$lib/router.svelte';
   import { authStore } from '$lib/stores/auth.svelte';
+  import { settingsStore } from '$lib/stores/settings.svelte';
   import { langStore } from '$lib/stores/lang.svelte';
   import { t } from '$lib/i18n/index.svelte';
 
   import './assets/styles/tokens.css';
   import './assets/styles/global.css';
+
+  import PublicLayout from './layouts/PublicLayout.svelte';
+  import Toast from '$lib/components/Toast.svelte';
 
   import Home from './routes/Home.svelte';
   import Login from './routes/admin/Login.svelte';
@@ -25,10 +29,13 @@
   defineRoute('*');
 
   let appContainer: HTMLElement;
+  let pageContainer = $state<HTMLElement | null>(null);
 
   onMount(() => {
     router.init();
     document.documentElement.lang = langStore.current;
+
+    settingsStore.init();
 
     const isAdmin = router.current.path.startsWith('/admin');
     if (isAdmin) {
@@ -65,6 +72,9 @@
     !isAdminProtected || (authStore.initialized && authStore.isAuthenticated)
   );
 
+  const isAdminRoute = $derived(router.current.path.startsWith('/admin'));
+  const usePublicLayout = $derived(!isAdminRoute && showPage);
+
   $effect(() => {
     if (router.current.path.startsWith('/admin') && !authStore.initialized) {
       authStore.init().then(() => {
@@ -77,6 +87,15 @@
       });
     }
   });
+
+  $effect(() => {
+    if (!pageContainer) return;
+    gsap.fromTo(
+      pageContainer,
+      { opacity: 0, y: 8 },
+      { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }
+    );
+  });
 </script>
 
 <svelte:head>
@@ -85,8 +104,22 @@
 
 <div bind:this={appContainer}>
   {#if showPage}
-    {#key page.key}
-      <page.component />
-    {/key}
+    {#if usePublicLayout}
+      <PublicLayout>
+        {#key page.key}
+          <div bind:this={pageContainer}>
+            <page.component />
+          </div>
+        {/key}
+      </PublicLayout>
+    {:else}
+      {#key page.key}
+        <div bind:this={pageContainer}>
+          <page.component />
+        </div>
+      {/key}
+    {/if}
   {/if}
 </div>
+
+<Toast />
