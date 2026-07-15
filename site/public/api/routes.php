@@ -56,6 +56,11 @@ function apply_cors(): void
 $authController = new AuthController();
 $csrfController = new CsrfController();
 $portfolioController = new PortfolioController();
+$organizationController = new OrganizationController();
+$heroController = new HeroController();
+$footerController = new FooterController();
+$settingsController = new SettingsController();
+$dashboardController = new DashboardController();
 
 /* ---- Health & info (no auth) ------------------------------------- */
 route('GET', '/api/health', function () {
@@ -103,7 +108,32 @@ route('PUT',    '/api/portfolio/{id}',         [$portfolioController, 'update'])
 route('DELETE', '/api/portfolio/{id}',         [$portfolioController, 'delete']);
 
 /* ---- Portfolio Media --------------------------------------------- */
+route('PUT',    '/api/portfolio/media/reorder',   [$portfolioController, 'reorderMedia']);
 route('GET',    '/api/portfolio/{id}/media',      [$portfolioController, 'listMedia']);
 route('POST',   '/api/portfolio/{id}/media',      [$portfolioController, 'uploadMedia']);
 route('DELETE', '/api/portfolio/media/{id}',      [$portfolioController, 'deleteMedia']);
-route('PUT',    '/api/portfolio/media/reorder',   [$portfolioController, 'reorderMedia']);
+
+/* ---- Organization (public GETs + admin CRUD) --------------------- */
+route('GET',    '/api/organization',              [$organizationController, 'list']);
+route('GET',    '/api/organization/tree',         [$organizationController, 'tree']);
+route('PUT',    '/api/organization/reorder',      [$organizationController, 'reorder']);
+route('GET',    '/api/organization/{id}',        [$organizationController, 'getById']);
+route('POST',   '/api/organization',              [$organizationController, 'create']);
+route('PUT',    '/api/organization/{id}',        [$organizationController, 'update']);
+route('DELETE', '/api/organization/{id}',        [$organizationController, 'delete']);
+route('POST',   '/api/organization/{id}/photo',  [$organizationController, 'uploadPhoto']);
+
+/* ---- Hero (public GET + admin PUT) ------------------------------- */
+route('GET',    '/api/hero',                      [$heroController, 'get']);
+route('PUT',    '/api/hero',                      [$heroController, 'update']);
+
+/* ---- Footer (public GET + admin PUT) ----------------------------- */
+route('GET',    '/api/footer',                    [$footerController, 'get']);
+route('PUT',    '/api/footer',                    [$footerController, 'update']);
+
+/* ---- Settings (public GET + admin PUT) -------------------------- */
+route('GET',    '/api/settings',                  [$settingsController, 'get']);
+route('PUT',    '/api/settings',                  [$settingsController, 'update']);
+
+/* ---- Dashboard (admin only) ------------------------------------- */
+route('GET',    '/api/dashboard',                 [$dashboardController, 'index']);

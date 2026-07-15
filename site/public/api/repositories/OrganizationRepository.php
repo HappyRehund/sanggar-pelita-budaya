@@ -20,7 +20,8 @@ class OrganizationRepository
                 (:parent_id, :name, :position, :photo, :biography, :display_order, :published)
         ");
 
-        $stmt->bindValue(':parent_id', $data['parent_id'] ?? null, PDO::PARAM_NULL);
+        $parentId = $data['parent_id'] ?? null;
+        $stmt->bindValue(':parent_id', $parentId, $parentId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':name', $data['name']);
         $stmt->bindValue(':position', $data['position']);
         $stmt->bindValue(':photo', $data['photo'] ?? null);
@@ -46,7 +47,8 @@ class OrganizationRepository
             WHERE id = :id
         ");
 
-        $stmt->bindValue(':parent_id', $data['parent_id'] ?? null, PDO::PARAM_NULL);
+        $parentId = $data['parent_id'] ?? null;
+        $stmt->bindValue(':parent_id', $parentId, $parentId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':name', $data['name']);
         $stmt->bindValue(':position', $data['position']);
         $stmt->bindValue(':photo', $data['photo'] ?? null);
