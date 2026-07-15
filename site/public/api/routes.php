@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/handlers/csrf.php';
-require_once __DIR__ . '/handlers/auth.php';
-require_once __DIR__ . '/handlers/admin_index.php';
 require_once __DIR__ . '/middleware/auth.php';
 require_once __DIR__ . '/middleware/csrf.php';
 
@@ -55,6 +52,11 @@ function apply_cors(): void
     }
 }
 
+/* ---- Controllers (autoloader resolves class files) --------------- */
+$authController = new AuthController();
+$csrfController = new CsrfController();
+
+/* ---- Health & info (no auth) ------------------------------------- */
 route('GET', '/api/health', function () {
     $db = getPDO();
     $stmt = $db->query("SELECT name FROM sqlite_master WHERE type='table'");
@@ -76,10 +78,15 @@ route('GET', '/api/info', function () {
     ]);
 });
 
-route('GET', '/api/csrf-token', 'get_csrf_token');
+/* ---- CSRF -------------------------------------------------------- */
+route('GET', '/api/csrf-token', [$csrfController, 'token']);
 
-route('POST', '/api/auth/login', 'login_handler');
-route('POST', '/api/auth/logout', 'logout_handler');
-route('GET', '/api/auth/me', 'me_handler');
+/* ---- Auth (spec-aligned paths) ----------------------------------- */
+route('POST', '/api/login', [$authController, 'login']);
+route('POST', '/api/logout', [$authController, 'logout']);
+route('GET', '/api/session', [$authController, 'session']);
 
-route('GET', '/api/admin', 'admin_index_handler');
+/* Legacy compat aliases (old /api/auth/* paths redirect to new) ---- */
+route('POST', '/api/auth/login', [$authController, 'login']);
+route('POST', '/api/auth/logout', [$authController, 'logout']);
+route('GET', '/api/auth/me', [$authController, 'session']);

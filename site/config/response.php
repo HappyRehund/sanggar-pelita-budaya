@@ -47,3 +47,8 @@ function forbidden_response(string $message = 'Forbidden'): void
 {
     error_response($message, 403);
 }
+
+function validation_error_response(array $errors, string $message = 'Validation failed'): void
+{
+    error_response($message, 422, $errors);
+}

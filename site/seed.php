@@ -16,6 +16,9 @@ try {
         seedDatabase();
         echo "[seed] Database seeded successfully.\n";
         echo "[seed]   - 1 admin user (admin/admin123)\n";
+        echo "[seed]   - 1 default hero row\n";
+        echo "[seed]   - 1 default footer row\n";
+        echo "[seed]   - 1 default settings row\n";
     }
 } catch (Throwable $e) {
     echo "[seed] ERROR: " . $e->getMessage() . "\n";

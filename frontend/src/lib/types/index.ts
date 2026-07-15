@@ -11,7 +11,7 @@ export type ApiResponse<T> =
 export interface User {
   id: number;
   username: string;
-  fullname: string;
+  full_name: string;
 }
 
 /* ---- Language ------------------------------------------------------ */

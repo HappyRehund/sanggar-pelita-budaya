@@ -15,7 +15,7 @@ class AuthStore {
     if (this.initialized) return;
     this.loading = true;
     try {
-      this.user = await authApi.me();
+      this.user = await authApi.session();
     } catch {
       this.user = null;
     } finally {

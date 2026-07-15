@@ -5,9 +5,9 @@ export { ApiError };
 
 export const authApi = {
   login: (username: string, password: string) =>
-    api.post<{ user: User }>('/api/auth/login', { username, password }),
-  logout: () => api.post<null>('/api/auth/logout'),
-  me: () => api.get<User>('/api/auth/me'),
+    api.post<{ user: User }>('/api/login', { username, password }),
+  logout: () => api.post<null>('/api/logout'),
+  session: () => api.get<User>('/api/session'),
 };
 
 export const healthApi = {

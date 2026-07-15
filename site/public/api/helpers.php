@@ -2,6 +2,73 @@
 
 declare(strict_types=1);
 
+/**
+ * Autoloader for backend classes.
+ * Maps class name to file in controllers/, services/, repositories/, middleware/.
+ */
+function autoload_backend_class(string $class): void
+{
+    $directories = ['controllers', 'services', 'repositories', 'middleware'];
+    $suffixes = ['Controller', 'Service', 'Repository', 'Middleware'];
+
+    foreach ($directories as $dir) {
+        foreach ($suffixes as $suffix) {
+            if (str_ends_with($class, $suffix)) {
+                $file = __DIR__ . '/' . $dir . '/' . $class . '.php';
+                if (file_exists($file)) {
+                    require_once $file;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+spl_autoload_register('autoload_backend_class');
+
+/**
+ * Parse the JSON body of the current request into an array.
+ * Returns an empty array if body is missing or invalid.
+ */
+function get_json_input(): array
+{
+    $raw = file_get_contents('php://input');
+    if ($raw === false || $raw === '') {
+        return [];
+    }
+
+    $decoded = json_decode($raw, true);
+    return is_array($decoded) ? $decoded : [];
+}
+
+/**
+ * Retrieve an uploaded file from $_FILES or parsed multipart input.
+ * Returns null if the field is not present or has an upload error.
+ */
+function get_uploaded_file(string $field): ?array
+{
+    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $content_type = $_SERVER['CONTENT_TYPE'] ?? '';
+
+    if (str_contains($content_type, 'multipart/form-data') && $method !== 'POST') {
+        $parsed = parse_multipart_input();
+        $files = $parsed['files'];
+        return $files[$field] ?? null;
+    }
+
+    if (!isset($_FILES[$field])) {
+        return null;
+    }
+
+    $file = $_FILES[$field];
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return null;
+    }
+
+    return $file;
+}
+
 function parse_request_body(): array
 {
     $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
