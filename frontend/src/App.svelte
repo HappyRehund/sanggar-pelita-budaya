@@ -14,6 +14,11 @@
   import Toast from '$lib/components/Toast.svelte';
 
   import Home from './routes/Home.svelte';
+  import AboutPage from '$modules/about/pages/AboutPage.svelte';
+  import OrganizationPage from '$modules/organization/pages/OrganizationPage.svelte';
+  import PortfolioListPage from '$modules/portfolio/pages/PortfolioListPage.svelte';
+  import PortfolioDetailPage from '$modules/portfolio/pages/PortfolioDetailPage.svelte';
+  import ContactPage from '$modules/contact/pages/ContactPage.svelte';
   import Login from './routes/admin/Login.svelte';
   import Admin from './routes/admin/Admin.svelte';
   import NotFound from './routes/NotFound.svelte';
@@ -58,6 +63,11 @@
   function getPageFromPath() {
     const m = router.current;
     if (m.path === '/') return { component: Home, key: 'home' };
+    if (m.path === '/about') return { component: AboutPage, key: 'about' };
+    if (m.path === '/organization') return { component: OrganizationPage, key: 'organization' };
+    if (m.path === '/portfolio') return { component: PortfolioListPage, key: 'portfolio' };
+    if (m.path === '/portfolio/:slug') return { component: PortfolioDetailPage, key: 'portfolio-detail' };
+    if (m.path === '/contact') return { component: ContactPage, key: 'contact' };
     if (m.path === '/admin/login') return { component: Login, key: 'admin-login' };
     if (m.path === '/admin') return { component: Admin, key: 'admin' };
     return { component: NotFound, key: 'not-found' };
