@@ -18,6 +18,9 @@ importers:
         specifier: ^15.0.4
         version: 15.0.12
     devDependencies:
+      '@lucide/svelte':
+        specifier: ^1.24.0
+        version: 1.24.0(svelte@5.56.5)
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.3
         version: 5.1.1(svelte@5.56.5)(vite@6.4.3)
@@ -210,6 +213,11 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lucide/svelte@1.24.0':
+    resolution: {integrity: sha512-yXwewA7ANQ5hfaSDrvsecosWjZn5RglzeXUZRSnxeANBskpNwblOkEJTqD0ujDdNKIKL8E9eVc2U/P3ziJr7OA==}
+    peerDependencies:
+      svelte: ^5
 
   '@rollup/rollup-android-arm-eabi@4.62.2':
     resolution: {integrity: sha512-6o7ZLZK+BeenkZCFNDXqpbjw9bD6nuWonvS/lwQJp7NoVVxm6p3qE7qQ5jGuBjiFsgvqjD8mZAU5oWxTmbOeOg==}
@@ -670,6 +678,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lucide/svelte@1.24.0(svelte@5.56.5)':
+    dependencies:
+      svelte: 5.56.5
 
   '@rollup/rollup-android-arm-eabi@4.62.2':
     optional: true

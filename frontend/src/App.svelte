@@ -7,7 +7,7 @@
   import { t } from '$lib/i18n/index.svelte';
 
   import './assets/styles/tokens.css';
-  import './assets/styles/public.css';
+  import './assets/styles/global.css';
 
   import Home from './routes/Home.svelte';
   import Login from './routes/admin/Login.svelte';
@@ -15,6 +15,11 @@
   import NotFound from './routes/NotFound.svelte';
 
   defineRoute('/');
+  defineRoute('/about');
+  defineRoute('/organization');
+  defineRoute('/portfolio');
+  defineRoute('/portfolio/:slug');
+  defineRoute('/contact');
   defineRoute('/admin/login');
   defineRoute('/admin');
   defineRoute('*');

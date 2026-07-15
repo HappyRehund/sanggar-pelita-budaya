@@ -11,6 +11,7 @@
     "deploy:sync": "node scripts/sync-to-site.js"
   },
   "devDependencies": {
+    "@lucide/svelte": "^1.24.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@tsconfig/svelte": "^5.0.4",
     "svelte": "^5.16.0",
