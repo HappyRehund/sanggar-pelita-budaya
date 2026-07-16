@@ -15,6 +15,12 @@
 <svelte:head>
   <title>{t('about_page_hero_title')} — {t('site_name')}</title>
   <meta name="description" content={t('about_page_hero_desc')} />
+  <link rel="canonical" href="/about" />
+  <meta property="og:title" content={t('about_page_hero_title')} />
+  <meta property="og:description" content={t('about_page_hero_desc')} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={t('about_page_hero_title')} />
 </svelte:head>
 
 <section class="about-hero">

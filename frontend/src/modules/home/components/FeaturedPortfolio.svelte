@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { portfolioStore } from '$lib/stores/portfolio.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { formatDate, uploadUrl, imageUrl } from '$lib/utils';
+  import { formatDate, uploadUrl, imageUrl, revealOnScroll, staggerReveal } from '$lib/utils';
   import { langStore } from '$lib/stores/lang.svelte';
   import { categoryLabel } from '$lib/constants/categories';
   import { portfolioDetailPath } from '$lib/constants/routes';
@@ -14,8 +14,15 @@
   import EmptyState from '$lib/components/EmptyState.svelte';
   import { ArrowRight } from '@lucide/svelte';
 
+  let sectionEl = $state<HTMLElement | null>(null);
+
   onMount(() => {
     portfolioStore.fetchFeatured(FEATURED_PORTFOLIO_LIMIT);
+    if (sectionEl) {
+      const c1 = revealOnScroll(sectionEl, { y: 30, duration: 0.6 });
+      const c2 = staggerReveal(sectionEl, '.portfolio-card', { stagger: 0.08, duration: 0.5 });
+      return () => { c1(); c2(); };
+    }
   });
 
   function getCover(item: { cover?: { filename: string } | null; slug: string }): string {
@@ -23,7 +30,7 @@
   }
 </script>
 
-<section class="section featured-portfolio">
+<section bind:this={sectionEl} class="section featured-portfolio">
   <div class="container">
     <SectionTitle eyebrow={t('featured_eyebrow')} title={t('featured_title')} description={t('featured_description')} align="center" />
 

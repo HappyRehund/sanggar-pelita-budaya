@@ -72,11 +72,16 @@
   {#if portfolio}
     <title>{portfolio.seo_title || portfolio.title} — {t('site_name')}</title>
     <meta name="description" content={portfolio.seo_description || portfolio.short_description} />
+    <link rel="canonical" href={`/portfolio/${portfolio.slug}`} />
     <meta property="og:title" content={portfolio.seo_title || portfolio.title} />
     <meta property="og:description" content={portfolio.seo_description || portfolio.short_description} />
+    <meta property="og:type" content="article" />
     {#if portfolio.og_image}
       <meta property="og:image" content={uploadUrl(portfolio.og_image.filename)} />
     {/if}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={portfolio.seo_title || portfolio.title} />
+    <meta name="twitter:description" content={portfolio.seo_description || portfolio.short_description} />
   {/if}
 </svelte:head>
 

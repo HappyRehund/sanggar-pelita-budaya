@@ -2,14 +2,21 @@
   import { onMount } from 'svelte';
   import { organizationStore } from '$lib/stores/organization.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { uploadUrl, imageUrl } from '$lib/utils';
+  import { uploadUrl, imageUrl, revealOnScroll, staggerReveal } from '$lib/utils';
   import Button from '$lib/components/Button.svelte';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
   import { ArrowRight } from '@lucide/svelte';
   import type { OrganizationMember } from '$lib/types';
 
+  let sectionEl = $state<HTMLElement | null>(null);
+
   onMount(() => {
     organizationStore.fetchList();
+    if (sectionEl) {
+      const c1 = revealOnScroll(sectionEl, { y: 30, duration: 0.6 });
+      const c2 = staggerReveal(sectionEl, '.org-card', { stagger: 0.12, duration: 0.5 });
+      return () => { c1(); c2(); };
+    }
   });
 
   const previewPositions = ['Chairperson', 'Ketua', 'Secretary', 'Sekretaris', 'Treasurer', 'Bendahara'];
@@ -21,7 +28,7 @@
   );
 </script>
 
-<section class="section org-preview">
+<section bind:this={sectionEl} class="section org-preview">
   <div class="container">
     <SectionTitle eyebrow={t('org_eyebrow')} title={t('org_title')} description={t('org_description')} align="center" />
 

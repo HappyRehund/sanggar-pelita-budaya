@@ -1,11 +1,18 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { imageUrl } from '$lib/utils';
+  import { imageUrl, revealOnScroll } from '$lib/utils';
   import Button from '$lib/components/Button.svelte';
   import { ArrowRight } from '@lucide/svelte';
+
+  let sectionEl = $state<HTMLElement | null>(null);
+
+  onMount(() => {
+    if (sectionEl) return revealOnScroll(sectionEl, { y: 30, duration: 0.7 });
+  });
 </script>
 
-<section class="section about-preview">
+<section bind:this={sectionEl} class="section about-preview">
   <div class="container about-preview__inner">
     <div class="about-preview__image">
       <img src={imageUrl('about-culture', 800, 1000)} alt="Cultural performance" class="about-preview__img" loading="lazy" />

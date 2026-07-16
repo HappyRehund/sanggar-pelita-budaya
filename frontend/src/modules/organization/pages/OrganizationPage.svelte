@@ -19,6 +19,12 @@
 <svelte:head>
   <title>{t('org_page_hero_title')} — {t('site_name')}</title>
   <meta name="description" content={t('org_page_hero_desc')} />
+  <link rel="canonical" href="/organization" />
+  <meta property="og:title" content={t('org_page_hero_title')} />
+  <meta property="og:description" content={t('org_page_hero_desc')} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={t('org_page_hero_title')} />
 </svelte:head>
 
 <section class="org-hero">

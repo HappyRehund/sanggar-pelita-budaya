@@ -38,6 +38,12 @@
 <svelte:head>
   <title>{t('contact_page_title')} — {t('site_name')}</title>
   <meta name="description" content={t('contact_page_desc')} />
+  <link rel="canonical" href="/contact" />
+  <meta property="og:title" content={t('contact_page_title')} />
+  <meta property="og:description" content={t('contact_page_desc')} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={t('contact_page_title')} />
 </svelte:head>
 
 <section class="contact-hero">

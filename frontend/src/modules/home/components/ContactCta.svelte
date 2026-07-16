@@ -1,15 +1,22 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { imageUrl } from '$lib/utils';
+  import { imageUrl, revealOnScroll } from '$lib/utils';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import Button from '$lib/components/Button.svelte';
   import { Mail, MapPin } from '@lucide/svelte';
+
+  let sectionEl = $state<HTMLElement | null>(null);
+
+  onMount(() => {
+    if (sectionEl) return revealOnScroll(sectionEl, { y: 30, duration: 0.7 });
+  });
 
   const bgImage = $derived(imageUrl('contact-cta', 1920, 800));
   const mapsUrl = $derived(settingsStore.footer?.maps_url || '');
 </script>
 
-<section class="contact-cta" style:background-image={`linear-gradient(rgba(26,22,18,0.75), rgba(26,22,18,0.75)), url(${bgImage})`}>
+<section bind:this={sectionEl} class="contact-cta" style:background-image={`linear-gradient(rgba(26,22,18,0.75), rgba(26,22,18,0.75)), url(${bgImage})`}>
   <div class="container contact-cta__inner">
     <h2 class="contact-cta__title">{t('contact_title')}</h2>
     <p class="contact-cta__desc text-pretty">{t('contact_description')}</p>

@@ -3,6 +3,7 @@
   import { portfolioApi } from '$lib/api';
   import { t } from '$lib/i18n/index.svelte';
   import { uploadUrl } from '$lib/utils';
+  import { revealOnScroll, staggerReveal } from '$lib/utils';
   import { GALLERY_IMAGE_LIMIT } from '$lib/constants/uploadLimits';
   import { useLightbox } from '$lib/hooks/useLightbox.svelte';
   import type { LightboxImage } from '$lib/hooks/useLightbox.svelte';
@@ -14,18 +15,29 @@
 
   let galleryImages = $state<PortfolioMedia[]>([]);
   let loading = $state(true);
+  let sectionEl = $state<HTMLElement | null>(null);
 
   const lightbox = useLightbox();
 
-  onMount(async () => {
-    try {
-      const all = await portfolioApi.galleryImages();
-      galleryImages = shuffle(all).slice(0, GALLERY_IMAGE_LIMIT);
-    } catch {
-      galleryImages = [];
-    } finally {
-      loading = false;
-    }
+  onMount(() => {
+    let cleanups: (() => void)[] = [];
+
+    (async () => {
+      try {
+        const all = await portfolioApi.galleryImages();
+        galleryImages = shuffle(all).slice(0, GALLERY_IMAGE_LIMIT);
+      } catch {
+        galleryImages = [];
+      } finally {
+        loading = false;
+      }
+      if (sectionEl) {
+        cleanups.push(revealOnScroll(sectionEl, { y: 30, duration: 0.6 }));
+        cleanups.push(staggerReveal(sectionEl, '.gallery__item', { stagger: 0.06, duration: 0.4 }));
+      }
+    })();
+
+    return () => { cleanups.forEach((c) => c()); };
   });
 
   function shuffle<T>(arr: T[]): T[] {
@@ -50,7 +62,7 @@
   }
 </script>
 
-<section class="section section--alt gallery">
+<section bind:this={sectionEl} class="section section--alt gallery">
   <div class="container">
     <SectionTitle eyebrow={t('gallery_eyebrow')} title={t('gallery_title')} description={t('gallery_description')} align="center" />
 

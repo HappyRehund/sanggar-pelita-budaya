@@ -46,6 +46,12 @@
 <svelte:head>
   <title>{t('portfolio_title')} — {t('site_name')}</title>
   <meta name="description" content={t('portfolio_description')} />
+  <link rel="canonical" href="/portfolio" />
+  <meta property="og:title" content={t('portfolio_title')} />
+  <meta property="og:description" content={t('portfolio_description')} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={t('portfolio_title')} />
 </svelte:head>
 
 <section class="portfolio-hero">

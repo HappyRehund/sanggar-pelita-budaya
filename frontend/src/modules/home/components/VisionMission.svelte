@@ -1,10 +1,22 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { Eye, Target } from '@lucide/svelte';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
   import { t } from '$lib/i18n/index.svelte';
+  import { revealOnScroll, staggerReveal } from '$lib/utils';
+
+  let sectionEl = $state<HTMLElement | null>(null);
+
+  onMount(() => {
+    if (sectionEl) {
+      const cleanup1 = revealOnScroll(sectionEl, { y: 30, duration: 0.6 });
+      const cleanup2 = staggerReveal(sectionEl, '.vm-card', { stagger: 0.15, duration: 0.5 });
+      return () => { cleanup1(); cleanup2(); };
+    }
+  });
 </script>
 
-<section class="section section--alt vision-mission">
+<section bind:this={sectionEl} class="section section--alt vision-mission">
   <div class="container">
     <SectionTitle eyebrow={t('vision_mission_eyebrow')} title={t('vision_mission_title')} align="center" />
 

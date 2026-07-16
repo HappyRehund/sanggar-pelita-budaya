@@ -1,8 +1,15 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { imageUrl } from '$lib/utils';
+  import { imageUrl, revealOnScroll } from '$lib/utils';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
   import { ChevronLeft, ChevronRight } from '@lucide/svelte';
+
+  let sectionEl = $state<HTMLElement | null>(null);
+
+  onMount(() => {
+    if (sectionEl) return revealOnScroll(sectionEl, { y: 30, duration: 0.6 });
+  });
 
   const services = [
     { img: 'dance-performance', title: t('service_dance_performance_title'), desc: t('service_dance_performance_desc') },
@@ -25,7 +32,7 @@
   }
 </script>
 
-<section class="section section--dark services">
+<section bind:this={sectionEl} class="section section--dark services">
   <div class="container">
     <SectionTitle eyebrow={t('services_eyebrow')} title={t('services_title')} description={t('services_description')} align="center" variant="light" />
   </div>
