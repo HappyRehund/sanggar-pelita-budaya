@@ -12,6 +12,9 @@ type RoutePattern = {
 
 function compile(path: string): RoutePattern {
   const keys: string[] = [];
+  if (path === '*') {
+    return { pattern: path, regex: /^.*$/, keys };
+  }
   const regex = new RegExp(
     '^' +
       path
