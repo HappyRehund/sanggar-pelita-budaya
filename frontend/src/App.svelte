@@ -11,6 +11,7 @@
   import './assets/styles/global.css';
 
   import PublicLayout from './layouts/PublicLayout.svelte';
+  import AdminLayout from './layouts/AdminLayout.svelte';
   import Toast from '$lib/components/Toast.svelte';
 
   import Home from './routes/Home.svelte';
@@ -20,7 +21,12 @@
   import PortfolioDetailPage from '$modules/portfolio/pages/PortfolioDetailPage.svelte';
   import ContactPage from '$modules/contact/pages/ContactPage.svelte';
   import Login from './routes/admin/Login.svelte';
-  import Admin from './routes/admin/Admin.svelte';
+  import Dashboard from '$modules/admin/pages/Dashboard.svelte';
+  import PortfolioAdmin from '$modules/admin/pages/PortfolioAdmin.svelte';
+  import OrganizationAdmin from '$modules/admin/pages/OrganizationAdmin.svelte';
+  import HeroAdmin from '$modules/admin/pages/HeroAdmin.svelte';
+  import FooterAdmin from '$modules/admin/pages/FooterAdmin.svelte';
+  import SettingsAdmin from '$modules/admin/pages/SettingsAdmin.svelte';
   import NotFound from './routes/NotFound.svelte';
 
   defineRoute('/');
@@ -31,6 +37,11 @@
   defineRoute('/contact');
   defineRoute('/admin/login');
   defineRoute('/admin');
+  defineRoute('/admin/portfolio');
+  defineRoute('/admin/organization');
+  defineRoute('/admin/hero');
+  defineRoute('/admin/footer');
+  defineRoute('/admin/settings');
   defineRoute('*');
 
   let appContainer: HTMLElement;
@@ -69,7 +80,12 @@
     if (m.path === '/portfolio/:slug') return { component: PortfolioDetailPage, key: 'portfolio-detail' };
     if (m.path === '/contact') return { component: ContactPage, key: 'contact' };
     if (m.path === '/admin/login') return { component: Login, key: 'admin-login' };
-    if (m.path === '/admin') return { component: Admin, key: 'admin' };
+    if (m.path === '/admin') return { component: Dashboard, key: 'admin-dashboard' };
+    if (m.path === '/admin/portfolio') return { component: PortfolioAdmin, key: 'admin-portfolio' };
+    if (m.path === '/admin/organization') return { component: OrganizationAdmin, key: 'admin-organization' };
+    if (m.path === '/admin/hero') return { component: HeroAdmin, key: 'admin-hero' };
+    if (m.path === '/admin/footer') return { component: FooterAdmin, key: 'admin-footer' };
+    if (m.path === '/admin/settings') return { component: SettingsAdmin, key: 'admin-settings' };
     return { component: NotFound, key: 'not-found' };
   }
 
@@ -82,8 +98,9 @@
     !isAdminProtected || (authStore.initialized && authStore.isAuthenticated)
   );
 
-  const isAdminRoute = $derived(router.current.path.startsWith('/admin'));
+  const isAdminRoute = $derived(router.current.path.startsWith('/admin') && router.current.path !== '/admin/login');
   const usePublicLayout = $derived(!isAdminRoute && showPage);
+  const useAdminLayout = $derived(isAdminRoute && showPage);
 
   $effect(() => {
     if (router.current.path.startsWith('/admin') && !authStore.initialized) {
@@ -122,6 +139,14 @@
           </div>
         {/key}
       </PublicLayout>
+    {:else if useAdminLayout}
+      <AdminLayout>
+        {#key page.key}
+          <div bind:this={pageContainer}>
+            <page.component />
+          </div>
+        {/key}
+      </AdminLayout>
     {:else}
       {#key page.key}
         <div bind:this={pageContainer}>
