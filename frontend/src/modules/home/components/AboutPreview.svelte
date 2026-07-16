@@ -70,7 +70,7 @@
     line-height: var(--lh-relaxed);
   }
 
-  .about-preview__cta-button {
+  .about-preview__content :global(.about-preview__cta-button) {
     align-self: flex-start;
     margin-top: var(--sp-2);
   }

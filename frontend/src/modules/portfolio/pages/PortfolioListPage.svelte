@@ -213,7 +213,7 @@
     min-width: 12rem;
   }
 
-  .portfolio-search__icon {
+  .portfolio-search :global(.portfolio-search__icon) {
     position: absolute;
     left: var(--sp-3);
     top: 50%;

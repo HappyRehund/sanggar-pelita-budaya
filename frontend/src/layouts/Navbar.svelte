@@ -258,7 +258,7 @@
     border-radius: var(--radius-md);
   }
 
-  .mobile-nav__cta-button {
+  .mobile-nav :global(.mobile-nav__cta-button) {
     margin-top: var(--sp-3);
   }
 </style>
