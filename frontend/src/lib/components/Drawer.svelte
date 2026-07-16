@@ -44,6 +44,7 @@
       tabindex="-1"
       aria-label={title ?? 'Drawer'}
       onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.stopPropagation()}
     >
       {#if title}
         <div class="drawer__header">

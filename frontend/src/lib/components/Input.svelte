@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
 
   interface Props extends HTMLInputAttributes {
@@ -17,13 +18,13 @@
     ...rest
   }: Props = $props();
 
-  let fieldValue = $state(value);
+  let fieldValue = $state(untrack(() => value));
 
   $effect(() => {
     fieldValue = value;
   });
 
-  const fieldId = rest.id ?? `input-${Math.random().toString(36).slice(2, 9)}`;
+  const fieldId = untrack(() => rest.id) ?? `input-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
 <div class="field {className}">
