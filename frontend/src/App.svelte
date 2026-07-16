@@ -21,12 +21,6 @@
   import PortfolioDetailPage from '$modules/portfolio/pages/PortfolioDetailPage.svelte';
   import ContactPage from '$modules/contact/pages/ContactPage.svelte';
   import Login from './routes/admin/Login.svelte';
-  import Dashboard from '$modules/admin/pages/Dashboard.svelte';
-  import PortfolioAdmin from '$modules/admin/pages/PortfolioAdmin.svelte';
-  import OrganizationAdmin from '$modules/admin/pages/OrganizationAdmin.svelte';
-  import HeroAdmin from '$modules/admin/pages/HeroAdmin.svelte';
-  import FooterAdmin from '$modules/admin/pages/FooterAdmin.svelte';
-  import SettingsAdmin from '$modules/admin/pages/SettingsAdmin.svelte';
   import NotFound from './routes/NotFound.svelte';
 
   defineRoute('/');
@@ -46,6 +40,8 @@
 
   let appContainer: HTMLElement;
   let pageContainer = $state<HTMLElement | null>(null);
+
+  let lazyComponent = $state<any>(null);
 
   onMount(() => {
     router.init();
@@ -71,7 +67,19 @@
     );
   });
 
-  function getPageFromPath() {
+  async function loadAdminPage(path: string): Promise<any> {
+    switch (path) {
+      case '/admin': return (await import('$modules/admin/pages/Dashboard.svelte')).default;
+      case '/admin/portfolio': return (await import('$modules/admin/pages/PortfolioAdmin.svelte')).default;
+      case '/admin/organization': return (await import('$modules/admin/pages/OrganizationAdmin.svelte')).default;
+      case '/admin/hero': return (await import('$modules/admin/pages/HeroAdmin.svelte')).default;
+      case '/admin/footer': return (await import('$modules/admin/pages/FooterAdmin.svelte')).default;
+      case '/admin/settings': return (await import('$modules/admin/pages/SettingsAdmin.svelte')).default;
+      default: return NotFound;
+    }
+  }
+
+  function getStaticPage() {
     const m = router.current;
     if (m.path === '/') return { component: Home, key: 'home' };
     if (m.path === '/about') return { component: AboutPage, key: 'about' };
@@ -80,16 +88,26 @@
     if (m.path === '/portfolio/:slug') return { component: PortfolioDetailPage, key: 'portfolio-detail' };
     if (m.path === '/contact') return { component: ContactPage, key: 'contact' };
     if (m.path === '/admin/login') return { component: Login, key: 'admin-login' };
-    if (m.path === '/admin') return { component: Dashboard, key: 'admin-dashboard' };
-    if (m.path === '/admin/portfolio') return { component: PortfolioAdmin, key: 'admin-portfolio' };
-    if (m.path === '/admin/organization') return { component: OrganizationAdmin, key: 'admin-organization' };
-    if (m.path === '/admin/hero') return { component: HeroAdmin, key: 'admin-hero' };
-    if (m.path === '/admin/footer') return { component: FooterAdmin, key: 'admin-footer' };
-    if (m.path === '/admin/settings') return { component: SettingsAdmin, key: 'admin-settings' };
-    return { component: NotFound, key: 'not-found' };
+    return null;
   }
 
-  const page = $derived(getPageFromPath());
+  const staticPage = $derived(getStaticPage());
+
+  $effect(() => {
+    if (staticPage) {
+      lazyComponent = null;
+      return;
+    }
+    const path = router.current.path;
+    if (path.startsWith('/admin') && path !== '/admin/login') {
+      lazyComponent = null;
+      loadAdminPage(path).then((comp) => {
+        lazyComponent = comp;
+      });
+    }
+  });
+
+  const page = $derived(staticPage ?? (lazyComponent ? { component: lazyComponent, key: router.current.path } : null));
 
   const isAdminProtected = $derived(
     router.current.path.startsWith('/admin') && router.current.path !== '/admin/login'
@@ -131,30 +149,47 @@
 
 <div bind:this={appContainer}>
   {#if showPage}
-    {#if usePublicLayout}
-      <PublicLayout>
+    {#if page}
+      {#if usePublicLayout}
+        <PublicLayout>
+          {#key page.key}
+            <div bind:this={pageContainer}>
+              <page.component />
+            </div>
+          {/key}
+        </PublicLayout>
+      {:else if useAdminLayout}
+        <AdminLayout>
+          {#key page.key}
+            <div bind:this={pageContainer}>
+              <page.component />
+            </div>
+          {/key}
+        </AdminLayout>
+      {:else}
         {#key page.key}
           <div bind:this={pageContainer}>
             <page.component />
           </div>
         {/key}
-      </PublicLayout>
-    {:else if useAdminLayout}
-      <AdminLayout>
-        {#key page.key}
-          <div bind:this={pageContainer}>
-            <page.component />
-          </div>
-        {/key}
-      </AdminLayout>
+      {/if}
     {:else}
-      {#key page.key}
-        <div bind:this={pageContainer}>
-          <page.component />
+      <div class="admin-loading" style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+        <div style="display:flex;gap:0.5rem">
+          <span style="width:0.5rem;height:0.5rem;border-radius:50%;background:var(--color-accent);animation:bounce 0.6s infinite alternate"></span>
+          <span style="width:0.5rem;height:0.5rem;border-radius:50%;background:var(--color-accent);animation:bounce 0.6s 0.2s infinite alternate"></span>
+          <span style="width:0.5rem;height:0.5rem;border-radius:50%;background:var(--color-accent);animation:bounce 0.6s 0.4s infinite alternate"></span>
         </div>
-      {/key}
+      </div>
     {/if}
   {/if}
 </div>
 
 <Toast />
+
+<style>
+  @keyframes bounce {
+    from { opacity: 0.3; transform: translateY(0); }
+    to { opacity: 1; transform: translateY(-8px); }
+  }
+</style>

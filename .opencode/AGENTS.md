@@ -6,111 +6,107 @@ This document orients future agents (human or AI) working on this codebase. It c
 
 ## What This Project Is
 
-A website for "Sanggar Pelita Budaya" — a cultural studio/gathering. Two audiences:
+A cultural organization website for "Sanggar Pelita Budaya" — an Indonesian traditional art studio. The site has two main areas:
 
-- **Public visitors** — see a plain landing page with a language toggle (EN/ID)
-- **Admins** — login to a simple admin page that shows "(this is admin)"
+- **Public website** — Home, About, Organization, Portfolio (list + detail), Contact, 404 — with museum-inspired editorial design, scroll-reveal animations, and full SEO metadata
+- **CMS** — Admin dashboard with Portfolio CRUD (incl. RichTextEditor + image upload + gallery management), Organization member management, Hero/Footer/Settings editors
 
-Built as **Svelte SPA + PHP REST API + SQLite**, target deployment to **shared hosting cPanel** (Rumahweb). No Node.js in production.
-
-The frontend is intentionally plain — a starter scaffold with GSAP fade-in, bilingual i18n, and admin login. The backend only has health check + auth endpoints.
+Built as **Svelte 5 SPA + PHP REST API + SQLite**, target deployment to **shared hosting cPanel** (Rumahweb). No Node.js in production.
 
 ---
 
 ## Core Architectural Decisions
 
 ### 1. **Frontend Svelte SPA (not SvelteKit)**
-- **Why SPA**: Simplest possible build — output is HTML + CSS + JS, no SSR runtime needed
-- **Why not SvelteKit**: SvelteKit adds complexity (adapter-node, SSR, etc.). For shared hosting, plain Vite + Svelte is ideal
-- **Tradeoff**: Initial page load fetches the SPA shell + JS bundle. SEO penalty but acceptable for this use case
+- Plain Vite + Svelte 5 + TypeScript. Output is static HTML + CSS + JS.
+- Custom History API router (`$lib/router.svelte.ts`) with `:param` support.
+- Admin pages are **code-split** via dynamic `import()` — only loaded when admin route is accessed.
 
 ### 2. **Native PHP, no framework**
-- **Why**: Deployment simplicity. No Composer install, no `vendor/` to upload
-- **Tradeoff**: Reinventing some wheels (routing, middleware), but minimal PHP files — manageable
-- **Convention**: All endpoints return JSON `{success, message, data}` or `{success: false, message, errors}`
+- Layered architecture: Controllers → Services → Repositories → SQLite.
+- No Composer; autoloader in `helpers.php` maps class suffix to directory.
+- All endpoints return JSON `{success, message, data}` or `{success: false, message, errors}`.
 
 ### 3. **SQLite, not MySQL**
-- **Why**: Single file, no server to configure, perfect for shared hosting
-- **Tradeoff**: Concurrent writes limited, but with WAL mode + busy_timeout 5s, sufficient for ~100 concurrent users
-- **Where DB lives**: `site/data/sanggar.sqlite` — **outside Document Root** so it can't be downloaded via web
+- Single file at `site/data/sanggar.sqlite` (outside Document Root).
+- WAL mode + busy_timeout 5s for concurrent access.
+- 7 tables: users, portfolio, portfolio_media, organization_members, hero, footer, settings.
 
 ### 4. **CSRF via double-submit token**
-- **Why**: Standard defense against CSRF for cookie-based session auth
-- **How**: `GET /api/csrf-token` returns token, client sends in `X-CSRF-Token` header on every POST/PUT/DELETE
-- **Frontend pattern**: Auto-fetch + cache in `src/lib/api/client.ts`, retry on 401
+- `GET /api/csrf-token` returns token, client sends in `X-CSRF-Token` header on non-GET requests.
+- Frontend `client.ts` auto-fetches + caches token, clears on 401.
 
 ### 5. **Session cookie with SameSite=Lax**
-- **Why**: Native browser protection against CSRF (Lax = cookies sent on top-level navigations, not on cross-site POSTs)
-- **Why not JWT**: JWT adds complexity (refresh tokens, storage). For shared hosting with PHP sessions, native sessions are simpler and equally secure
+- Native PHP sessions, `session_regenerate_id` on login.
+- Session keys: `admin_logged_in`, `admin_user_id`, `admin_username`, `admin_full_name`.
 
-### 6. **i18n custom (not Paraglide)**
-- **Why not Paraglide**: Paraglide v2 had a known issue where the SDK couldn't resolve the message-format plugin path. Custom solution is simpler.
-- **Custom solution**: Bilingual (en, id) dictionaries in `src/lib/i18n/{en,id}.json`, loaded by simple `t(key, vars?)` function
-- **Base language**: `en` (English) — reference structure for integrity/validation checks
-- **Reactivity**: `$state`-based store, language switchable via `langStore.toggle()` or `i18n.set('id')`
-- **Tradeoff**: No compile-time message extraction, but build is simpler
+### 6. **i18n custom (EN/ID bilingual)**
+- Dictionaries in `src/lib/i18n/{en,id}.json` (297 keys each).
+- `t(key, vars?)` function + `i18n` store with persistent localStorage.
+- Both files must be updated together (AGENTS.md pattern #2).
 
-### 7. **Design: System fonts, minimal styling**
-- **Why**: No external font requests, fast load, clean starter aesthetic
-- **Tokens**: System font stack (San Francisco, Segoe UI, Roboto, etc.)
-- **Palette**: Dark surface (--color-bg: #1a1a2e) + accent (--color-accent: #e8a87c)
-- **Animations**: GSAP fade-in on app mount (`gsap.fromTo` with `power2.out` easing)
+### 7. **Design: Cultural museum-inspired**
+- Cormorant Garamond (serif headings), Inter (sans body), Great Vibes (script accent).
+- Color palette: deep red (#9e2a2b), warm gold (#c9a227), ivory (#fbf7f0), cream, dark brown.
+- Spacing scale 4–128px, radii 12–32px, soft shadows.
+- GSAP scroll-reveal animations via `lib/utils/animations.ts`.
 
-### 8. **Sync script preserves user uploads**
-- **The `pnpm run deploy:sync` script wipes `site/public/assets/` and copies from `dist/`** — this is intentional to avoid stale JS chunks
-- **User uploads** (`site/public/uploads/`) are **never** touched by sync or build
+### 8. **Feature-based module architecture**
+- `modules/home/`, `modules/about/`, `modules/organization/`, `modules/portfolio/`, `modules/contact/`, `modules/admin/`
+- Each module owns its components + pages.
+- `lib/components/` contains only cross-module reusable components (24 components).
+- `layouts/` contains PublicLayout, AdminLayout, Navbar, Footer.
 
-### 9. **Deployment scripts (two modes)**
-- **`scripts/package-deploy.sh`** — Full deployment ZIP of `site/` (excludes SQLite DB, uploads, PHP backups). Use for initial deploy or when backend code changes.
-- **`scripts/package-assets.sh`** — UI-only ZIP of `site/public/assets/` (+ optional `index.html` via `--with-index` flag). Strips `site/public/` prefix so files extract directly into `public_html/`. Use when only the frontend changes. Output goes to `deployment/` folder.
+### 9. **Image upload flow**
+- Files stored in `site/public/uploads/{hero,portfolio,organization,settings,documents}/`.
+- Unique filenames: `YYYYMMDD_<8hex>.<ext>`.
+- SQLite stores metadata only (filename, mime, dimensions, size, alt_text, sort_order).
+- Deleting a portfolio unlinks all associated files (orphan cleanup in transaction).
 
-### 10. **`overflow-x: hidden` on body**
-- Added to `tokens.css` body rule to prevent horizontal scroll artifacts on mobile.
+### 10. **Code-splitting for performance**
+- Public pages are statically imported (critical path).
+- Admin pages use dynamic `import()` — loaded on-demand when admin route is accessed.
+- Vite manualChunks: `vendor` (svelte+gsap), `sanitizer` (dompurify+marked).
 
 ---
 
 ## File-by-File Mental Model
 
-### Server (PHP API + SPA)
+### Backend (PHP API)
 
 | File | Mental model |
 |---|---|
-| `site/public/api/index.php` | Front controller. Parses `PATH_INFO`, dispatches to handler. The ONLY entry point for API. |
-| `site/public/api/routes.php` | Route table. `route('GET', '/api/...', 'handler_name')`. Match via regex with `{id}` capture groups. |
-| `site/public/api/.htaccess` | Rewrites `/api/*` → `index.php/$1`. |
-| `site/config/app.php` | Constants: paths, env flags, CORS origins. Loaded everywhere. |
-| `site/config/database.php` | PDO singleton (static), PRAGMA settings, `initSchema()` (CREATE TABLE users), `seedDatabase()` (idempotent — admin user only), `bootstrapDatabase()`. |
-| `site/config/response.php` | `success_response($data)`, `error_response($msg, $status, $errors)`. Always JSON. |
-| `site/public/api/middleware/auth.php` | `require_auth()` — abort 401 if no session. `is_authenticated()` getter. |
-| `site/public/api/middleware/csrf.php` | `require_csrf()` — abort 403 if no token match. `generate_csrf_token()` (session-persistent). |
-| `site/public/api/helpers.php` | `parse_request_body()` — for PUT multipart, PHP doesn't auto-parse `$_POST` so we read `php://input`. |
-| `site/public/api/handlers/csrf.php` | `get_csrf_token()` — GET /api/csrf-token. |
-| `site/public/api/handlers/auth.php` | `login_handler()`, `logout_handler()`, `me_handler()` — session-based auth. |
-| `site/public/api/handlers/admin_index.php` | `admin_index_handler()` — GET /api/admin, returns `{message: "this is admin"}`. |
-| `site/seed.php` | CLI seeder. `php seed.php` is idempotent — runs on Docker container boot. Seeds admin user only. |
-| `docker/Dockerfile` | `php:8.3-apache` + `pdo_sqlite` + `mod_rewrite` + custom `apache.conf`. |
-| `docker/entrypoint.sh` | `chown data/uploads` → `php seed.php` → `apache2-foreground`. |
-| `docker/apache.conf` | `<Directory>` rules: deny `data/`, allow `public/`, `Options -Indexes` for uploads. |
+| `site/public/api/index.php` | Front controller. Session, multipart, CORS, OPTIONS, bootstrap DB, dispatch. |
+| `site/public/api/routes.php` | Route table + controller instantiation. All routes registered here. |
+| `site/public/api/helpers.php` | Autoloader, `get_json_input()`, `get_uploaded_file()`, multipart parsing. |
+| `site/public/api/helpers/formatters.php` | `formatPortfolioRow()`, `formatMediaRow()`, `formatOrganizationRow()`, `buildPaginationMeta()`. |
+| `site/public/api/controllers/` | Thin: AuthController, CsrfController, PortfolioController, OrganizationController, HeroController, FooterController, SettingsController, DashboardController. |
+| `site/public/api/services/` | Business logic: AuthService, ValidationService, UploadService, PortfolioService, PortfolioMediaService, OrganizationService, HeroService, FooterService, SettingsService, DashboardService. |
+| `site/public/api/repositories/` | PDO-only: User, Portfolio, PortfolioMedia, Organization, Hero, Footer, Settings repositories. |
+| `site/public/api/middleware/` | `auth.php` (require_auth, is_authenticated, get_current_*), `csrf.php` (generate, validate, require). |
+| `site/config/app.php` | Constants: paths, CORS, upload limits, per-page limits. |
+| `site/config/database.php` | PDO singleton, `initSchema()` (7 tables + indexes + FKs), `migrateLegacyUsersTable()`, seed functions. |
+| `site/config/response.php` | `success_response()`, `error_response()`, `validation_error_response()`, `not_found_response()`, `unauthorized_response()`, `forbidden_response()`. |
+| `site/seed.php` | CLI seeder: admin user + default hero/footer/settings. Idempotent. |
 
 ### Frontend
 
 | File | Mental model |
 |---|---|
-| `frontend/src/App.svelte` | Router shell. Defines routes, mounts correct page. GATES admin pages until auth verified. GSAP fade-in on mount. |
-| `frontend/src/main.ts` | Mounts App. |
-| `frontend/src/lib/api/client.ts` | `api` object: `get`, `post`, `put`, `delete`. Auto-fetches CSRF token, attaches as header. Throws `ApiError` on non-2xx. CSRF cleared on 401. |
-| `frontend/src/lib/api/index.ts` | Domain modules: `authApi` (login, logout, me), `healthApi` (check). |
-| `frontend/src/lib/stores/auth.svelte.ts` | Auth state with `$state`. `init()` checks `/api/auth/me`, `login()`, `logout()`. |
-| `frontend/src/lib/stores/lang.svelte.ts` | Thin proxy to i18n store. `langStore.toggle()` delegates to `i18n.toggle()`. |
-| `frontend/src/lib/router.svelte.ts` | History API SPA router. `defineRoute()` + `matchRoute()` + `navigate()` + `router.go()`. Intercepts `<a>` clicks for SPA navigation. |
-| `frontend/src/lib/i18n/index.svelte.ts` | `t(key, vars?)` function + `i18n` store with persistent localStorage. Supports en, id. Base: en. |
-| `frontend/src/lib/types/index.ts` | TypeScript types: `ApiResponse`, `User`, `Lang`. |
-| `frontend/src/routes/Home.svelte` | Plain landing page with header (lang toggle + admin link), hello message, footer. |
-| `frontend/src/routes/admin/Login.svelte` | Login form. Uses `value=` + `oninput` (NOT `bind:value`). |
-| `frontend/src/routes/admin/Admin.svelte` | Simple admin page showing "(this is admin)" + logout link. |
-| `frontend/src/routes/NotFound.svelte` | 404 page. |
-| `frontend/src/assets/styles/tokens.css` | Design system: colors, fonts, spacing. CSS variables only. |
-| `frontend/src/assets/styles/public.css` | All page styles (header, main, footer, login, admin, not-found). |
+| `frontend/src/App.svelte` | Router shell. 3-way layout: PublicLayout (public), AdminLayout (admin), bare (login). Static imports for public pages, dynamic `import()` for admin pages. GSAP page transitions. |
+| `frontend/src/lib/router.svelte.ts` | History API SPA router. `defineRoute()` + `matchRoute()` + `navigate()` + `router.go()`. Supports `:param` capture. |
+| `frontend/src/lib/api/client.ts` | `api` object: get/post/put/delete. Auto CSRF token, `ApiError` on non-2xx. |
+| `frontend/src/lib/api/endpoints.ts` | Centralized API path constants. |
+| `frontend/src/lib/api/index.ts` | Domain modules: authApi, healthApi, portfolioApi, organizationApi, heroApi, footerApi, settingsApi, dashboardApi. |
+| `frontend/src/lib/stores/` | auth, lang, notification (toast), loading, portfolio, organization, settings. |
+| `frontend/src/lib/hooks/` | usePagination, useSearch, useDebounce, useIntersection, useLightbox. |
+| `frontend/src/lib/components/` | 24 reusable components: Button, Badge, Card, Input, Textarea, Select, Checkbox, Radio, Modal, Drawer, Accordion, Carousel, Toast, Pagination, Lightbox, Tabs, Dropdown, Skeleton, EmptyState, Spinner, SectionTitle, Image, Icon, FileUpload, RichTextEditor. |
+| `frontend/src/lib/utils/` | dateFormatter, slugify, imageUrl, fileSizeFormatter, debounce, animations (GSAP reveal/parallax/stagger). |
+| `frontend/src/lib/constants/` | routes, categories, uploadLimits, fileTypes, languages. |
+| `frontend/src/lib/types/index.ts` | All entity types: User, Portfolio, PortfolioMedia, OrganizationMember, Hero, Footer, Settings, DashboardData, PaginationMeta, PaginatedResponse, PortfolioListQuery, etc. |
+| `frontend/src/layouts/` | PublicLayout (Navbar + slot + Footer), AdminLayout (sidebar + topbar + slot), Navbar, Footer. |
+| `frontend/src/modules/` | Feature modules: home (8 section components + HomePage), about, organization, portfolio (list + detail), contact, admin (Dashboard, PortfolioAdmin, OrganizationAdmin, HeroAdmin, FooterAdmin, SettingsAdmin, ConfirmDialog). |
+| `frontend/src/routes/` | Thin route assemblers: Home, NotFound, admin/Login. |
 
 ---
 
@@ -118,29 +114,37 @@ The frontend is intentionally plain — a starter scaffold with GSAP fade-in, bi
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/api/health` | No | Health check — returns status, time, env, DB tables |
-| GET | `/api/info` | No | App info — name, version, PHP version |
-| GET | `/api/csrf-token` | No | Get CSRF token (session-persistent) |
-| POST | `/api/auth/login` | CSRF | Login with username + password → sets session |
-| POST | `/api/auth/logout` | CSRF | Destroy session |
-| GET | `/api/auth/me` | Session | Get current user info |
-| GET | `/api/admin` | Session | Admin endpoint — returns `{message: "this is admin"}` |
-
----
-
-## Common Tasks
-
-### Add a new API endpoint
-1. **Server (PHP)** — add function in appropriate handler file (`site/public/api/handlers/*.php`)
-2. **Routes** — add `route('GET', '/api/...', 'handler_name')` in `routes.php`
-3. **Frontend API** — add method in `frontend/src/lib/api/index.ts`
-4. **Frontend page** — call from your Svelte component, handle loading/error states
-
-### Add a new public page
-1. **Frontend** — create page in `frontend/src/routes/MyPage.svelte`
-2. **Register route** — in `App.svelte`, add `defineRoute('/mypage')` and add case in `getPageFromPath()`
-3. **i18n** — add new keys to `frontend/src/lib/i18n/{en,id}.json` (BOTH files)
-4. **Build** — `pnpm build && pnpm run deploy:sync`
+| GET | `/api/health` | No | Health check |
+| GET | `/api/info` | No | App info |
+| GET | `/api/csrf-token` | No | Get CSRF token |
+| POST | `/api/login` | CSRF | Login |
+| POST | `/api/logout` | CSRF | Logout |
+| GET | `/api/session` | Session | Current user |
+| GET | `/api/portfolio` | No | List (pagination, filters, search, sort) |
+| GET | `/api/portfolio/featured` | No | Featured portfolio |
+| GET | `/api/portfolio/gallery` | No | All gallery images |
+| GET | `/api/portfolio/slug/{slug}` | No | Get by slug (with media + related) |
+| GET | `/api/portfolio/{id}` | No | Get by ID |
+| POST | `/api/portfolio` | Auth+CSRF | Create |
+| PUT | `/api/portfolio/{id}` | Auth+CSRF | Update |
+| DELETE | `/api/portfolio/{id}` | Auth+CSRF | Delete (+ orphan cleanup) |
+| POST | `/api/portfolio/{id}/media` | Auth+CSRF | Upload media |
+| DELETE | `/api/portfolio/media/{id}` | Auth+CSRF | Delete media |
+| PUT | `/api/portfolio/media/reorder` | Auth+CSRF | Reorder gallery |
+| GET | `/api/organization` | No | List members |
+| GET | `/api/organization/tree` | No | Hierarchy tree |
+| POST | `/api/organization` | Auth+CSRF | Create member |
+| PUT | `/api/organization/{id}` | Auth+CSRF | Update member |
+| DELETE | `/api/organization/{id}` | Auth+CSRF | Delete member |
+| PUT | `/api/organization/reorder` | Auth+CSRF | Reorder members |
+| POST | `/api/organization/{id}/photo` | Auth+CSRF | Upload photo |
+| GET | `/api/hero` | No | Get hero |
+| PUT | `/api/hero` | Auth+CSRF | Update hero |
+| GET | `/api/footer` | No | Get footer |
+| PUT | `/api/footer` | Auth+CSRF | Update footer |
+| GET | `/api/settings` | No | Get settings |
+| PUT | `/api/settings` | Auth+CSRF | Update settings |
+| GET | `/api/dashboard` | Auth | Dashboard stats + recent uploads |
 
 ---
 
@@ -148,75 +152,26 @@ The frontend is intentionally plain — a starter scaffold with GSAP fade-in, bi
 
 ### 1. **Form components use `value` + `oninput`, NOT `bind:value`**
 ```svelte
-<!-- CORRECT -->
 <input value={username} oninput={(e) => (username = e.target.value)} />
-
-<!-- WRONG — silently fails when parent value is undefined -->
-<input bind:value={username} />
 ```
-Reason: `$bindable` causes `props_invalid_value` when parent value is undefined.
 
 ### 2. **Bilingual i18n — always add to BOTH files**
-When adding a new translation key, update `en.json` AND `id.json`:
-```json
-// en.json
-"my_key": "My text"
-// id.json
-"my_key": "Teks saya"
-```
-The `t()` function falls back to the key name if missing.
+Update `en.json` AND `id.json` together.
 
-### 3. **Language switch in UI**
-```svelte
-<button onclick={() => langStore.toggle()}>
-  {t('lang_toggle')}
-</button>
-```
-`langStore` proxies to `i18n.toggle()` which updates `document.documentElement.lang` and persists to localStorage.
+### 3. **Admin route gating in App.svelte**
+`showPage` derived prevents onMount race. Admin pages use dynamic `import()`.
 
-### 4. **Admin route gating in App.svelte**
-```svelte
-const isAdminProtected = $derived(
-  router.current.path.startsWith('/admin') && router.current.path !== '/admin/login'
-);
-const showPage = $derived(
-  !isAdminProtected || (authStore.initialized && authStore.isAuthenticated)
-);
-```
-This prevents race conditions where child `onMount` fires before auth check completes.
+### 4. **CSRF in client.ts**
+Token cached, auto-attached to non-GET, cleared on 401.
 
-### 5. **CSRF in client.ts**
-- Token cached after first `GET /api/csrf-token`
-- Auto-attached to all non-GET requests
-- Cleared on 401 (forces re-fetch)
-- Server validates with `hash_equals()` (timing-safe)
+### 5. **Sync script preserves uploads**
+`pnpm run deploy:sync` wipes `assets/` but never touches `uploads/` or `data/`.
 
-### 6. **Sync script preserves uploads**
-`pnpm run deploy:sync`:
-- Wipes `site/public/assets/` and copies `dist/assets/`
-- Copies `dist/index.html` → `site/public/index.html`
-- **Never touches** `site/public/uploads/`
-- **Never touches** `site/data/sanggar.sqlite`
+### 6. **Prepared statements only**
+All repositories use PDO prepared statements. Never concatenate SQL.
 
-### 7. **Two deployment ZIP modes**
-- **Full deploy** (`scripts/package-deploy.sh`): ZIPs entire `site/` excluding SQLite DB, uploads, PHP backups.
-- **UI-only deploy** (`scripts/package-assets.sh`): ZIPs only `site/public/assets/` (+ optional `index.html`). Output to `deployment/` folder.
-- Both scripts are idempotent and print sanity-check results.
-
----
-
-## Known Issues & TODOs
-
-### TODO (not yet implemented)
-- [ ] **Change password UI** — admin still uses `admin/admin123`. Manual via SQLite:
-  ```bash
-  php -r "echo password_hash('NEW_PASSWORD', PASSWORD_DEFAULT);" > /tmp/hash
-  sqlite3 site/data/sanggar.sqlite "UPDATE users SET password=$(cat /tmp/hash) WHERE username='admin';"
-  ```
-- [ ] **Rate limiting on login** — currently unlimited attempts. Add token bucket per IP.
-- [ ] **CSRF rotation on login** — current token persists across logins. Best practice: regenerate on auth state change.
-- [ ] **Frontend tests** — no unit/e2e tests.
-- [ ] **Server tests** — no PHP unit tests.
+### 7. **Transactions for multi-step operations**
+Portfolio create/delete, media reorder, organization reorder — all wrapped in transactions with rollback.
 
 ---
 
@@ -224,16 +179,13 @@ This prevents race conditions where child `onMount` fires before auth check comp
 
 ### Local development
 ```bash
-# Server (PHP API + SPA)
-docker compose up -d
-
-# Frontend
-cd frontend && pnpm dev
+docker compose up -d     # Backend (PHP API + SQLite)
+cd frontend && pnpm dev  # Frontend (Vite dev server)
 ```
 
 ### Before commit
 ```bash
-cd frontend && pnpm check
+cd frontend && pnpm check  # svelte-check (0 errors required)
 ```
 
 ### Before deploy

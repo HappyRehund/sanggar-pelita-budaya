@@ -24,7 +24,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['svelte', 'dompurify', 'marked'],
+          vendor: ['svelte', 'gsap'],
+          sanitizer: ['dompurify', 'marked'],
         },
       },
     },
