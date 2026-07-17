@@ -4,52 +4,74 @@
    ============================================================ */
 
 :root {
-  /* ---- Color · Primary ------------------------------------------------ */
-  --color-red: #9e2a2b;            /* Deep traditional red */
-  --color-red-dark: #7a1f20;
-  --color-red-soft: #c44545;
-  --color-gold: #c9a227;           /* Warm gold */
-  --color-gold-dark: #a8851d;
-  --color-gold-soft: #e0c25a;
+  /* ============================================================
+     Brand base colors — the only four source hues.
+     All other colors below are derived by lightening/darkening
+     these. No new hues, no pure #000000, no pure #FFFFFF.
+       Red   #D2001A  (primary / accent)
+       Gold  #FFDE00  (secondary / highlight)
+       Ivory #FFFAE7  (light surface / background)
+       Gray  #EFEFEF  (cool neutral)
+     ============================================================ */
 
-  /* ---- Color · Neutrals ----------------------------------------------- */
-  --color-ivory: #fbf7f0;
-  --color-cream: #f5ede0;
-  --color-beige: #e8dcc8;
-  --color-brown: #3b2a20;          /* Dark brown */
-  --color-brown-light: #5a4636;
+  /* ---- Color · Primary — Red family (derived from #D2001A) ----------- */
+  --color-red:        #D2001A;   /* base */
+  --color-red-dark:   #A30014;   /* darkened ~20% — hover */
+  --color-red-darker: #6E000D;   /* darkened ~45% — pressed */
+  --color-red-soft:   #E86672;   /* lightened, mixed toward ivory */
 
-  --color-white: #ffffff;
-  --color-gray-50: #f8f7f4;
-  --color-gray-100: #f0eeea;
-  --color-gray-200: #e2ddd5;
-  --color-gray-300: #c9c2b6;
-  --color-gray-400: #a89e8e;
-  --color-gray-500: #8a7f6f;
-  --color-gray-600: #6b6256;
-  --color-gray-700: #4d463d;
-  --color-gray-800: #2f2a24;
-  --color-black: #1a1612;          /* Soft black, warm-tinted */
+  /* ---- Color · Secondary — Gold family (derived from #FFDE00) -------- */
+  --color-gold:       #FFDE00;   /* base */
+  --color-gold-dark:  #C9AF00;   /* darkened ~20% — stays yellow */
+  --color-gold-soft:  #FFEA66;   /* lightened, mixed toward ivory */
+
+  /* ---- Color · Neutrals — Ivory family (warm, derived from #FFFAE7) -- */
+  --color-ivory:      #FFFAE7;   /* base — page background */
+  --color-cream:      #FBF3D6;   /* ivory, slightly darkened */
+  --color-beige:      #F2E9C8;   /* ivory, darkened more — borders */
+
+  /* ---- Color · Neutrals — Gray family (cool, derived from #EFEFEF) --- */
+  --color-gray:       #EFEFEF;   /* base */
+  --color-gray-50:    #F4F4F4;   /* lightened, mixed toward ivory */
+  --color-gray-100:   #F4F4F4;
+  --color-gray-200:   #E4E4E4;
+  --color-gray-300:   #D2D2D2;
+  --color-gray-400:   #9A9A9A;
+  --color-gray-500:   #6E6E6E;
+  --color-gray-600:   #4A4A4A;
+  --color-gray-700:   #2E2E2E;
+  --color-gray-800:   #2E2E2E;
+
+  /* ---- Color · Ink — the "black" replacement (very dark red) --------- */
+  --color-ink:        #240003;   /* #D2001A darkened ~85% — text/dark bg */
+  --color-ink-soft:   #3D0008;   /* slightly lighter — secondary dark text */
+
+  /* ---- Legacy aliases (kept so existing components keep working) ----- */
+  --color-brown:       var(--color-ink);        /* alias */
+  --color-brown-light: var(--color-ink-soft);   /* alias */
+  --color-black:       var(--color-ink);        /* alias — soft black, red-tinted */
+  --color-white:       var(--color-ivory);      /* alias — ivory is the lightest allowed */
 
   /* ---- Color · Semantic ----------------------------------------------- */
-  --color-bg: var(--color-ivory);
-  --color-surface: var(--color-white);
-  --color-surface-alt: var(--color-cream);
-  --color-text: var(--color-brown);
-  --color-text-muted: var(--color-gray-600);
-  --color-text-subtle: var(--color-gray-500);
-  --color-border: var(--color-beige);
+  --color-bg:            var(--color-ivory);
+  --color-surface:       var(--color-ivory);     /* was white; ivory is lightest allowed */
+  --color-surface-alt:   var(--color-cream);
+  --color-text:          var(--color-ink);
+  --color-text-muted:    var(--color-gray-600);
+  --color-text-subtle:   var(--color-gray-500);
+  --color-border:        var(--color-beige);
   --color-border-strong: var(--color-gray-300);
 
-  --color-accent: var(--color-red);
-  --color-accent-hover: var(--color-red-dark);
-  --color-highlight: var(--color-gold);
+  --color-accent:        var(--color-red);
+  --color-accent-hover:  var(--color-red-dark);
+  --color-highlight:     var(--color-gold);
   --color-highlight-soft: var(--color-gold-soft);
 
-  --color-success: #4a7c4e;
-  --color-warning: #c9a227;
-  --color-danger: #9e2a2b;
-  --color-info: #4a6b8a;
+  /* Semantic feedback — remapped onto the brand family (no green/blue) */
+  --color-success: var(--color-gold-dark);   /* was green #4a7c4e — banned hue */
+  --color-warning: var(--color-gold-dark);
+  --color-danger:  var(--color-red);
+  --color-info:    var(--color-gray-600);    /* was blue #4a6b8a — banned hue */
 
   /* ---- Typography · Families ----------------------------------------- */
   --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -112,13 +134,13 @@
   --radius-3xl: 32px;    /* hero images */
   --radius-full: 9999px;
 
-  /* ---- Shadows (soft, gentle) ----------------------------------------- */
-  --shadow-xs: 0 1px 2px rgba(59, 42, 32, 0.04);
-  --shadow-sm: 0 2px 8px rgba(59, 42, 32, 0.06);
-  --shadow-md: 0 6px 24px rgba(59, 42, 32, 0.08);
-  --shadow-lg: 0 12px 40px rgba(59, 42, 32, 0.1);
-  --shadow-xl: 0 24px 64px rgba(59, 42, 32, 0.14);
-  --shadow-gold: 0 6px 24px rgba(201, 162, 39, 0.18);
+  /* ---- Shadows (soft, gentle — derived from ink + gold) -------------- */
+  --shadow-xs: 0 1px 2px rgba(36, 0, 3, 0.04);
+  --shadow-sm: 0 2px 8px rgba(36, 0, 3, 0.06);
+  --shadow-md: 0 6px 24px rgba(36, 0, 3, 0.08);
+  --shadow-lg: 0 12px 40px rgba(36, 0, 3, 0.10);
+  --shadow-xl: 0 24px 64px rgba(36, 0, 3, 0.14);
+  --shadow-gold: 0 6px 24px rgba(201, 175, 0, 0.18);
 
   /* ---- Transitions ---------------------------------------------------- */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);   /* premium ease-out */

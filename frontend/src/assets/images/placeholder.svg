@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
-  <rect width="800" height="600" fill="#f0eeea" />
-  <g fill="none" stroke="#c9c2b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(340,220)">
+  <rect width="800" height="600" fill="#F4F4F4" />
+  <g fill="none" stroke="#D2D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(340,220)">
     <rect x="4" y="4" width="112" height="112" rx="8" />
     <path d="M120 116 L160 76 L220 136" />
     <circle cx="170" cy="50" r="14" />
   </g>
-  <text x="400" y="380" font-family="Georgia, serif" font-size="22" fill="#8a7f6f" text-anchor="middle">Image unavailable</text>
+  <text x="400" y="380" font-family="Georgia, serif" font-size="22" fill="#6E6E6E" text-anchor="middle">Image unavailable</text>
 </svg>

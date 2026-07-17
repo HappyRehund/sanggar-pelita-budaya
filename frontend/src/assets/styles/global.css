@@ -102,7 +102,7 @@ h6 {
   font-family: var(--font-serif);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-tight);
-  color: var(--color-brown);
+  color: var(--color-ink);
   letter-spacing: var(--tracking-tight);
 }
 
@@ -133,7 +133,7 @@ p {
 /* ---- Selection ---------------------------------------------------- */
 ::selection {
   background-color: var(--color-gold-soft);
-  color: var(--color-brown);
+  color: var(--color-ink);
 }
 
 /* ============================================================
@@ -170,8 +170,8 @@ p {
 }
 
 .section--dark {
-  background-color: var(--color-brown);
-  color: var(--color-cream);
+  background-color: var(--color-ink);
+  color: var(--color-ivory);
 }
 
 .section--dark h1,
