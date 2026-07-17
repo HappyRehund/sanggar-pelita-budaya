@@ -5,7 +5,7 @@
   import { t } from '$lib/i18n/index.svelte';
   import { uploadUrl, imageUrl } from '$lib/utils';
   import Button from '$lib/components/Button.svelte';
-  import { ArrowRight, Download } from '@lucide/svelte';
+  import { ArrowRight } from '@lucide/svelte';
 
   const hero = $derived(settingsStore.hero);
 
@@ -50,13 +50,9 @@
     <p class="hero__subtitle script">{hero?.subtitle ?? t('hero_subtitle')}</p>
     <p class="hero__desc">{hero?.description ?? t('hero_description')}</p>
     <div class="hero__actions">
-      <Button variant="primary" size="lg" href={hero?.primary_button_url || '/portfolio'}>
+      <Button variant="primary" size="lg" href={hero?.primary_button_url || '/about'}>
         {hero?.primary_button_text || t('hero_cta_primary')}
         <ArrowRight size={18} />
-      </Button>
-      <Button variant="secondary" size="lg" href={hero?.secondary_button_url || '/contact'}>
-        <Download size={16} />
-        {hero?.secondary_button_text || t('hero_cta_secondary')}
       </Button>
     </div>
   </div>

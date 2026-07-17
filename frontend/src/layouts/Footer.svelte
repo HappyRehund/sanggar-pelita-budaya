@@ -14,7 +14,6 @@
     { path: '/about', label: () => t('nav_about') },
     { path: '/organization', label: () => t('nav_organization') },
     { path: '/portfolio', label: () => t('nav_portfolio') },
-    { path: '/contact', label: () => t('nav_contact') },
   ];
 
   const socials = $derived([

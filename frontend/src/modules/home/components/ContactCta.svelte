@@ -4,7 +4,7 @@
   import { imageUrl, revealOnScroll } from '$lib/utils';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import Button from '$lib/components/Button.svelte';
-  import { Mail, MapPin } from '@lucide/svelte';
+  import { MessageCircle, MapPin } from '@lucide/svelte';
 
   let sectionEl = $state<HTMLElement | null>(null);
 
@@ -21,8 +21,8 @@
     <h2 class="contact-cta__title">{t('contact_title')}</h2>
     <p class="contact-cta__desc text-pretty">{t('contact_description')}</p>
     <div class="contact-cta__actions">
-      <Button variant="primary" size="lg" href="/contact">
-        <Mail size={18} />
+      <Button variant="primary" size="lg" href="https://wa.me/62819864460" target="_blank" rel="noopener noreferrer">
+        <MessageCircle size={18} />
         {t('contact_cta_button')}
       </Button>
       {#if mapsUrl}

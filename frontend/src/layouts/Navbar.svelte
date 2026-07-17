@@ -1,12 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Menu, Globe, Download } from '@lucide/svelte';
+  import { Menu, Globe } from '@lucide/svelte';
   import { router } from '$lib/router.svelte';
   import { langStore } from '$lib/stores/lang.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { t } from '$lib/i18n/index.svelte';
   import { uploadUrl } from '$lib/utils';
-  import Button from '$lib/components/Button.svelte';
   import Drawer from '$lib/components/Drawer.svelte';
 
   let scrolled = $state(false);
@@ -17,7 +16,6 @@
     { path: '/about', label: () => t('nav_about') },
     { path: '/organization', label: () => t('nav_organization') },
     { path: '/portfolio', label: () => t('nav_portfolio') },
-    { path: '/contact', label: () => t('nav_contact') },
   ];
 
   const currentPath = $derived(router.current.path);
@@ -79,10 +77,6 @@
         <Globe size={16} />
         <span>{langStore.current === 'en' ? 'ID' : 'EN'}</span>
       </button>
-      <Button variant="secondary" size="sm" href="/contact" class="navbar__cta">
-        <Download size={14} />
-        {t('download_profile')}
-      </Button>
       <button
         class="navbar__burger"
         onclick={() => (mobileOpen = true)}
@@ -112,9 +106,6 @@
       <Globe size={18} />
       <span>{langStore.current === 'en' ? t('lang_name_id') : t('lang_name_en')}</span>
     </button>
-    <Button variant="primary" size="md" full href="/contact" class="mobile-nav__cta-button">
-      {t('download_profile')}
-    </Button>
   </nav>
 </Drawer>
 

@@ -19,7 +19,6 @@
   import OrganizationPage from '$modules/organization/pages/OrganizationPage.svelte';
   import PortfolioListPage from '$modules/portfolio/pages/PortfolioListPage.svelte';
   import PortfolioDetailPage from '$modules/portfolio/pages/PortfolioDetailPage.svelte';
-  import ContactPage from '$modules/contact/pages/ContactPage.svelte';
   import Login from './routes/admin/Login.svelte';
   import NotFound from './routes/NotFound.svelte';
 
@@ -28,7 +27,6 @@
   defineRoute('/organization');
   defineRoute('/portfolio');
   defineRoute('/portfolio/:slug');
-  defineRoute('/contact');
   defineRoute('/admin/login');
   defineRoute('/admin');
   defineRoute('/admin/portfolio');
@@ -86,7 +84,6 @@
     if (m.path === '/organization') return { component: OrganizationPage, key: 'organization' };
     if (m.path === '/portfolio') return { component: PortfolioListPage, key: 'portfolio' };
     if (m.path === '/portfolio/:slug') return { component: PortfolioDetailPage, key: 'portfolio-detail' };
-    if (m.path === '/contact') return { component: ContactPage, key: 'contact' };
     if (m.path === '/admin/login') return { component: Login, key: 'admin-login' };
     return null;
   }

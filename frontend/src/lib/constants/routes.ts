@@ -8,7 +8,6 @@ export const ROUTES = {
   ORGANIZATION: '/organization',
   PORTFOLIO: '/portfolio',
   PORTFOLIO_DETAIL: '/portfolio/:slug',
-  CONTACT: '/contact',
   ADMIN: '/admin',
   ADMIN_LOGIN: '/admin/login',
   ADMIN_DASHBOARD: '/admin/dashboard',
