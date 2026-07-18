@@ -52,14 +52,22 @@
     </nav>
 
     <div class="navbar__actions">
-      <button
-        class="navbar__lang"
-        onclick={() => langStore.toggle()}
-        aria-label="Switch language"
-      >
-        <Globe size={16} />
-        <span>{langStore.current === 'en' ? 'ID' : 'EN'}</span>
-      </button>
+      <div class="navbar__lang" role="group" aria-label="Language switcher">
+        <button
+          type="button"
+          class="navbar__lang-option"
+          class:navbar__lang-option--active={langStore.current === 'en'}
+          onclick={() => langStore.set('en')}
+          aria-pressed={langStore.current === 'en'}
+        >EN</button>
+        <button
+          type="button"
+          class="navbar__lang-option"
+          class:navbar__lang-option--active={langStore.current === 'id'}
+          onclick={() => langStore.set('id')}
+          aria-pressed={langStore.current === 'id'}
+        >ID</button>
+      </div>
       <button
         class="navbar__burger"
         onclick={() => (mobileOpen = true)}
@@ -150,18 +158,34 @@
   .navbar__lang {
     display: inline-flex;
     align-items: center;
-    gap: var(--sp-1);
-    padding: var(--sp-2) var(--sp-3);
-    border-radius: var(--radius-md);
-    font-size: var(--fs-body-sm);
-    font-weight: var(--fw-semibold);
-    color: var(--color-text-muted);
-    transition: color var(--duration-fast) var(--ease-smooth), background-color var(--duration-fast) var(--ease-smooth);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-full);
+    padding: 2px;
+    background-color: var(--color-surface-alt);
+    flex-shrink: 0;
   }
 
-  .navbar__lang:hover {
-    color: var(--color-accent);
-    background-color: var(--color-surface-alt);
+  .navbar__lang-option {
+    padding: var(--sp-1) var(--sp-3);
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-text-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+                color var(--duration-fast) var(--ease-smooth);
+  }
+
+  .navbar__lang-option:hover:not(.navbar__lang-option--active) {
+    color: var(--color-text);
+  }
+
+  .navbar__lang-option--active {
+    background-color: var(--color-accent);
+    color: var(--color-ivory);
   }
 
   .navbar__burger {
