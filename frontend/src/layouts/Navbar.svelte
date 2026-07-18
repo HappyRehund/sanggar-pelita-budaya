@@ -34,6 +34,7 @@
   <div class="navbar__inner">
     <a href="/" class="navbar__logo" onclick={(e) => { e.preventDefault(); navigate('/'); }}>
       <img src={logoSvg} alt={siteName} class="navbar__logo-img" />
+      <span class="navbar__logo-text">{siteName}</span>
     </a>
 
     <nav class="navbar__nav" aria-label="Primary">
@@ -121,6 +122,14 @@
   .navbar__logo-img {
     height: 2.5rem;
     width: auto;
+  }
+
+  .navbar__logo-text {
+    font-family: var(--font-serif);
+    font-size: var(--fs-h4);
+    font-weight: var(--fw-semibold);
+    color: var(--color-brown);
+    letter-spacing: var(--tracking-tight);
   }
 
   .navbar__nav {
