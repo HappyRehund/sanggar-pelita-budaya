@@ -115,7 +115,7 @@
 
   const isLoginRoute = $derived(router.current.path === '/admin/login');
   const isAdminRoute = $derived(router.current.path.startsWith('/admin') && !isLoginRoute);
-  const usePublicLayout = $derived(!isAdminRoute && showPage);
+  const usePublicLayout = $derived(!isAdminRoute && !isLoginRoute && showPage);
   const useAdminLayout = $derived(isAdminRoute && showPage);
 
   $effect(() => {
