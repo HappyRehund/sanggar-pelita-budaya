@@ -3,7 +3,7 @@
   import { authStore } from '$lib/stores/auth.svelte';
   import { router } from '$lib/router.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { LayoutDashboard, FolderOpen, Users, Image, PanelBottom, Settings, LogOut, Menu, ArrowLeft } from '@lucide/svelte';
+  import { LayoutDashboard, FolderOpen, Users, Settings, LogOut, Menu, ArrowLeft } from '@lucide/svelte';
 
   interface Props {
     children: Snippet;
@@ -16,8 +16,6 @@
     { path: '/admin', icon: LayoutDashboard, label: () => t('admin_nav_dashboard'), exact: true },
     { path: '/admin/portfolio', icon: FolderOpen, label: () => t('admin_nav_portfolio') },
     { path: '/admin/organization', icon: Users, label: () => t('admin_nav_organization') },
-    { path: '/admin/hero', icon: Image, label: () => t('admin_nav_hero') },
-    { path: '/admin/footer', icon: PanelBottom, label: () => t('admin_nav_footer') },
     { path: '/admin/settings', icon: Settings, label: () => t('admin_nav_settings') },
   ];
 

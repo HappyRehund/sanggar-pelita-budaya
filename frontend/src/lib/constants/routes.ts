@@ -15,8 +15,6 @@ export const ROUTES = {
   ADMIN_PORTFOLIO_NEW: '/admin/portfolio/new',
   ADMIN_PORTFOLIO_EDIT: '/admin/portfolio/:id',
   ADMIN_ORGANIZATION: '/admin/organization',
-  ADMIN_HERO: '/admin/hero',
-  ADMIN_FOOTER: '/admin/footer',
   ADMIN_SETTINGS: '/admin/settings',
   NOT_FOUND: '*',
 } as const;

@@ -28,13 +28,11 @@
   defineRoute('/portfolio');
   defineRoute('/portfolio/:slug');
   defineRoute('/admin/login');
-  defineRoute('/admin');
-  defineRoute('/admin/portfolio');
-  defineRoute('/admin/organization');
-  defineRoute('/admin/hero');
-  defineRoute('/admin/footer');
-  defineRoute('/admin/settings');
-  defineRoute('*');
+defineRoute('/admin');
+defineRoute('/admin/portfolio');
+defineRoute('/admin/organization');
+defineRoute('/admin/settings');
+defineRoute('*');
 
   let appContainer: HTMLElement;
   let pageContainer = $state<HTMLElement | null>(null);
@@ -70,8 +68,6 @@
       case '/admin': return (await import('$modules/admin/pages/Dashboard.svelte')).default;
       case '/admin/portfolio': return (await import('$modules/admin/pages/PortfolioAdmin.svelte')).default;
       case '/admin/organization': return (await import('$modules/admin/pages/OrganizationAdmin.svelte')).default;
-      case '/admin/hero': return (await import('$modules/admin/pages/HeroAdmin.svelte')).default;
-      case '/admin/footer': return (await import('$modules/admin/pages/FooterAdmin.svelte')).default;
       case '/admin/settings': return (await import('$modules/admin/pages/SettingsAdmin.svelte')).default;
       default: return NotFound;
     }

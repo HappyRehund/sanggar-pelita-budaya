@@ -6,7 +6,7 @@
   import { notifications } from '$lib/stores/notification.svelte';
   import { uploadUrl } from '$lib/utils';
   import type { DashboardData } from '$lib/types';
-  import { FolderOpen, Users, Award, Sparkles, CheckCircle, FileEdit, Plus, LayoutDashboard, PanelBottom } from '@lucide/svelte';
+  import { FolderOpen, Users, Award, Sparkles, CheckCircle, FileEdit, Plus } from '@lucide/svelte';
 
   let data = $state<DashboardData | null>(null);
   let loading = $state(true);
@@ -33,8 +33,6 @@
   const quickActions = [
     { icon: Plus, label: t('admin_action_create_portfolio'), path: '/admin/portfolio?new=true' },
     { icon: Users, label: t('admin_action_add_member'), path: '/admin/organization?new=true' },
-    { icon: LayoutDashboard, label: t('admin_action_update_hero'), path: '/admin/hero' },
-    { icon: PanelBottom, label: t('admin_action_edit_footer'), path: '/admin/footer' },
   ];
 </script>
 
@@ -206,8 +204,9 @@
 
   .quick-actions {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--sp-4);
+    max-width: 32rem;
   }
 
   .quick-action {
@@ -246,6 +245,5 @@
 
   @media (max-width: 768px) {
     .dashboard__stats { grid-template-columns: repeat(2, 1fr); }
-    .quick-actions { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
