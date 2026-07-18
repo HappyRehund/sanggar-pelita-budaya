@@ -20,9 +20,9 @@ A production-ready cultural organization website with a lightweight Content Mana
 - **Dashboard** — 6 stat cards, recent uploads, quick actions
 - **Portfolio** — Full CRUD with RichTextEditor, cover/gallery image upload, draft/publish, featured toggle, SEO fields
 - **Organization** — Member CRUD with photo upload, parent assignment, display order
-- **Hero** — Single-record editor with background image upload
-- **Footer** — Single-record editor with logo upload, social links, maps URL
 - **Settings** — Site name, description, language, logo/favicon/OG image uploads
+
+> Hero and Footer are **static frontend content** (i18n + `lib/constants/siteContent.ts`) — not editable via the CMS.
 
 ### Languages
 - **English (en)** — base language
@@ -99,7 +99,7 @@ frontend/src/
 │   ├── organization/        # OrganizationPage
 │   ├── portfolio/           # PortfolioListPage, PortfolioDetailPage
 │   ├── contact/             # ContactPage
-│   └── admin/               # Dashboard, PortfolioAdmin, OrganizationAdmin, HeroAdmin, FooterAdmin, SettingsAdmin
+│   └── admin/               # Dashboard, PortfolioAdmin, OrganizationAdmin, SettingsAdmin
 └── routes/                  # Home, NotFound, admin/Login
 
 site/
@@ -107,14 +107,16 @@ site/
 ├── data/                    # sanggar.sqlite (outside Document Root)
 ├── public/
 │   ├── api/
-│   │   ├── controllers/     # 8 thin controllers
-│   │   ├── services/        # 10 service classes (business logic)
-│   │   ├── repositories/    # 7 repository classes (PDO only)
+│   │   ├── controllers/     # 6 thin controllers
+│   │   ├── services/        # 8 service classes (business logic)
+│   │   ├── repositories/    # 5 repository classes (PDO only)
 │   │   ├── middleware/      # auth.php, csrf.php
 │   │   └── helpers/         # formatters.php
-│   └── uploads/             # hero/, portfolio/, organization/, settings/, documents/
-└── seed.php                 # CLI seeder (admin + default hero/footer/settings)
+│   └── uploads/             # portfolio/, organization/, settings/, documents/
+└── seed.php                 # CLI seeder (admin + default settings)
 ```
+
+> **Hero and Footer are static frontend content** (i18n + `frontend/src/lib/constants/siteContent.ts`) — not stored in the database or editable via the Admin CMS. Only Settings, Organization, and Portfolio are CMS-managed.
 
 ---
 

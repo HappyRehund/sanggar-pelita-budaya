@@ -30,7 +30,8 @@ Built as **Svelte 5 SPA + PHP REST API + SQLite**, target deployment to **shared
 ### 3. **SQLite, not MySQL**
 - Single file at `site/data/sanggar.sqlite` (outside Document Root).
 - WAL mode + busy_timeout 5s for concurrent access.
-- 7 tables: users, portfolio, portfolio_media, organization_members, hero, footer, settings.
+- 5 tables: users, portfolio, portfolio_media, organization_members, settings.
+- Hero and Footer are **static frontend content** (i18n + `lib/constants/siteContent.ts`) — not in the DB.
 
 ### 4. **CSRF via double-submit token**
 - `GET /api/csrf-token` returns token, client sends in `X-CSRF-Token` header on non-GET requests.
@@ -58,10 +59,11 @@ Built as **Svelte 5 SPA + PHP REST API + SQLite**, target deployment to **shared
 - `layouts/` contains PublicLayout, AdminLayout, Navbar, Footer.
 
 ### 9. **Image upload flow**
-- Files stored in `site/public/uploads/{hero,portfolio,organization,settings,documents}/`.
+- Files stored in `site/public/uploads/{portfolio,organization,settings,documents}/`.
 - Unique filenames: `YYYYMMDD_<8hex>.<ext>`.
 - SQLite stores metadata only (filename, mime, dimensions, size, alt_text, sort_order).
 - Deleting a portfolio unlinks all associated files (orphan cleanup in transaction).
+- Hero background and Navbar/Footer logos are **static frontend assets** under `frontend/src/assets/` (not uploaded).
 
 ### 10. **Code-splitting for performance**
 - Public pages are statically imported (critical path).
@@ -80,14 +82,14 @@ Built as **Svelte 5 SPA + PHP REST API + SQLite**, target deployment to **shared
 | `site/public/api/routes.php` | Route table + controller instantiation. All routes registered here. |
 | `site/public/api/helpers.php` | Autoloader, `get_json_input()`, `get_uploaded_file()`, multipart parsing. |
 | `site/public/api/helpers/formatters.php` | `formatPortfolioRow()`, `formatMediaRow()`, `formatOrganizationRow()`, `buildPaginationMeta()`. |
-| `site/public/api/controllers/` | Thin: AuthController, CsrfController, PortfolioController, OrganizationController, HeroController, FooterController, SettingsController, DashboardController. |
-| `site/public/api/services/` | Business logic: AuthService, ValidationService, UploadService, PortfolioService, PortfolioMediaService, OrganizationService, HeroService, FooterService, SettingsService, DashboardService. |
-| `site/public/api/repositories/` | PDO-only: User, Portfolio, PortfolioMedia, Organization, Hero, Footer, Settings repositories. |
+| `site/public/api/controllers/` | Thin: AuthController, CsrfController, PortfolioController, OrganizationController, SettingsController, DashboardController. |
+| `site/public/api/services/` | Business logic: AuthService, ValidationService, UploadService, PortfolioService, PortfolioMediaService, OrganizationService, SettingsService, DashboardService. |
+| `site/public/api/repositories/` | PDO-only: User, Portfolio, PortfolioMedia, Organization, Settings repositories. |
 | `site/public/api/middleware/` | `auth.php` (require_auth, is_authenticated, get_current_*), `csrf.php` (generate, validate, require). |
 | `site/config/app.php` | Constants: paths, CORS, upload limits, per-page limits. |
-| `site/config/database.php` | PDO singleton, `initSchema()` (7 tables + indexes + FKs), `migrateLegacyUsersTable()`, seed functions. |
+| `site/config/database.php` | PDO singleton, `initSchema()` (5 tables + indexes + FKs + DROP of legacy hero/footer), `migrateLegacyUsersTable()`, seed functions. |
 | `site/config/response.php` | `success_response()`, `error_response()`, `validation_error_response()`, `not_found_response()`, `unauthorized_response()`, `forbidden_response()`. |
-| `site/seed.php` | CLI seeder: admin user + default hero/footer/settings. Idempotent. |
+| `site/seed.php` | CLI seeder: admin user + default settings. Idempotent. |
 
 ### Frontend
 
@@ -97,15 +99,15 @@ Built as **Svelte 5 SPA + PHP REST API + SQLite**, target deployment to **shared
 | `frontend/src/lib/router.svelte.ts` | History API SPA router. `defineRoute()` + `matchRoute()` + `navigate()` + `router.go()`. Supports `:param` capture. |
 | `frontend/src/lib/api/client.ts` | `api` object: get/post/put/delete. Auto CSRF token, `ApiError` on non-2xx. |
 | `frontend/src/lib/api/endpoints.ts` | Centralized API path constants. |
-| `frontend/src/lib/api/index.ts` | Domain modules: authApi, healthApi, portfolioApi, organizationApi, heroApi, footerApi, settingsApi, dashboardApi. |
+| `frontend/src/lib/api/index.ts` | Domain modules: authApi, healthApi, portfolioApi, organizationApi, settingsApi, dashboardApi. |
 | `frontend/src/lib/stores/` | auth, lang, notification (toast), loading, portfolio, organization, settings. |
 | `frontend/src/lib/hooks/` | usePagination, useSearch, useDebounce, useIntersection, useLightbox. |
 | `frontend/src/lib/components/` | 24 reusable components: Button, Badge, Card, Input, Textarea, Select, Checkbox, Radio, Modal, Drawer, Accordion, Carousel, Toast, Pagination, Lightbox, Tabs, Dropdown, Skeleton, EmptyState, Spinner, SectionTitle, Image, Icon, FileUpload, RichTextEditor. |
 | `frontend/src/lib/utils/` | dateFormatter, slugify, imageUrl, fileSizeFormatter, debounce, animations (GSAP reveal/parallax/stagger). |
-| `frontend/src/lib/constants/` | routes, categories, uploadLimits, fileTypes, languages. |
-| `frontend/src/lib/types/index.ts` | All entity types: User, Portfolio, PortfolioMedia, OrganizationMember, Hero, Footer, Settings, DashboardData, PaginationMeta, PaginatedResponse, PortfolioListQuery, etc. |
+| `frontend/src/lib/constants/` | routes, categories, uploadLimits, fileTypes, languages, siteContent (static Hero/Footer URLs + socials). |
+| `frontend/src/lib/types/index.ts` | All entity types: User, Portfolio, PortfolioMedia, OrganizationMember, Settings, DashboardData, PaginationMeta, PaginatedResponse, PortfolioListQuery, etc. (Hero/Footer removed — static frontend content). |
 | `frontend/src/layouts/` | PublicLayout (Navbar + slot + Footer), AdminLayout (sidebar + topbar + slot), Navbar, Footer. |
-| `frontend/src/modules/` | Feature modules: home (8 section components + HomePage), about, organization, portfolio (list + detail), contact, admin (Dashboard, PortfolioAdmin, OrganizationAdmin, HeroAdmin, FooterAdmin, SettingsAdmin, ConfirmDialog). |
+| `frontend/src/modules/` | Feature modules: home (8 section components + HomePage), about, organization, portfolio (list + detail), contact, admin (Dashboard, PortfolioAdmin, OrganizationAdmin, SettingsAdmin, ConfirmDialog). |
 | `frontend/src/routes/` | Thin route assemblers: Home, NotFound, admin/Login. |
 
 ---
@@ -138,13 +140,11 @@ Built as **Svelte 5 SPA + PHP REST API + SQLite**, target deployment to **shared
 | DELETE | `/api/organization/{id}` | Auth+CSRF | Delete member |
 | PUT | `/api/organization/reorder` | Auth+CSRF | Reorder members |
 | POST | `/api/organization/{id}/photo` | Auth+CSRF | Upload photo |
-| GET | `/api/hero` | No | Get hero |
-| PUT | `/api/hero` | Auth+CSRF | Update hero |
-| GET | `/api/footer` | No | Get footer |
-| PUT | `/api/footer` | Auth+CSRF | Update footer |
 | GET | `/api/settings` | No | Get settings |
 | PUT | `/api/settings` | Auth+CSRF | Update settings |
 | GET | `/api/dashboard` | Auth | Dashboard stats + recent uploads |
+
+> **Hero and Footer are static frontend content** — driven by i18n keys + `frontend/src/lib/constants/siteContent.ts`. No `/api/hero` or `/api/footer` endpoints exist.
 
 ---
 
@@ -172,6 +172,14 @@ All repositories use PDO prepared statements. Never concatenate SQL.
 
 ### 7. **Transactions for multi-step operations**
 Portfolio create/delete, media reorder, organization reorder — all wrapped in transactions with rollback.
+
+### 8. **Hero & Footer are static frontend content**
+- Hero and Footer are **not** CMS-managed. No DB tables, no API endpoints, no admin pages.
+- Translatable text lives in i18n (`hero_*`, `footer_*` keys in `en.json` / `id.json`).
+- Non-translatable URLs (maps URL, social URLs, hero CTA target) live in `frontend/src/lib/constants/siteContent.ts`.
+- Hero background image: `frontend/src/assets/hero-bg.webp` (imported directly).
+- Navbar + Footer logo: `frontend/src/assets/logo-sanggar-pelita-budaya.svg` (imported directly).
+- Only **Settings, Organization, and Portfolio** remain CMS-managed via the Admin.
 
 ---
 
