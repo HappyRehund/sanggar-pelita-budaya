@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { Menu, Globe } from '@lucide/svelte';
   import { router } from '$lib/router.svelte';
   import { langStore } from '$lib/stores/lang.svelte';
@@ -8,7 +7,6 @@
   import { uploadUrl } from '$lib/utils';
   import Drawer from '$lib/components/Drawer.svelte';
 
-  let scrolled = $state(false);
   let mobileOpen = $state(false);
 
   const navItems = [
@@ -27,24 +25,13 @@
     return currentPath.startsWith(path);
   }
 
-  onMount(() => {
-    const handleScroll = () => {
-      scrolled = window.scrollY > 24;
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  });
-
   function navigate(path: string): void {
     mobileOpen = false;
     router.go(path);
   }
 </script>
 
-<svelte:window onkeydown={(e) => { if (e.key === 'Escape') mobileOpen = false; }} />
-
-<header class="navbar" class:navbar--scrolled={scrolled}>
+<header class="navbar">
   <div class="navbar__inner">
     <a href="/" class="navbar__logo" onclick={(e) => { e.preventDefault(); navigate('/'); }}>
       {#if logo}
@@ -114,13 +101,6 @@
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-    transition: background-color var(--duration-short) var(--ease-smooth),
-      box-shadow var(--duration-short) var(--ease-smooth),
-      backdrop-filter var(--duration-short) var(--ease-smooth);
-    background-color: transparent;
-  }
-
-  .navbar--scrolled {
     background-color: rgba(251, 247, 240, 0.95);
     backdrop-filter: blur(12px);
     box-shadow: var(--shadow-sm);
