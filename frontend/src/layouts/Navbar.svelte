@@ -4,7 +4,7 @@
   import { langStore } from '$lib/stores/lang.svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { uploadUrl } from '$lib/utils';
+  import logoSvg from '$assets/logo-sanggar-pelita-budaya.svg';
   import Drawer from '$lib/components/Drawer.svelte';
 
   let mobileOpen = $state(false);
@@ -18,7 +18,6 @@
 
   const currentPath = $derived(router.current.path);
   const siteName = $derived(settingsStore.siteName);
-  const logo = $derived(settingsStore.settings?.logo ?? null);
 
   function isActive(path: string): boolean {
     if (path === '/') return currentPath === '/';
@@ -34,11 +33,7 @@
 <header class="navbar">
   <div class="navbar__inner">
     <a href="/" class="navbar__logo" onclick={(e) => { e.preventDefault(); navigate('/'); }}>
-      {#if logo}
-        <img src={uploadUrl(logo)} alt={siteName} class="navbar__logo-img" />
-      {:else}
-        <span class="navbar__logo-text">{siteName}</span>
-      {/if}
+      <img src={logoSvg} alt={siteName} class="navbar__logo-img" />
     </a>
 
     <nav class="navbar__nav" aria-label="Primary">
@@ -126,14 +121,6 @@
   .navbar__logo-img {
     height: 2.5rem;
     width: auto;
-  }
-
-  .navbar__logo-text {
-    font-family: var(--font-serif);
-    font-size: var(--fs-h4);
-    font-weight: var(--fw-semibold);
-    color: var(--color-brown);
-    letter-spacing: var(--tracking-tight);
   }
 
   .navbar__nav {

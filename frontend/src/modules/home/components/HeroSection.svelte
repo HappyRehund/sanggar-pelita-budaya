@@ -1,22 +1,16 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { gsap } from 'gsap';
-  import { settingsStore } from '$lib/stores/settings.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { uploadUrl, imageUrl } from '$lib/utils';
+  import { SITE_CONTENT } from '$lib/constants';
+  import heroBg from '$assets/hero-bg.webp';
   import Button from '$lib/components/Button.svelte';
   import { ArrowRight } from '@lucide/svelte';
-
-  const hero = $derived(settingsStore.hero);
 
   let heroEl: HTMLElement;
   let bgEl: HTMLElement;
 
-  const bgImage = $derived(
-    hero?.background_image
-      ? uploadUrl(hero.background_image)
-      : imageUrl('hero-culture', 1920, 1080)
-  );
+  const bgImage = heroBg;
 
   onMount(() => {
     const ctx = gsap.context(() => {
@@ -46,12 +40,12 @@
   <div class="hero__overlay"></div>
   <div class="hero__content container">
     <span class="hero__eyebrow eyebrow">{t('hero_eyebrow')}</span>
-    <h1 class="hero__title">{hero?.headline ?? t('hero_title')}</h1>
-    <p class="hero__subtitle script">{hero?.subtitle ?? t('hero_subtitle')}</p>
-    <p class="hero__desc">{hero?.description ?? t('hero_description')}</p>
+    <h1 class="hero__title">{t('hero_title')}</h1>
+    <p class="hero__subtitle script">{t('hero_subtitle')}</p>
+    <p class="hero__desc">{t('hero_description')}</p>
     <div class="hero__actions">
-      <Button variant="primary" size="lg" href={hero?.primary_button_url || '/about'}>
-        {hero?.primary_button_text || t('hero_cta_primary')}
+      <Button variant="primary" size="lg" href={SITE_CONTENT.heroPrimaryCtaUrl}>
+        {t('hero_cta_primary')}
         <ArrowRight size={18} />
       </Button>
     </div>

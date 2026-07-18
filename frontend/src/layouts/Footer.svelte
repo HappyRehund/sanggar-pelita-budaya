@@ -2,12 +2,11 @@
   import { MapPin, Phone, Mail, Globe, Clock, ExternalLink } from '@lucide/svelte';
   import { settingsStore } from '$lib/stores/settings.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { uploadUrl } from '$lib/utils';
+  import { SITE_CONTENT } from '$lib/constants';
   import { router } from '$lib/router.svelte';
+  import logoSvg from '$assets/logo-sanggar-pelita-budaya.svg';
 
-  const footer = $derived(settingsStore.footer);
   const siteName = $derived(settingsStore.siteName);
-  const logo = $derived(footer?.logo ?? null);
 
   const quickLinks = [
     { path: '/', label: () => t('nav_home') },
@@ -17,32 +16,31 @@
   ];
 
   const socials = $derived([
-    { url: footer?.facebook, icon: ExternalLink, label: 'Facebook' },
-    { url: footer?.instagram, icon: ExternalLink, label: 'Instagram' },
-    { url: footer?.youtube, icon: ExternalLink, label: 'YouTube' },
+    { url: SITE_CONTENT.socials.facebook, icon: ExternalLink, label: 'Facebook' },
+    { url: SITE_CONTENT.socials.instagram, icon: ExternalLink, label: 'Instagram' },
+    { url: SITE_CONTENT.socials.youtube, icon: ExternalLink, label: 'YouTube' },
   ].filter((s) => s.url));
 
   const year = new Date().getFullYear();
-  const copyright = $derived(
-    (footer?.copyright ?? '© {year} Sanggar Pelita Budaya. All rights reserved.')
-      .replace('{year}', String(year))
-  );
+  const copyright = $derived(t('footer_copyright_template').replace('{year}', String(year)));
+
+  const address = $derived(t('footer_address_value'));
+  const phone = $derived(t('footer_phone_value'));
+  const email = $derived(t('footer_email_value'));
+  const website = $derived(t('footer_website_value'));
+  const workingHours = $derived(t('footer_working_hours_value'));
+  const mapsUrl = $derived(SITE_CONTENT.mapsUrl);
 
   function navigate(path: string): void {
     router.go(path);
   }
 </script>
 
-{#if footer}
-  <footer class="footer">
+<footer class="footer">
     <div class="footer__inner">
       <div class="footer__col footer__col--brand">
-        {#if logo}
-          <img src={uploadUrl(logo)} alt={siteName} class="footer__logo" />
-        {:else}
-          <span class="footer__logo-text">{siteName}</span>
-        {/if}
-        <p class="footer__desc">{footer.description}</p>
+        <img src={logoSvg} alt={siteName} class="footer__logo" />
+        <p class="footer__desc">{t('footer_desc')}</p>
         {#if socials.length > 0}
           <div class="footer__socials">
             {#each socials as social (social.label)}
@@ -80,39 +78,39 @@
       <div class="footer__col">
         <h3 class="footer__heading">{t('footer_address')}</h3>
         <ul class="footer__contact">
-          {#if footer.address}
+          {#if address}
             <li>
               <MapPin size={16} />
-              <span>{footer.address}</span>
+              <span>{address}</span>
             </li>
           {/if}
-          {#if footer.phone}
+          {#if phone}
             <li>
               <Phone size={16} />
-              <a href={`tel:${footer.phone}`}>{footer.phone}</a>
+              <a href={`tel:${phone}`}>{phone}</a>
             </li>
           {/if}
-          {#if footer.email}
+          {#if email}
             <li>
               <Mail size={16} />
-              <a href={`mailto:${footer.email}`}>{footer.email}</a>
+              <a href={`mailto:${email}`}>{email}</a>
             </li>
           {/if}
-          {#if footer.website}
+          {#if website}
             <li>
               <Globe size={16} />
-              <a href={footer.website} target="_blank" rel="noopener noreferrer">{footer.website}</a>
+              <a href={website} target="_blank" rel="noopener noreferrer">{website}</a>
             </li>
           {/if}
-          {#if footer.working_hours}
+          {#if workingHours}
             <li>
               <Clock size={16} />
-              <span>{footer.working_hours}</span>
+              <span>{workingHours}</span>
             </li>
           {/if}
         </ul>
-        {#if footer.maps_url}
-          <a href={footer.maps_url} target="_blank" rel="noopener noreferrer" class="footer__maps">
+        {#if mapsUrl}
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="footer__maps">
             <MapPin size={14} />
             {t('view_on_map')}
           </a>
@@ -124,23 +122,12 @@
       <p class="footer__copyright">{copyright}</p>
     </div>
   </footer>
-{:else}
-  <footer class="footer footer--minimal">
-    <div class="footer__bottom">
-      <p class="footer__copyright">© {year} {siteName}. {t('footer_copyright')}</p>
-    </div>
-  </footer>
-{/if}
 
 <style>
   .footer {
     background-color: var(--color-brown);
     color: var(--color-beige);
     padding-top: var(--sp-12);
-  }
-
-  .footer--minimal {
-    padding-top: var(--sp-6);
   }
 
   .footer__inner {
@@ -161,14 +148,6 @@
   .footer__logo {
     height: 3rem;
     width: auto;
-    margin-bottom: var(--sp-2);
-  }
-
-  .footer__logo-text {
-    font-family: var(--font-serif);
-    font-size: var(--fs-h4);
-    font-weight: var(--fw-semibold);
-    color: var(--color-ivory);
     margin-bottom: var(--sp-2);
   }
 
