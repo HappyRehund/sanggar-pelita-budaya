@@ -31,12 +31,6 @@ export const API = {
   ORGANIZATION_REORDER: '/api/organization/reorder',
   ORGANIZATION_PHOTO: (id: number) => `/api/organization/${id}/photo`,
 
-  // Hero
-  HERO: '/api/hero',
-
-  // Footer
-  FOOTER: '/api/footer',
-
   // Settings
   SETTINGS: '/api/settings',
 

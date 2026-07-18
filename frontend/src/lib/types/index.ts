@@ -89,39 +89,6 @@ export interface OrganizationMember {
   updated_at: string;
 }
 
-/* ---- Hero ----------------------------------------------------------- */
-export interface Hero {
-  id: number;
-  headline: string;
-  subtitle: string;
-  description: string;
-  background_image: string | null;
-  primary_button_text: string;
-  primary_button_url: string;
-  secondary_button_text: string;
-  secondary_button_url: string;
-  updated_at: string;
-}
-
-/* ---- Footer --------------------------------------------------------- */
-export interface Footer {
-  id: number;
-  logo: string | null;
-  description: string;
-  address: string;
-  phone: string;
-  email: string;
-  website: string;
-  working_hours: string;
-  facebook: string | null;
-  instagram: string | null;
-  youtube: string | null;
-  tiktok: string | null;
-  maps_url: string;
-  copyright: string;
-  updated_at: string;
-}
-
 /* ---- Settings ------------------------------------------------------- */
 export interface Settings {
   id: number;

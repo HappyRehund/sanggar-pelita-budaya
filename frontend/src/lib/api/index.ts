@@ -6,8 +6,6 @@ import type {
   PortfolioListSummary,
   PortfolioMedia,
   OrganizationMember,
-  Hero,
-  Footer,
   Settings,
   DashboardData,
   PaginatedResponse,
@@ -100,28 +98,6 @@ export const organizationApi = {
     const formData = new FormData();
     formData.append('file', file);
     return api.post<OrganizationMember>(API.ORGANIZATION_PHOTO(id), formData);
-  },
-};
-
-/* ---- Hero --------------------------------------------------------- */
-export const heroApi = {
-  get: () => api.get<Hero>(API.HERO),
-  update: (data: Partial<Hero>) => api.put<Hero>(API.HERO, data),
-  uploadBackground: (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return api.put<Hero>(API.HERO, formData);
-  },
-};
-
-/* ---- Footer ------------------------------------------------------- */
-export const footerApi = {
-  get: () => api.get<Footer>(API.FOOTER),
-  update: (data: Partial<Footer>) => api.put<Footer>(API.FOOTER, data),
-  uploadLogo: (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    return api.put<Footer>(API.FOOTER, formData);
   },
 };
 

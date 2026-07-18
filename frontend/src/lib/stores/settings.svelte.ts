@@ -1,10 +1,8 @@
-import { settingsApi, heroApi, footerApi } from '$lib/api';
-import type { Settings, Hero, Footer } from '$lib/types';
+import { settingsApi } from '$lib/api';
+import type { Settings } from '$lib/types';
 
 class SettingsStore {
   settings = $state<Settings | null>(null);
-  hero = $state<Hero | null>(null);
-  footer = $state<Footer | null>(null);
   loading = $state(false);
   initialized = $state(false);
 
@@ -12,14 +10,7 @@ class SettingsStore {
     if (this.initialized) return;
     this.loading = true;
     try {
-      const [settings, hero, footer] = await Promise.all([
-        settingsApi.get(),
-        heroApi.get(),
-        footerApi.get(),
-      ]);
-      this.settings = settings;
-      this.hero = hero;
-      this.footer = footer;
+      this.settings = await settingsApi.get();
     } catch {
       // Settings are non-critical for rendering; fail silently
     } finally {
@@ -31,22 +22,6 @@ class SettingsStore {
   async refreshSettings(): Promise<void> {
     try {
       this.settings = await settingsApi.get();
-    } catch {
-      // silent fail
-    }
-  }
-
-  async refreshHero(): Promise<void> {
-    try {
-      this.hero = await heroApi.get();
-    } catch {
-      // silent fail
-    }
-  }
-
-  async refreshFooter(): Promise<void> {
-    try {
-      this.footer = await footerApi.get();
     } catch {
       // silent fail
     }
