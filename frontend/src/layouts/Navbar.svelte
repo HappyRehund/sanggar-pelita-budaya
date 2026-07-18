@@ -175,7 +175,7 @@
   }
 
   /* ---- Mobile ---- */
-  @media (max-width: 880px) {
+  @media (max-width: 768px) {
     .navbar__nav {
       display: none;
     }
