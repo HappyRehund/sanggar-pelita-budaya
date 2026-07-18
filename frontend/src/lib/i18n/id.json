@@ -61,6 +61,13 @@
   "footer_working_hours": "Jam Kerja",
   "footer_follow_us": "Ikuti Kami",
   "footer_copyright": "Hak cipta dilindungi.",
+  "footer_desc": "Sanggar Pelita Budaya — melestarikan dan merayakan warisan budaya Indonesia melalui seni tradisional.",
+  "footer_address_value": "",
+  "footer_phone_value": "",
+  "footer_email_value": "",
+  "footer_website_value": "",
+  "footer_working_hours_value": "",
+  "footer_copyright_template": "© {year} Sanggar Pelita Budaya. Hak cipta dilindungi.",
 
   "hero_eyebrow": "Warisan Budaya Indonesia",
   "hero_title": "Sanggar Pelita Budaya",
