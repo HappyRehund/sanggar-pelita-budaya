@@ -19,7 +19,6 @@ define('UPLOAD_BASE_PATH', BASE_PATH . '/public/uploads');
 define('UPLOAD_PUBLIC_PATH', '/uploads');
 
 define('UPLOAD_FOLDERS', [
-    'hero' => 'hero',
     'portfolio' => 'portfolio',
     'organization' => 'organization',
     'settings' => 'settings',

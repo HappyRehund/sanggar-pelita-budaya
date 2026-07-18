@@ -109,40 +109,9 @@ function initSchema(): void
         );
     ");
 
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS hero (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            headline TEXT NOT NULL DEFAULT '',
-            subtitle TEXT NOT NULL DEFAULT '',
-            description TEXT NOT NULL DEFAULT '',
-            background_image TEXT,
-            primary_button_text TEXT NOT NULL DEFAULT '',
-            primary_button_url TEXT NOT NULL DEFAULT '',
-            secondary_button_text TEXT NOT NULL DEFAULT '',
-            secondary_button_url TEXT NOT NULL DEFAULT '',
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-    ");
-
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS footer (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            logo TEXT,
-            description TEXT NOT NULL DEFAULT '',
-            address TEXT NOT NULL DEFAULT '',
-            phone TEXT NOT NULL DEFAULT '',
-            email TEXT NOT NULL DEFAULT '',
-            website TEXT NOT NULL DEFAULT '',
-            working_hours TEXT NOT NULL DEFAULT '',
-            facebook TEXT,
-            instagram TEXT,
-            youtube TEXT,
-            tiktok TEXT,
-            maps_url TEXT NOT NULL DEFAULT '',
-            copyright TEXT NOT NULL DEFAULT '',
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-    ");
+    // Drop legacy hero/footer tables (content now static frontend-only)
+    $pdo->exec("DROP TABLE IF EXISTS hero");
+    $pdo->exec("DROP TABLE IF EXISTS footer");
 
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS settings (
@@ -227,16 +196,6 @@ function isSeeded(): bool
         return false;
     }
 
-    $heroExists = $pdo->query('SELECT COUNT(*) as count FROM hero')->fetch();
-    if (((int) $heroExists['count']) === 0) {
-        return false;
-    }
-
-    $footerExists = $pdo->query('SELECT COUNT(*) as count FROM footer')->fetch();
-    if (((int) $footerExists['count']) === 0) {
-        return false;
-    }
-
     $settingsExists = $pdo->query('SELECT COUNT(*) as count FROM settings')->fetch();
     if (((int) $settingsExists['count']) === 0) {
         return false;
@@ -250,8 +209,6 @@ function seedDatabase(): void
     $pdo = getPDO();
 
     seedAdmin($pdo);
-    seedHero($pdo);
-    seedFooter($pdo);
     seedSettings($pdo);
 }
 
@@ -267,60 +224,6 @@ function seedAdmin(PDO $pdo): void
         'INSERT INTO users (username, password_hash, full_name) VALUES (?, ?, ?)'
     );
     $stmt->execute(['admin', $hash, 'Administrator Sanggar']);
-}
-
-function seedHero(PDO $pdo): void
-{
-    $count = $pdo->query('SELECT COUNT(*) as count FROM hero')->fetch();
-    if (((int) $count['count']) > 0) {
-        return;
-    }
-
-    $stmt = $pdo->prepare("
-        INSERT INTO hero (headline, subtitle, description, background_image,
-            primary_button_text, primary_button_url,
-            secondary_button_text, secondary_button_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        'Sanggar Pelita Budaya',
-        'Where Tradition Lives',
-        'Preserving and celebrating the richness of Indonesian traditional art through dance, music, and community.',
-        null,
-        'Explore Our Work',
-        '/portfolio',
-        'Download Profile',
-        '/contact',
-    ]);
-}
-
-function seedFooter(PDO $pdo): void
-{
-    $count = $pdo->query('SELECT COUNT(*) as count FROM footer')->fetch();
-    if (((int) $count['count']) > 0) {
-        return;
-    }
-
-    $stmt = $pdo->prepare("
-        INSERT INTO footer (logo, description, address, phone, email, website,
-            working_hours, facebook, instagram, youtube, tiktok, maps_url, copyright)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        null,
-        'Sanggar Pelita Budaya — preserving and celebrating Indonesian cultural heritage through traditional art.',
-        '',
-        '',
-        '',
-        '',
-        '',
-        null,
-        null,
-        null,
-        null,
-        '',
-        '© {year} Sanggar Pelita Budaya. All rights reserved.',
-    ]);
 }
 
 function seedSettings(PDO $pdo): void

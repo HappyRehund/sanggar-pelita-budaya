@@ -57,8 +57,6 @@ $authController = new AuthController();
 $csrfController = new CsrfController();
 $portfolioController = new PortfolioController();
 $organizationController = new OrganizationController();
-$heroController = new HeroController();
-$footerController = new FooterController();
 $settingsController = new SettingsController();
 $dashboardController = new DashboardController();
 
@@ -122,14 +120,6 @@ route('POST',   '/api/organization',              [$organizationController, 'cre
 route('PUT',    '/api/organization/{id}',        [$organizationController, 'update']);
 route('DELETE', '/api/organization/{id}',        [$organizationController, 'delete']);
 route('POST',   '/api/organization/{id}/photo',  [$organizationController, 'uploadPhoto']);
-
-/* ---- Hero (public GET + admin PUT) ------------------------------- */
-route('GET',    '/api/hero',                      [$heroController, 'get']);
-route('PUT',    '/api/hero',                      [$heroController, 'update']);
-
-/* ---- Footer (public GET + admin PUT) ----------------------------- */
-route('GET',    '/api/footer',                    [$footerController, 'get']);
-route('PUT',    '/api/footer',                    [$footerController, 'update']);
 
 /* ---- Settings (public GET + admin PUT) -------------------------- */
 route('GET',    '/api/settings',                  [$settingsController, 'get']);
