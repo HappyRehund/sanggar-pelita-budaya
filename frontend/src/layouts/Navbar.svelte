@@ -121,7 +121,8 @@
   .navbar__logo {
     display: flex;
     align-items: center;
-    gap: var(--sp-2);
+    justify-items: center;
+    gap: var(--sp-4);
     flex-shrink: 0;
   }
 
@@ -132,10 +133,11 @@
 
   .navbar__logo-text {
     font-family: var(--font-script);
-    font-size: var(--fs-h4);
+    font-size: var(--fs-body-lg);
     color: var(--color-brown);
     letter-spacing: normal;
-    line-height: 1;
+    line-height: 1.1;
+    transform: translateY(0.1rem);
   }
 
   .navbar__nav {
