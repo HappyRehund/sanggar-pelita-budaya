@@ -63,7 +63,7 @@
 
   .hero__bg {
     position: absolute;
-    inset: -20%;
+    inset: 0;
     background-size: cover;
     background-position: center;
     will-change: transform;
