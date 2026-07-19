@@ -136,8 +136,8 @@
     font-size: var(--fs-body-lg);
     color: var(--color-brown);
     letter-spacing: normal;
-    line-height: 1.1;
-    transform: translateY(0.1rem);
+    line-height: var(--lh-snug);
+    transform: translateY(0.2rem);
   }
 
   .navbar__nav {
