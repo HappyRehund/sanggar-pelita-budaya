@@ -3,7 +3,7 @@
   import { router } from '$lib/router.svelte';
   import { langStore } from '$lib/stores/lang.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import logoSvg from '$assets/logo-sanggar-pelita-budaya.svg';
+  import logoSvg from '$assets/logo/logo-sanggar-pelita-budaya.svg';
   import Drawer from '$lib/components/Drawer.svelte';
 
   let mobileOpen = $state(false);

@@ -3,7 +3,7 @@
   import { gsap } from 'gsap';
   import { t } from '$lib/i18n/index.svelte';
   import { SITE_CONTENT } from '$lib/constants';
-  import heroBg from '$assets/hero-bg.webp';
+  import heroBg from '$assets/images/hero/hero-bg.webp';
   import Button from '$lib/components/Button.svelte';
   import { ArrowRight } from '@lucide/svelte';
 
