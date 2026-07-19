@@ -2,7 +2,6 @@
   import { Menu, Globe } from '@lucide/svelte';
   import { router } from '$lib/router.svelte';
   import { langStore } from '$lib/stores/lang.svelte';
-  import { settingsStore } from '$lib/stores/settings.svelte';
   import { t } from '$lib/i18n/index.svelte';
   import logoSvg from '$assets/logo-sanggar-pelita-budaya.svg';
   import Drawer from '$lib/components/Drawer.svelte';
@@ -17,7 +16,6 @@
   ];
 
   const currentPath = $derived(router.current.path);
-  const siteName = $derived(settingsStore.siteName);
 
   function isActive(path: string): boolean {
     if (path === '/') return currentPath === '/';
@@ -33,8 +31,8 @@
 <header class="navbar">
   <div class="navbar__inner">
     <a href="/" class="navbar__logo" onclick={(e) => { e.preventDefault(); navigate('/'); }}>
-      <img src={logoSvg} alt={siteName} class="navbar__logo-img" />
-      <span class="navbar__logo-text">{siteName}</span>
+      <img src={logoSvg} alt="Sanggar Pelita Budaya" class="navbar__logo-img" />
+      <span class="navbar__logo-text">Sanggar Pelita Budaya</span>
     </a>
 
     <nav class="navbar__nav" aria-label="Primary">
@@ -80,7 +78,7 @@
   </div>
 </header>
 
-<Drawer open={mobileOpen} side="right" title={siteName} onclose={() => (mobileOpen = false)}>
+<Drawer open={mobileOpen} side="right" title="Sanggar Pelita Budaya" onclose={() => (mobileOpen = false)}>
   <nav class="mobile-nav" aria-label="Mobile navigation">
     {#each navItems as item (item.path)}
       <a
