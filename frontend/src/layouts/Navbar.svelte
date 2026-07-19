@@ -141,11 +141,11 @@
   }
 
   .nav-link {
-    font-family: var(--font-script);
-    font-size: var(--fs-body-lg);
+    font-family: var(--font-serif);
+    font-size: var(--fs-body-md);
     color: var(--color-text);
     text-decoration: none;
-    transform: translateY(0.2rem);
+    transform: translateY(0.025rem);
     transition: color var(--duration-fast) var(--ease-smooth);
   }
 
