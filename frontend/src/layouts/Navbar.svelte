@@ -131,11 +131,11 @@
   }
 
   .navbar__logo-text {
-    font-family: var(--font-serif);
+    font-family: var(--font-script);
     font-size: var(--fs-h4);
-    font-weight: var(--fw-semibold);
     color: var(--color-brown);
-    letter-spacing: var(--tracking-tight);
+    letter-spacing: normal;
+    line-height: 1;
   }
 
   .navbar__nav {
