@@ -4,7 +4,7 @@
   import { t } from '$lib/i18n/index.svelte';
   import { SITE_CONTENT } from '$lib/constants';
   import { router } from '$lib/router.svelte';
-  import logoSvg from '$assets/logo-sanggar-pelita-budaya.svg';
+  import logoSvg from '$assets/logo/logo-sanggar-pelita-budaya.svg';
 
   const siteName = $derived(settingsStore.siteName);
 
