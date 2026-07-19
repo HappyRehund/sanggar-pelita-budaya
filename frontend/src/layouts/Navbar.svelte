@@ -145,6 +145,7 @@
     font-size: var(--fs-body-lg);
     color: var(--color-text);
     text-decoration: none;
+    transform: translateY(0.2rem);
     transition: color var(--duration-fast) var(--ease-smooth);
   }
 
@@ -185,8 +186,9 @@
     padding: var(--sp-1) var(--sp-3);
     border: none;
     border-radius: var(--radius-full);
-    font-family: var(--font-script);
+    font-family: var(--font-serif);
     font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
     letter-spacing: var(--tracking-wide);
     color: var(--color-text-muted);
     background: transparent;
@@ -239,6 +241,7 @@
     font-family: var(--font-script);
     color: var(--color-text);
     border-radius: var(--radius-md);
+    transform: translateY(0.2rem);
     transition: background-color var(--duration-fast) var(--ease-smooth), color var(--duration-fast) var(--ease-smooth);
   }
 
