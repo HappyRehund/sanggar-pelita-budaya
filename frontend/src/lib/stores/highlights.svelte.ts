@@ -1,14 +1,14 @@
-import { portfolioApi } from '$lib/api';
+import { highlightsApi } from '$lib/api';
 import type {
-  Portfolio,
-  PortfolioListSummary,
-  PortfolioListQuery,
-  PortfolioCategory,
-  PortfolioSort,
+  Highlight,
+  HighlightListSummary,
+  HighlightListQuery,
+  HighlightCategory,
+  HighlightSort,
 } from '$lib/types';
 
-class PortfolioStore {
-  items = $state<PortfolioListSummary[]>([]);
+class HighlightsStore {
+  items = $state<HighlightListSummary[]>([]);
   pagination = $state({
     current_page: 1,
     total_pages: 1,
@@ -20,19 +20,19 @@ class PortfolioStore {
   loading = $state(false);
   error = $state<string | null>(null);
 
-  category = $state<PortfolioCategory | 'all'>('all');
+  category = $state<HighlightCategory | 'all'>('all');
   search = $state('');
-  sort = $state<PortfolioSort>('newest');
+  sort = $state<HighlightSort>('newest');
   page = $state(1);
 
-  featured = $state<PortfolioListSummary[]>([]);
-  current = $state<Portfolio | null>(null);
+  featured = $state<HighlightListSummary[]>([]);
+  current = $state<Highlight | null>(null);
 
   async fetchList(): Promise<void> {
     this.loading = true;
     this.error = null;
     try {
-      const query: PortfolioListQuery = {
+      const query: HighlightListQuery = {
         page: this.page,
         per_page: 12,
         category: this.category,
@@ -40,11 +40,11 @@ class PortfolioStore {
         sort: this.sort,
         published: true,
       };
-      const result = await portfolioApi.list(query);
+      const result = await highlightsApi.list(query);
       this.items = result.items;
       this.pagination = result.pagination;
     } catch (e) {
-      this.error = e instanceof Error ? e.message : 'Failed to load portfolio';
+      this.error = e instanceof Error ? e.message : 'Failed to load highlights';
     } finally {
       this.loading = false;
     }
@@ -52,20 +52,20 @@ class PortfolioStore {
 
   async fetchFeatured(limit = 6): Promise<void> {
     try {
-      this.featured = await portfolioApi.featured(limit);
+      this.featured = await highlightsApi.featured(limit);
     } catch {
       this.featured = [];
     }
   }
 
-  async fetchBySlug(slug: string): Promise<Portfolio | null> {
+  async fetchBySlug(slug: string): Promise<Highlight | null> {
     this.loading = true;
     this.error = null;
     try {
-      this.current = await portfolioApi.getBySlug(slug);
+      this.current = await highlightsApi.getBySlug(slug);
       return this.current;
     } catch (e) {
-      this.error = e instanceof Error ? e.message : 'Failed to load portfolio';
+      this.error = e instanceof Error ? e.message : 'Failed to load highlights';
       this.current = null;
       return null;
     } finally {
@@ -73,7 +73,7 @@ class PortfolioStore {
     }
   }
 
-  setCategory(category: PortfolioCategory | 'all'): void {
+  setCategory(category: HighlightCategory | 'all'): void {
     this.category = category;
     this.page = 1;
     this.fetchList();
@@ -85,7 +85,7 @@ class PortfolioStore {
     this.fetchList();
   }
 
-  setSort(sort: PortfolioSort): void {
+  setSort(sort: HighlightSort): void {
     this.sort = sort;
     this.page = 1;
     this.fetchList();
@@ -108,4 +108,4 @@ class PortfolioStore {
   }
 }
 
-export const portfolioStore = new PortfolioStore();
+export const highlightsStore = new HighlightsStore();

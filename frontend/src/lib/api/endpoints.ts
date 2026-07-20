@@ -14,15 +14,15 @@ export const API = {
   HEALTH: '/api/health',
   INFO: '/api/info',
 
-  // Portfolio
-  PORTFOLIO: '/api/portfolio',
-  PORTFOLIO_FEATURED: '/api/portfolio/featured',
-  PORTFOLIO_GALLERY: '/api/portfolio/gallery',
-  PORTFOLIO_SLUG: (slug: string) => `/api/portfolio/slug/${slug}`,
-  PORTFOLIO_DETAIL: (id: number) => `/api/portfolio/${id}`,
-  PORTFOLIO_MEDIA: (id: number) => `/api/portfolio/${id}/media`,
-  PORTFOLIO_MEDIA_DETAIL: (id: number) => `/api/portfolio/media/${id}`,
-  PORTFOLIO_MEDIA_REORDER: '/api/portfolio/media/reorder',
+  // Highlights
+  HIGHLIGHTS: '/api/highlights',
+  HIGHLIGHTS_FEATURED: '/api/highlights/featured',
+  HIGHLIGHTS_GALLERY: '/api/highlights/gallery',
+  HIGHLIGHTS_SLUG: (slug: string) => `/api/highlights/slug/${slug}`,
+  HIGHLIGHTS_DETAIL: (id: number) => `/api/highlights/${id}`,
+  HIGHLIGHTS_MEDIA: (id: number) => `/api/highlights/${id}/media`,
+  HIGHLIGHTS_MEDIA_DETAIL: (id: number) => `/api/highlights/media/${id}`,
+  HIGHLIGHTS_MEDIA_REORDER: '/api/highlights/media/reorder',
 
   // Organization
   ORGANIZATION: '/api/organization',

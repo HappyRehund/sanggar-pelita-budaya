@@ -2,14 +2,14 @@ import { api, ApiError } from './client';
 import { API } from './endpoints';
 import type {
   User,
-  Portfolio,
-  PortfolioListSummary,
-  PortfolioMedia,
+  Highlight,
+  HighlightListSummary,
+  HighlightMedia,
   OrganizationMember,
   Settings,
   DashboardData,
   PaginatedResponse,
-  PortfolioListQuery,
+  HighlightListQuery,
 } from '$lib/types';
 
 export { ApiError };
@@ -28,9 +28,9 @@ export const healthApi = {
   check: () => api.get<{ status: string; time: string; env: string }>(API.HEALTH),
 };
 
-/* ---- Portfolio ---------------------------------------------------- */
-export const portfolioApi = {
-  list: (query: PortfolioListQuery = {}) => {
+/* ---- Highlights --------------------------------------------------- */
+export const highlightsApi = {
+  list: (query: HighlightListQuery = {}) => {
     const params = new URLSearchParams();
     if (query.page) params.set('page', String(query.page));
     if (query.per_page) params.set('per_page', String(query.per_page));
@@ -40,40 +40,40 @@ export const portfolioApi = {
     if (query.featured !== undefined) params.set('featured', String(query.featured));
     if (query.published !== undefined) params.set('published', String(query.published));
     const qs = params.toString();
-    return api.get<PaginatedResponse<PortfolioListSummary>>(
-      qs ? `${API.PORTFOLIO}?${qs}` : API.PORTFOLIO
+    return api.get<PaginatedResponse<HighlightListSummary>>(
+      qs ? `${API.HIGHLIGHTS}?${qs}` : API.HIGHLIGHTS
     );
   },
 
   featured: (limit = 6) =>
-    api.get<PortfolioListSummary[]>(`${API.PORTFOLIO_FEATURED}?limit=${limit}`),
+    api.get<HighlightListSummary[]>(`${API.HIGHLIGHTS_FEATURED}?limit=${limit}`),
 
-  galleryImages: () => api.get<PortfolioMedia[]>(API.PORTFOLIO_GALLERY),
+  galleryImages: () => api.get<HighlightMedia[]>(API.HIGHLIGHTS_GALLERY),
 
-  getBySlug: (slug: string) => api.get<Portfolio>(API.PORTFOLIO_SLUG(slug)),
+  getBySlug: (slug: string) => api.get<Highlight>(API.HIGHLIGHTS_SLUG(slug)),
 
-  getById: (id: number) => api.get<Portfolio>(API.PORTFOLIO_DETAIL(id)),
+  getById: (id: number) => api.get<Highlight>(API.HIGHLIGHTS_DETAIL(id)),
 
-  create: (data: Partial<Portfolio>) => api.post<Portfolio>(API.PORTFOLIO, data),
+  create: (data: Partial<Highlight>) => api.post<Highlight>(API.HIGHLIGHTS, data),
 
-  update: (id: number, data: Partial<Portfolio>) => api.put<Portfolio>(API.PORTFOLIO_DETAIL(id), data),
+  update: (id: number, data: Partial<Highlight>) => api.put<Highlight>(API.HIGHLIGHTS_DETAIL(id), data),
 
-  delete: (id: number) => api.delete<null>(API.PORTFOLIO_DETAIL(id)),
+  delete: (id: number) => api.delete<null>(API.HIGHLIGHTS_DETAIL(id)),
 
-  listMedia: (id: number) => api.get<PortfolioMedia[]>(API.PORTFOLIO_MEDIA(id)),
+  listMedia: (id: number) => api.get<HighlightMedia[]>(API.HIGHLIGHTS_MEDIA(id)),
 
   uploadMedia: (id: number, file: File, type: 'cover' | 'gallery' | 'og', altText?: string) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
     if (altText) formData.append('alt_text', altText);
-    return api.post<PortfolioMedia>(API.PORTFOLIO_MEDIA(id), formData);
+    return api.post<HighlightMedia>(API.HIGHLIGHTS_MEDIA(id), formData);
   },
 
-  deleteMedia: (mediaId: number) => api.delete<null>(API.PORTFOLIO_MEDIA_DETAIL(mediaId)),
+  deleteMedia: (mediaId: number) => api.delete<null>(API.HIGHLIGHTS_MEDIA_DETAIL(mediaId)),
 
   reorderMedia: (order: Record<string, number>) =>
-    api.put<null>(API.PORTFOLIO_MEDIA_REORDER, { order }),
+    api.put<null>(API.HIGHLIGHTS_MEDIA_REORDER, { order }),
 };
 
 /* ---- Organization ------------------------------------------------- */
