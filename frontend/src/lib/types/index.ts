@@ -17,13 +17,13 @@ export interface User {
 /* ---- Language ------------------------------------------------------ */
 export type Lang = 'id' | 'en';
 
-/* ---- Portfolio ----------------------------------------------------- */
-export type PortfolioCategory = 'achievement' | 'activity';
+/* ---- Highlights ---------------------------------------------------- */
+export type HighlightCategory = 'achievement' | 'activity';
 export type MediaKind = 'cover' | 'gallery' | 'og';
 
-export interface PortfolioMedia {
+export interface HighlightMedia {
   id: number;
-  portfolio_id: number;
+  highlight_id: number;
   type: MediaKind;
   filename: string;
   original_filename: string;
@@ -37,18 +37,18 @@ export interface PortfolioMedia {
   created_at: string;
 }
 
-export interface Portfolio {
+export interface Highlight {
   id: number;
   title: string;
   slug: string;
-  category: PortfolioCategory;
+  category: HighlightCategory;
   short_description: string;
   content: string;
-  cover_image_id: number | null;
-  cover?: PortfolioMedia | null;
-  og_image_id: number | null;
-  og_image?: PortfolioMedia | null;
-  gallery?: PortfolioMedia[];
+  cover_media_id: number | null;
+  cover?: HighlightMedia | null;
+  og_media_id: number | null;
+  og_media?: HighlightMedia | null;
+  gallery?: HighlightMedia[];
   event_date: string | null;
   location: string | null;
   youtube_url: string | null;
@@ -58,18 +58,18 @@ export interface Portfolio {
   seo_description: string | null;
   created_at: string;
   updated_at: string;
-  related?: PortfolioListSummary[];
+  related?: HighlightListSummary[];
 }
 
-export interface PortfolioListSummary {
+export interface HighlightListSummary {
   id: number;
   title: string;
   slug: string;
-  category: PortfolioCategory;
+  category: HighlightCategory;
   short_description: string;
   event_date: string | null;
   location: string | null;
-  cover?: PortfolioMedia | null;
+  cover?: HighlightMedia | null;
   featured: boolean;
   published: boolean;
 }
@@ -104,12 +104,12 @@ export interface Settings {
 
 /* ---- Dashboard ------------------------------------------------------ */
 export interface DashboardStats {
-  total_portfolio: number;
+  total_highlights: number;
   achievements: number;
   activities: number;
   organization_members: number;
-  published_portfolio: number;
-  draft_portfolio: number;
+  published_highlights: number;
+  draft_highlights: number;
 }
 
 export interface RecentUpload {
@@ -117,7 +117,7 @@ export interface RecentUpload {
   filename: string;
   original_filename: string;
   created_at: string;
-  portfolio_id: number | null;
+  highlight_id: number | null;
 }
 
 export interface DashboardData {
@@ -146,15 +146,15 @@ export interface ValidationError {
   message: string;
 }
 
-/* ---- Portfolio queries ---------------------------------------------- */
-export type PortfolioSort = 'newest' | 'oldest' | 'alphabetical';
+/* ---- Highlights queries --------------------------------------------- */
+export type HighlightSort = 'newest' | 'oldest' | 'alphabetical';
 
-export interface PortfolioListQuery {
+export interface HighlightListQuery {
   page?: number;
   per_page?: number;
-  category?: PortfolioCategory | 'all';
+  category?: HighlightCategory | 'all';
   search?: string;
-  sort?: PortfolioSort;
+  sort?: HighlightSort;
   featured?: boolean;
   published?: boolean;
 }

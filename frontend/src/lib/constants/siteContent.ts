@@ -6,7 +6,7 @@
 
 export const SITE_CONTENT = {
   /** Hero primary CTA target. Text comes from i18n key `hero_cta_primary`. */
-  heroPrimaryCtaUrl: '/portfolio',
+  heroPrimaryCtaUrl: '/highlights',
 
   /** Google Maps link shown in Footer and Home ContactCta section. */
   mapsUrl: '',

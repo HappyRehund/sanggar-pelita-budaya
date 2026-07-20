@@ -14,13 +14,13 @@ export const UPLOAD_ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'] as const
 
 export const UPLOAD_FOLDERS = {
   HERO: 'hero',
-  PORTFOLIO: 'portfolio',
+  HIGHLIGHTS: 'highlights',
   ORGANIZATION: 'organization',
   SETTINGS: 'settings',
   DOCUMENTS: 'documents',
 } as const;
 
-export const PORTFOLIO_PER_PAGE = 12;
-export const FEATURED_PORTFOLIO_LIMIT = 6;
-export const RELATED_PORTFOLIO_LIMIT = 4;
-export const GALLERY_IMAGE_LIMIT = 10;
+export const HIGHLIGHTS_PER_PAGE = 12;
+export const FEATURED_HIGHLIGHTS_LIMIT = 6;
+export const RELATED_HIGHLIGHTS_LIMIT = 4;
+export const HIGHLIGHTS_GALLERY_IMAGE_LIMIT = 10;

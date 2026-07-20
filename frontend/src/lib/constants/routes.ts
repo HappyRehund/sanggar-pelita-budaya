@@ -6,14 +6,14 @@ export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
   ORGANIZATION: '/organization',
-  PORTFOLIO: '/portfolio',
-  PORTFOLIO_DETAIL: '/portfolio/:slug',
+  HIGHLIGHTS: '/highlights',
+  HIGHLIGHTS_DETAIL: '/highlights/:slug',
   ADMIN: '/admin',
   ADMIN_LOGIN: '/admin/login',
   ADMIN_DASHBOARD: '/admin/dashboard',
-  ADMIN_PORTFOLIO: '/admin/portfolio',
-  ADMIN_PORTFOLIO_NEW: '/admin/portfolio/new',
-  ADMIN_PORTFOLIO_EDIT: '/admin/portfolio/:id',
+  ADMIN_HIGHLIGHTS: '/admin/highlights',
+  ADMIN_HIGHLIGHTS_NEW: '/admin/highlights/new',
+  ADMIN_HIGHLIGHTS_EDIT: '/admin/highlights/:id',
   ADMIN_ORGANIZATION: '/admin/organization',
   ADMIN_SETTINGS: '/admin/settings',
   NOT_FOUND: '*',
@@ -21,10 +21,10 @@ export const ROUTES = {
 
 export type RoutePath = (typeof ROUTES)[keyof typeof ROUTES];
 
-export function portfolioDetailPath(slug: string): string {
-  return `/portfolio/${slug}`;
+export function highlightDetailPath(slug: string): string {
+  return `/highlights/${slug}`;
 }
 
-export function portfolioEditPath(id: number): string {
-  return `/admin/portfolio/${id}`;
+export function highlightEditPath(id: number): string {
+  return `/admin/highlights/${id}`;
 }

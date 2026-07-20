@@ -1,16 +1,16 @@
 /* ============================================================
-   Portfolio category constants
+   Highlights category constants
    ============================================================ */
 
-import type { PortfolioCategory } from '$lib/types';
+import type { HighlightCategory } from '$lib/types';
 
-export const CATEGORIES: PortfolioCategory[] = ['achievement', 'activity'];
+export const CATEGORIES: HighlightCategory[] = ['achievement', 'activity'];
 
-export const CATEGORY_LABELS: Record<PortfolioCategory, { en: string; id: string }> = {
+export const CATEGORY_LABELS: Record<HighlightCategory, { en: string; id: string }> = {
   achievement: { en: 'Achievement', id: 'Prestasi' },
   activity: { en: 'Activity', id: 'Kegiatan' },
 };
 
-export function categoryLabel(category: PortfolioCategory, lang: 'en' | 'id'): string {
+export function categoryLabel(category: HighlightCategory, lang: 'en' | 'id'): string {
   return CATEGORY_LABELS[category][lang];
 }
