@@ -9,24 +9,24 @@
   import img3 from '$assets/images/about/about-3.jpg';
 
   type SlotName = 'front' | 'left' | 'right';
-  type Card = { key: string; src: string };
+  type Card = { key: string; src: string; outline: string };
 
   const cards: Card[] = [
-    { key: 'a', src: img1 },
-    { key: 'b', src: img2 },
-    { key: 'c', src: img3 },
+    { key: 'a', src: img1, outline: 'var(--color-red)' },
+    { key: 'b', src: img2, outline: 'var(--color-gold-dark)' },
+    { key: 'c', src: img3, outline: 'var(--color-ink)' },
   ];
 
   let order = $state<string[]>(cards.map((c) => c.key));
 
-  const ROTATE_MS = 1500;
+  const ROTATE_MS = 2500;
   const FRONT_SHADOW = '0 26px 46px -14px rgba(20,20,15,0.30), 0 10px 18px -10px rgba(20,20,15,0.18)';
   const SIDE_SHADOW = '0 14px 26px -12px rgba(20,20,15,0.20)';
 
   const slotStyles: Record<SlotName, { transform: string; z: number; scrim: number; shadow: string }> = {
     front: { transform: 'translate(-50%, 0) rotate(0deg) scale(1)',                          z: 3, scrim: 0,    shadow: FRONT_SHADOW },
-    left:  { transform: 'translate(calc(-50% - 110px), 38px) rotate(-9deg) scale(0.92)',     z: 2, scrim: 0.18, shadow: SIDE_SHADOW },
-    right: { transform: 'translate(calc(-50% + 110px), 38px) rotate(9deg) scale(0.92)',      z: 1, scrim: 0.18, shadow: SIDE_SHADOW },
+    left:  { transform: 'translate(calc(-50% - 130px), 44px) rotate(-9deg) scale(0.92)',   z: 2, scrim: 0.18, shadow: SIDE_SHADOW },
+    right: { transform: 'translate(calc(-50% + 130px), 44px) rotate(9deg) scale(0.92)',     z: 1, scrim: 0.18, shadow: SIDE_SHADOW },
   };
 
   function slotFor(key: string): SlotName {
@@ -114,8 +114,10 @@
             style:--scrim={style.scrim}
             style:--shadow={style.shadow}
           >
-            <span class="stack__scrim" aria-hidden="true"></span>
-            <img src={card.src} alt="" class="stack__img" loading="lazy" />
+            <span class="stack__frame">
+              <span class="stack__scrim" aria-hidden="true"></span>
+              <img src={card.src} alt="" class="stack__img" loading="lazy" />
+            </span>
           </button>
         {/each}
       </div>
@@ -145,12 +147,13 @@
     position: relative;
     border-radius: var(--radius-3xl);
     aspect-ratio: 4 / 5;
+    padding-top: var(--sp-8);
   }
 
   .stack {
     position: relative;
-    width: 300px;
-    height: 452px;
+    width: 360px;
+    height: 542px;
     max-width: 100%;
     margin: 0 auto;
     transform: scale(1);
@@ -161,15 +164,15 @@
     position: absolute;
     top: 0;
     left: 50%;
-    width: 300px;
-    height: 440px;
-    margin-left: -150px;
+    width: 360px;
+    height: 528px;
+    margin-left: -180px;
     border: 0;
-    padding: 0;
-    border-radius: 26px;
+    padding: 2px;
+    border-radius: 30px;
     overflow: hidden;
     cursor: pointer;
-    background: #ffffff;
+    background: linear-gradient(135deg, var(--color-red), var(--color-gold-dark));
     transform: var(--tx);
     z-index: var(--z);
     box-shadow: var(--shadow);
@@ -177,6 +180,15 @@
       transform 0.85s cubic-bezier(0.3, 1.15, 0.4, 1),
       box-shadow 0.85s ease;
     will-change: transform;
+  }
+
+  .stack__frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+    z-index: 1;
   }
 
   .stack__card:focus-visible {
@@ -242,7 +254,7 @@
     }
     .about-preview__image {
       aspect-ratio: auto;
-      min-height: 420px;
+      min-height: 480px;
     }
     .stack {
       transform: scale(0.82);
