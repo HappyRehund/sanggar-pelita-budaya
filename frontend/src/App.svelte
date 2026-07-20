@@ -17,22 +17,22 @@
   import Home from './routes/Home.svelte';
   import AboutPage from '$modules/about/pages/AboutPage.svelte';
   import OrganizationPage from '$modules/organization/pages/OrganizationPage.svelte';
-  import PortfolioListPage from '$modules/portfolio/pages/PortfolioListPage.svelte';
-  import PortfolioDetailPage from '$modules/portfolio/pages/PortfolioDetailPage.svelte';
+  import HighlightsListPage from '$modules/highlights/pages/HighlightsListPage.svelte';
+  import HighlightsDetailPage from '$modules/highlights/pages/HighlightsDetailPage.svelte';
   import Login from './routes/admin/Login.svelte';
   import NotFound from './routes/NotFound.svelte';
 
   defineRoute('/');
   defineRoute('/about');
   defineRoute('/organization');
-  defineRoute('/portfolio');
-  defineRoute('/portfolio/:slug');
+  defineRoute('/highlights');
+  defineRoute('/highlights/:slug');
   defineRoute('/admin/login');
-defineRoute('/admin');
-defineRoute('/admin/portfolio');
-defineRoute('/admin/organization');
-defineRoute('/admin/settings');
-defineRoute('*');
+  defineRoute('/admin');
+  defineRoute('/admin/highlights');
+  defineRoute('/admin/organization');
+  defineRoute('/admin/settings');
+  defineRoute('*');
 
   let appContainer: HTMLElement;
   let pageContainer = $state<HTMLElement | null>(null);
@@ -66,7 +66,7 @@ defineRoute('*');
   async function loadAdminPage(path: string): Promise<any> {
     switch (path) {
       case '/admin': return (await import('$modules/admin/pages/Dashboard.svelte')).default;
-      case '/admin/portfolio': return (await import('$modules/admin/pages/PortfolioAdmin.svelte')).default;
+      case '/admin/highlights': return (await import('$modules/admin/pages/HighlightsAdmin.svelte')).default;
       case '/admin/organization': return (await import('$modules/admin/pages/OrganizationAdmin.svelte')).default;
       case '/admin/settings': return (await import('$modules/admin/pages/SettingsAdmin.svelte')).default;
       default: return NotFound;
@@ -78,8 +78,8 @@ defineRoute('*');
     if (m.path === '/') return { component: Home, key: 'home' };
     if (m.path === '/about') return { component: AboutPage, key: 'about' };
     if (m.path === '/organization') return { component: OrganizationPage, key: 'organization' };
-    if (m.path === '/portfolio') return { component: PortfolioListPage, key: 'portfolio' };
-    if (m.path === '/portfolio/:slug') return { component: PortfolioDetailPage, key: 'portfolio-detail' };
+    if (m.path === '/highlights') return { component: HighlightsListPage, key: 'highlights' };
+    if (m.path === '/highlights/:slug') return { component: HighlightsDetailPage, key: 'highlights-detail' };
     if (m.path === '/admin/login') return { component: Login, key: 'admin-login' };
     return null;
   }

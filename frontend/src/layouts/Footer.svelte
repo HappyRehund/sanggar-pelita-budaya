@@ -12,7 +12,7 @@
     { path: '/', label: () => t('nav_home') },
     { path: '/about', label: () => t('nav_about') },
     { path: '/organization', label: () => t('nav_organization') },
-    { path: '/portfolio', label: () => t('nav_portfolio') },
+    { path: '/highlights', label: () => t('nav_highlights') },
   ];
 
   const socials = $derived([

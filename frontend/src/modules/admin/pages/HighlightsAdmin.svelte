@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { portfolioApi } from '$lib/api';
+  import { highlightsApi } from '$lib/api';
   import { t } from '$lib/i18n/index.svelte';
   import { notifications } from '$lib/stores/notification.svelte';
   import { categoryLabel } from '$lib/constants/categories';
   import { slugify } from '$lib/utils';
   import { formatDateInput, uploadUrl, imageUrl } from '$lib/utils';
   import { langStore } from '$lib/stores/lang.svelte';
-  import type { PortfolioListSummary, PortfolioCategory, PortfolioMedia } from '$lib/types';
+  import type { HighlightListSummary, HighlightCategory, HighlightMedia } from '$lib/types';
   import Button from '$lib/components/Button.svelte';
   import Input from '$lib/components/Input.svelte';
   import Textarea from '$lib/components/Textarea.svelte';
@@ -22,20 +22,20 @@
   import { Plus, Search, Pencil, Trash2, ArrowLeft, X } from '@lucide/svelte';
 
   let mode = $state<'list' | 'edit' | 'create'>('list');
-  let items = $state<PortfolioListSummary[]>([]);
+  let items = $state<HighlightListSummary[]>([]);
   let loading = $state(true);
   let search = $state('');
   let saving = $state(false);
-  let deleteTarget = $state<PortfolioListSummary | null>(null);
+  let deleteTarget = $state<HighlightListSummary | null>(null);
 
   let formData = $state({
-    title: '', slug: '', category: 'activity' as PortfolioCategory,
+    title: '', slug: '', category: 'activity' as HighlightCategory,
     short_description: '', content: '', event_date: '', location: '',
     youtube_url: '', featured: false, published: false,
     seo_title: '', seo_description: '',
   });
-  let coverMedia = $state<PortfolioMedia | null>(null);
-  let galleryMedia = $state<PortfolioMedia[]>([]);
+  let coverMedia = $state<HighlightMedia | null>(null);
+  let galleryMedia = $state<HighlightMedia[]>([]);
   let slugTouched = $state(false);
 
   let editId = $state<number | null>(null);
@@ -47,7 +47,7 @@
   async function loadList(): Promise<void> {
     loading = true;
     try {
-      const result = await portfolioApi.list({});
+      const result = await highlightsApi.list({});
       items = result.items;
     } catch {
       notifications.error(t('toast_error'));
@@ -65,12 +65,12 @@
     slugTouched = false;
   }
 
-  async function startEdit(item: PortfolioListSummary): Promise<void> {
+  async function startEdit(item: HighlightListSummary): Promise<void> {
     mode = 'edit';
     editId = item.id;
     loading = true;
     try {
-      const full = await portfolioApi.getById(item.id);
+      const full = await highlightsApi.getById(item.id);
       coverMedia = full.cover ?? null;
       galleryMedia = full.gallery ?? [];
       formData = {
@@ -109,12 +109,12 @@
     const payload = { ...formData, published: publish ? true : formData.published };
     try {
       if (editId !== null) {
-        await portfolioApi.update(editId, payload);
-        notifications.success(t('toast_portfolio_updated'));
+        await highlightsApi.update(editId, payload);
+        notifications.success(t('toast_highlights_updated'));
       } else {
-        const created = await portfolioApi.create(payload);
+        const created = await highlightsApi.create(payload);
         editId = created.id;
-        notifications.success(t('toast_portfolio_created'));
+        notifications.success(t('toast_highlights_created'));
       }
       await loadList();
       backToList();
@@ -133,8 +133,8 @@
   async function handleDelete(): Promise<void> {
     if (!deleteTarget) return;
     try {
-      await portfolioApi.delete(deleteTarget.id);
-      notifications.success(t('toast_portfolio_deleted'));
+      await highlightsApi.delete(deleteTarget.id);
+      notifications.success(t('toast_highlights_deleted'));
       await loadList();
     } catch {
       notifications.error(t('toast_error'));
@@ -146,7 +146,7 @@
   async function handleCoverUpload(files: File[]): Promise<void> {
     if (!editId || files.length === 0) return;
     try {
-      const media = await portfolioApi.uploadMedia(editId, files[0], 'cover');
+      const media = await highlightsApi.uploadMedia(editId, files[0], 'cover');
       coverMedia = media;
       notifications.success(t('upload_success'));
     } catch {
@@ -158,7 +158,7 @@
     if (!editId || files.length === 0) return;
     try {
       for (const file of files) {
-        const media = await portfolioApi.uploadMedia(editId, file, 'gallery');
+        const media = await highlightsApi.uploadMedia(editId, file, 'gallery');
         galleryMedia = [...galleryMedia, media];
       }
       notifications.success(t('upload_success'));
@@ -167,9 +167,9 @@
     }
   }
 
-  async function deleteMedia(media: PortfolioMedia): Promise<void> {
+  async function deleteMedia(media: HighlightMedia): Promise<void> {
     try {
-      await portfolioApi.deleteMedia(media.id);
+      await highlightsApi.deleteMedia(media.id);
       galleryMedia = galleryMedia.filter((m) => m.id !== media.id);
       if (coverMedia?.id === media.id) coverMedia = null;
       notifications.success(t('toast_deleted'));
@@ -181,7 +181,7 @@
   async function deleteCover(): Promise<void> {
     if (!coverMedia) return;
     try {
-      await portfolioApi.deleteMedia(coverMedia.id);
+      await highlightsApi.deleteMedia(coverMedia.id);
       coverMedia = null;
       notifications.success(t('toast_deleted'));
     } catch {
@@ -195,10 +195,10 @@
 {#if mode === 'list'}
   <div class="admin-page">
     <div class="admin-page__header">
-      <h1 class="admin-page__title">{t('admin_portfolio_title')}</h1>
+      <h1 class="admin-page__title">{t('admin_highlights_title')}</h1>
       <Button variant="primary" size="sm" onclick={startCreate}>
         <Plus size={16} />
-        {t('admin_portfolio_new')}
+        {t('admin_highlights_new')}
       </Button>
     </div>
 
@@ -210,32 +210,32 @@
     {#if loading}
       {#each Array(5) as _, i (i)}<Skeleton variant="rect" height="60px" />{/each}
     {:else if filteredItems.length === 0}
-      <EmptyState title={t('admin_portfolio_empty')} />
+      <EmptyState title={t('admin_highlights_empty')} />
     {:else}
       <div class="table-wrap">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>{t('admin_portfolio_col_cover')}</th>
-              <th>{t('admin_portfolio_col_title')}</th>
-              <th>{t('admin_portfolio_col_category')}</th>
-              <th>{t('admin_portfolio_col_location')}</th>
-              <th>{t('admin_portfolio_col_status')}</th>
-              <th>{t('admin_portfolio_col_actions')}</th>
+              <th>{t('admin_highlights_col_cover')}</th>
+              <th>{t('admin_highlights_col_title')}</th>
+              <th>{t('admin_highlights_col_category')}</th>
+              <th>{t('admin_highlights_col_location')}</th>
+              <th>{t('admin_highlights_col_status')}</th>
+              <th>{t('admin_highlights_col_actions')}</th>
             </tr>
           </thead>
           <tbody>
             {#each filteredItems as item (item.id)}
               <tr>
                 <td>
-                  <img src={item.cover ? uploadUrl(item.cover.filename) : imageUrl(`p-${item.slug}`, 80, 60)} alt="" class="table-thumb" />
+                  <img src={item.cover ? uploadUrl(item.cover.filename) : imageUrl(`h-${item.slug}`, 80, 60)} alt="" class="table-thumb" />
                 </td>
                 <td>{item.title}</td>
                 <td><Badge variant={item.category}>{categoryLabel(item.category, langStore.current)}</Badge></td>
                 <td>{item.location || '—'}</td>
                 <td>
                   <span class="status-badge" class:status-badge--published={item.published} class:status-badge--draft={!item.published}>
-                    {item.published ? t('admin_portfolio_status_published') : t('admin_portfolio_status_draft')}
+                    {item.published ? t('admin_highlights_status_published') : t('admin_highlights_status_draft')}
                   </span>
                 </td>
                 <td>
@@ -255,7 +255,7 @@
   <div class="admin-page">
     <div class="admin-page__header">
       <button class="back-btn" onclick={backToList}><ArrowLeft size={18} /> {t('back')}</button>
-      <h1 class="admin-page__title">{editId ? t('admin_portfolio_edit') : t('admin_portfolio_new')}</h1>
+      <h1 class="admin-page__title">{editId ? t('admin_highlights_edit') : t('admin_highlights_new')}</h1>
     </div>
 
     {#if loading}
@@ -263,28 +263,28 @@
     {:else}
       <div class="form-grid">
         <div class="form-main">
-          <Input label={t('admin_portfolio_field_title')} value={formData.title} oninput={onTitleInput} placeholder="Traditional Dance Festival 2026" />
-          <Input label={t('admin_portfolio_field_slug')} value={formData.slug} oninput={onSlugInput} placeholder="traditional-dance-festival-2026" hint={t('admin_portfolio_field_slug')} />
+          <Input label={t('admin_highlights_field_title')} value={formData.title} oninput={onTitleInput} placeholder="Traditional Dance Festival 2026" />
+          <Input label={t('admin_highlights_field_slug')} value={formData.slug} oninput={onSlugInput} placeholder="traditional-dance-festival-2026" hint={t('admin_highlights_field_slug')} />
           <div class="form-row">
-            <Select label={t('admin_portfolio_field_category')} value={formData.category} options={[{value:'achievement',label:t('category_achievement')},{value:'activity',label:t('category_activity')}]} onchange={(e) => (formData.category = (e.target as HTMLSelectElement).value as PortfolioCategory)} />
-            <Input label={t('admin_portfolio_field_event_date')} type="date" value={formData.event_date} oninput={(e) => (formData.event_date = (e.target as HTMLInputElement).value)} />
+            <Select label={t('admin_highlights_field_category')} value={formData.category} options={[{value:'achievement',label:t('category_achievement')},{value:'activity',label:t('category_activity')}]} onchange={(e) => (formData.category = (e.target as HTMLSelectElement).value as HighlightCategory)} />
+            <Input label={t('admin_highlights_field_event_date')} type="date" value={formData.event_date} oninput={(e) => (formData.event_date = (e.target as HTMLInputElement).value)} />
           </div>
-          <Input label={t('admin_portfolio_field_location')} value={formData.location} oninput={(e) => (formData.location = (e.target as HTMLInputElement).value)} placeholder="Jakarta, Indonesia" />
-          <Textarea label={t('admin_portfolio_field_short_description')} value={formData.short_description} oninput={(e) => (formData.short_description = (e.target as HTMLTextAreaElement).value)} />
+          <Input label={t('admin_highlights_field_location')} value={formData.location} oninput={(e) => (formData.location = (e.target as HTMLInputElement).value)} placeholder="Jakarta, Indonesia" />
+          <Textarea label={t('admin_highlights_field_short_description')} value={formData.short_description} oninput={(e) => (formData.short_description = (e.target as HTMLTextAreaElement).value)} />
           <div class="form-field">
-            <label class="form-label">{t('admin_portfolio_field_content')}</label>
+            <label class="form-label">{t('admin_highlights_field_content')}</label>
             <RichTextEditor value={formData.content} placeholder="Write the full description..." onchange={(html) => (formData.content = html)} />
           </div>
-          <Input label={t('admin_portfolio_field_youtube')} value={formData.youtube_url} oninput={(e) => (formData.youtube_url = (e.target as HTMLInputElement).value)} placeholder="https://youtube.com/watch?v=..." />
+          <Input label={t('admin_highlights_field_youtube')} value={formData.youtube_url} oninput={(e) => (formData.youtube_url = (e.target as HTMLInputElement).value)} placeholder="https://youtube.com/watch?v=..." />
           <div class="form-row">
-            <Input label={t('admin_portfolio_field_seo_title')} value={formData.seo_title} oninput={(e) => (formData.seo_title = (e.target as HTMLInputElement).value)} />
-            <Input label={t('admin_portfolio_field_seo_description')} value={formData.seo_description} oninput={(e) => (formData.seo_description = (e.target as HTMLInputElement).value)} />
+            <Input label={t('admin_highlights_field_seo_title')} value={formData.seo_title} oninput={(e) => (formData.seo_title = (e.target as HTMLInputElement).value)} />
+            <Input label={t('admin_highlights_field_seo_description')} value={formData.seo_description} oninput={(e) => (formData.seo_description = (e.target as HTMLInputElement).value)} />
           </div>
         </div>
 
         <div class="form-sidebar">
           <div class="form-section">
-            <h3 class="form-section__title">{t('admin_portfolio_field_cover')}</h3>
+            <h3 class="form-section__title">{t('admin_highlights_field_cover')}</h3>
             {#if editId === null}
               <p class="form-hint">{t('save')} first to upload images.</p>
             {:else}
@@ -299,7 +299,7 @@
           </div>
 
           <div class="form-section">
-            <h3 class="form-section__title">{t('admin_portfolio_field_gallery')}</h3>
+            <h3 class="form-section__title">{t('admin_highlights_field_gallery')}</h3>
             {#if editId === null}
               <p class="form-hint">{t('save')} first to upload images.</p>
             {:else}
@@ -318,8 +318,8 @@
           </div>
 
           <div class="form-section">
-            <Checkbox label={t('admin_portfolio_field_featured')} checked={formData.featured} onchange={(e) => (formData.featured = (e.target as HTMLInputElement).checked)} />
-            <Checkbox label={t('admin_portfolio_field_published')} checked={formData.published} onchange={(e) => (formData.published = (e.target as HTMLInputElement).checked)} />
+            <Checkbox label={t('admin_highlights_field_featured')} checked={formData.featured} onchange={(e) => (formData.featured = (e.target as HTMLInputElement).checked)} />
+            <Checkbox label={t('admin_highlights_field_published')} checked={formData.published} onchange={(e) => (formData.published = (e.target as HTMLInputElement).checked)} />
           </div>
 
           <div class="form-actions">
@@ -336,7 +336,7 @@
 <ConfirmDialog
   open={deleteTarget !== null}
   title={t('delete')}
-  message={t('confirm_delete_portfolio')}
+  message={t('confirm_delete_highlights')}
   confirmLabel={t('delete')}
   onconfirm={handleDelete}
   oncancel={() => (deleteTarget = null)}

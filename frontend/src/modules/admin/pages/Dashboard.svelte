@@ -22,16 +22,16 @@
   });
 
   const statCards = $derived(data ? [
-    { icon: FolderOpen, label: t('admin_stat_total_portfolio'), value: data.stats.total_portfolio, color: 'accent' },
+    { icon: FolderOpen, label: t('admin_stat_total_highlights'), value: data.stats.total_highlights, color: 'accent' },
     { icon: Award, label: t('admin_stat_achievements'), value: data.stats.achievements, color: 'gold' },
     { icon: Sparkles, label: t('admin_stat_activities'), value: data.stats.activities, color: 'red' },
     { icon: Users, label: t('admin_stat_members'), value: data.stats.organization_members, color: 'blue' },
-    { icon: CheckCircle, label: t('admin_stat_published'), value: data.stats.published_portfolio, color: 'green' },
-    { icon: FileEdit, label: t('admin_stat_drafts'), value: data.stats.draft_portfolio, color: 'gray' },
+    { icon: CheckCircle, label: t('admin_stat_published'), value: data.stats.published_highlights, color: 'green' },
+    { icon: FileEdit, label: t('admin_stat_drafts'), value: data.stats.draft_highlights, color: 'gray' },
   ] : []);
 
   const quickActions = [
-    { icon: Plus, label: t('admin_action_create_portfolio'), path: '/admin/portfolio?new=true' },
+    { icon: Plus, label: t('admin_action_create_highlights'), path: '/admin/highlights?new=true' },
     { icon: Users, label: t('admin_action_add_member'), path: '/admin/organization?new=true' },
   ];
 </script>

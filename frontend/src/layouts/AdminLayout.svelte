@@ -14,7 +14,7 @@
 
   const navItems = [
     { path: '/admin', icon: LayoutDashboard, label: () => t('admin_nav_dashboard'), exact: true },
-    { path: '/admin/portfolio', icon: FolderOpen, label: () => t('admin_nav_portfolio') },
+    { path: '/admin/highlights', icon: FolderOpen, label: () => t('admin_nav_highlights') },
     { path: '/admin/organization', icon: Users, label: () => t('admin_nav_organization') },
     { path: '/admin/settings', icon: Settings, label: () => t('admin_nav_settings') },
   ];
