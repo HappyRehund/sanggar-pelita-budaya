@@ -4,8 +4,7 @@
   import VisionMission from '../components/VisionMission.svelte';
   import OrgPreview from '../components/OrgPreview.svelte';
   import ServicesCarousel from '../components/ServicesCarousel.svelte';
-  import FeaturedPortfolio from '../components/FeaturedPortfolio.svelte';
-  import GallerySection from '../components/GallerySection.svelte';
+  import HighlightsSection from '../components/HighlightsSection.svelte';
   import ContactCta from '../components/ContactCta.svelte';
 </script>
 
@@ -14,6 +13,5 @@
 <VisionMission />
 <OrgPreview />
 <ServicesCarousel />
-<FeaturedPortfolio />
-<GallerySection />
+<HighlightsSection />
 <ContactCta />

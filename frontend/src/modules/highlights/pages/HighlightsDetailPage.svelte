@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { router } from '$lib/router.svelte';
-  import { portfolioStore } from '$lib/stores/portfolio.svelte';
+  import { highlightsStore } from '$lib/stores/highlights.svelte';
   import { t } from '$lib/i18n/index.svelte';
   import { formatDate, uploadUrl, imageUrl } from '$lib/utils';
   import { langStore } from '$lib/stores/lang.svelte';
   import { categoryLabel } from '$lib/constants/categories';
-  import { portfolioDetailPath } from '$lib/constants/routes';
+  import { highlightDetailPath } from '$lib/constants/routes';
   import { useLightbox } from '$lib/hooks/useLightbox.svelte';
   import type { LightboxImage } from '$lib/hooks/useLightbox.svelte';
   import DOMPurify from 'dompurify';
@@ -24,22 +24,22 @@
     const params = router.current.params;
     slug = params.slug ?? '';
     if (slug) {
-      portfolioStore.fetchBySlug(slug);
+      highlightsStore.fetchBySlug(slug);
     }
   });
 
-  const portfolio = $derived(portfolioStore.current);
+  const highlight = $derived(highlightsStore.current);
 
   function getCoverUrl(): string {
-    if (portfolio?.cover) return uploadUrl(portfolio.cover.filename);
-    return imageUrl(`portfolio-${slug}`, 1200, 600);
+    if (highlight?.cover) return uploadUrl(highlight.cover.filename);
+    return imageUrl(`highlights-${slug}`, 1200, 600);
   }
 
   function getGalleryImages(): LightboxImage[] {
-    if (!portfolio?.gallery) return [];
-    return portfolio.gallery.map((img: { filename: string; alt_text: string | null }) => ({
+    if (!highlight?.gallery) return [];
+    return highlight.gallery.map((img: { filename: string; alt_text: string | null }) => ({
       src: uploadUrl(img.filename),
-      alt: img.alt_text ?? 'Gallery image',
+      alt: img.alt_text ?? 'Highlights image',
     }));
   }
 
@@ -61,7 +61,7 @@
 
   function share(): void {
     if (navigator.share) {
-      navigator.share({ title: portfolio?.title ?? '', url: window.location.href });
+      navigator.share({ title: highlight?.title ?? '', url: window.location.href });
     } else {
       navigator.clipboard?.writeText(window.location.href);
     }
@@ -69,23 +69,23 @@
 </script>
 
 <svelte:head>
-  {#if portfolio}
-    <title>{portfolio.seo_title || portfolio.title} — {t('site_name')}</title>
-    <meta name="description" content={portfolio.seo_description || portfolio.short_description} />
-    <link rel="canonical" href={`/portfolio/${portfolio.slug}`} />
-    <meta property="og:title" content={portfolio.seo_title || portfolio.title} />
-    <meta property="og:description" content={portfolio.seo_description || portfolio.short_description} />
+  {#if highlight}
+    <title>{highlight.seo_title || highlight.title} — {t('site_name')}</title>
+    <meta name="description" content={highlight.seo_description || highlight.short_description} />
+    <link rel="canonical" href={`/highlights/${highlight.slug}`} />
+    <meta property="og:title" content={highlight.seo_title || highlight.title} />
+    <meta property="og:description" content={highlight.seo_description || highlight.short_description} />
     <meta property="og:type" content="article" />
-    {#if portfolio.og_image}
-      <meta property="og:image" content={uploadUrl(portfolio.og_image.filename)} />
+    {#if highlight.og_media}
+      <meta property="og:image" content={uploadUrl(highlight.og_media.filename)} />
     {/if}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={portfolio.seo_title || portfolio.title} />
-    <meta name="twitter:description" content={portfolio.seo_description || portfolio.short_description} />
+    <meta name="twitter:title" content={highlight.seo_title || highlight.title} />
+    <meta name="twitter:description" content={highlight.seo_description || highlight.short_description} />
   {/if}
 </svelte:head>
 
-{#if portfolioStore.loading && !portfolio}
+{#if highlightsStore.loading && !highlight}
   <div class="container section">
     <Skeleton variant="rect" height="400px" />
     <div style="margin-top: var(--sp-6)">
@@ -93,61 +93,61 @@
       <Skeleton variant="text" width="40%" />
     </div>
   </div>
-{:else if portfolio}
-  <article class="portfolio-detail">
-    <div class="portfolio-detail__hero">
-      <img src={getCoverUrl()} alt={portfolio.title} class="portfolio-detail__hero-img" />
-      <div class="portfolio-detail__hero-overlay"></div>
-      <div class="container portfolio-detail__hero-content">
-        <Badge variant={portfolio.category}>{categoryLabel(portfolio.category, langStore.current)}</Badge>
-        <h1 class="portfolio-detail__title">{portfolio.title}</h1>
-        <div class="portfolio-detail__meta">
-          {#if portfolio.event_date}
-            <span class="portfolio-detail__meta-item">
+{:else if highlight}
+  <article class="highlights-detail">
+    <div class="highlights-detail__hero">
+      <img src={getCoverUrl()} alt={highlight.title} class="highlights-detail__hero-img" />
+      <div class="highlights-detail__hero-overlay"></div>
+      <div class="container highlights-detail__hero-content">
+        <Badge variant={highlight.category}>{categoryLabel(highlight.category, langStore.current)}</Badge>
+        <h1 class="highlights-detail__title">{highlight.title}</h1>
+        <div class="highlights-detail__meta">
+          {#if highlight.event_date}
+            <span class="highlights-detail__meta-item">
               <Calendar size={16} />
-              {formatDate(portfolio.event_date, langStore.current)}
+              {formatDate(highlight.event_date, langStore.current)}
             </span>
           {/if}
-          {#if portfolio.location}
-            <span class="portfolio-detail__meta-item">
+          {#if highlight.location}
+            <span class="highlights-detail__meta-item">
               <MapPin size={16} />
-              {portfolio.location}
+              {highlight.location}
             </span>
           {/if}
-          <button class="portfolio-detail__share" onclick={share} aria-label={t('portfolio_detail_share')}>
+          <button class="highlights-detail__share" onclick={share} aria-label={t('highlights_detail_share')}>
             <Share2 size={16} />
-            {t('portfolio_detail_share')}
+            {t('highlights_detail_share')}
           </button>
         </div>
       </div>
     </div>
 
-    <div class="container container--reading portfolio-detail__content">
-      <p class="lead">{portfolio.short_description}</p>
+    <div class="container container--reading highlights-detail__content">
+      <p class="lead">{highlight.short_description}</p>
       <div class="rich-content">
-        {@html sanitizeContent(portfolio.content)}
+        {@html sanitizeContent(highlight.content)}
       </div>
     </div>
 
-    {#if portfolio.youtube_url}
-      {@const embed = getYouTubeEmbed(portfolio.youtube_url)}
+    {#if highlight.youtube_url}
+      {@const embed = getYouTubeEmbed(highlight.youtube_url)}
       {#if embed}
-        <div class="container portfolio-detail__video">
-          <div class="portfolio-detail__video-wrap">
+        <div class="container highlights-detail__video">
+          <div class="highlights-detail__video-wrap">
             <iframe src={embed} title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
           </div>
         </div>
       {/if}
     {/if}
 
-    {#if portfolio.gallery && portfolio.gallery.length > 0}
+    {#if highlight.gallery && highlight.gallery.length > 0}
       <section class="section">
         <div class="container">
-          <h2 class="portfolio-detail__section-title">{t('portfolio_detail_gallery')}</h2>
-          <div class="portfolio-detail__gallery">
-            {#each portfolio.gallery as img, i (img.id)}
-              <button class="portfolio-detail__gallery-item" onclick={() => openLightbox(i)} aria-label="View image">
-                <img src={uploadUrl(img.filename)} alt={img.alt_text ?? 'Gallery image'} loading="lazy" />
+          <h2 class="highlights-detail__section-title">{t('highlights_detail_gallery')}</h2>
+          <div class="highlights-detail__gallery">
+            {#each highlight.gallery as img, i (img.id)}
+              <button class="highlights-detail__gallery-item" onclick={() => openLightbox(i)} aria-label="View image">
+                <img src={uploadUrl(img.filename)} alt={img.alt_text ?? 'Highlights image'} loading="lazy" />
               </button>
             {/each}
           </div>
@@ -155,16 +155,16 @@
       </section>
     {/if}
 
-    {#if portfolio.related && portfolio.related.length > 0}
+    {#if highlight.related && highlight.related.length > 0}
       <section class="section section--alt">
         <div class="container">
-          <h2 class="portfolio-detail__section-title">{t('portfolio_detail_related')}</h2>
-          <div class="portfolio-detail__related">
-            {#each portfolio.related as item (item.id)}
-              <a href={portfolioDetailPath(item.slug)} class="related-card">
+          <h2 class="highlights-detail__section-title">{t('highlights_detail_related')}</h2>
+          <div class="highlights-detail__related">
+            {#each highlight.related as item (item.id)}
+              <a href={highlightDetailPath(item.slug)} class="related-card">
                 <div class="related-card__image">
                   <img
-                    src={item.cover ? uploadUrl(item.cover.filename) : imageUrl(`portfolio-${item.slug}`, 400, 300)}
+                    src={item.cover ? uploadUrl(item.cover.filename) : imageUrl(`highlights-${item.slug}`, 400, 300)}
                     alt={item.title}
                     loading="lazy"
                   />
@@ -189,33 +189,33 @@
   />
 {:else}
   <div class="container section">
-    <EmptyState title={t('portfolio_detail_not_found')}>
-      <Button variant="primary" size="md" href="/portfolio">{t('back')}</Button>
+    <EmptyState title={t('highlights_detail_not_found')}>
+      <Button variant="primary" size="md" href="/highlights">{t('back')}</Button>
     </EmptyState>
   </div>
 {/if}
 
 <style>
-  .portfolio-detail__hero {
+  .highlights-detail__hero {
     position: relative;
     height: 60vh;
     min-height: 24rem;
     overflow: hidden;
   }
 
-  .portfolio-detail__hero-img {
+  .highlights-detail__hero-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .portfolio-detail__hero-overlay {
+  .highlights-detail__hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, rgba(26, 22, 18, 0.85), rgba(26, 22, 18, 0.3) 60%, transparent);
   }
 
-  .portfolio-detail__hero-content {
+  .highlights-detail__hero-content {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -226,14 +226,14 @@
     gap: var(--sp-3);
   }
 
-  .portfolio-detail__title {
+  .highlights-detail__title {
     font-size: var(--fs-h1);
     font-weight: var(--fw-semibold);
     color: var(--color-ivory);
     max-width: 36rem;
   }
 
-  .portfolio-detail__meta {
+  .highlights-detail__meta {
     display: flex;
     align-items: center;
     gap: var(--sp-5);
@@ -242,13 +242,13 @@
     flex-wrap: wrap;
   }
 
-  .portfolio-detail__meta-item {
+  .highlights-detail__meta-item {
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
   }
 
-  .portfolio-detail__share {
+  .highlights-detail__share {
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
@@ -256,7 +256,7 @@
     margin-left: auto;
   }
 
-  .portfolio-detail__content {
+  .highlights-detail__content {
     padding: var(--sp-10) var(--sp-5);
   }
 
@@ -273,11 +273,11 @@
   .rich-content :global(a) { color: var(--color-accent); text-decoration: underline; }
   .rich-content :global(ul), .rich-content :global(ol) { padding-left: var(--sp-5); margin: var(--sp-2) 0; }
 
-  .portfolio-detail__video {
+  .highlights-detail__video {
     margin-bottom: var(--sp-10);
   }
 
-  .portfolio-detail__video-wrap {
+  .highlights-detail__video-wrap {
     position: relative;
     aspect-ratio: 16 / 9;
     border-radius: var(--radius-2xl);
@@ -285,7 +285,7 @@
     box-shadow: var(--shadow-lg);
   }
 
-  .portfolio-detail__video-wrap iframe {
+  .highlights-detail__video-wrap iframe {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -293,20 +293,20 @@
     border: 0;
   }
 
-  .portfolio-detail__section-title {
+  .highlights-detail__section-title {
     font-family: var(--font-serif);
     font-size: var(--fs-h2);
     font-weight: var(--fw-semibold);
     margin-bottom: var(--sp-6);
   }
 
-  .portfolio-detail__gallery {
+  .highlights-detail__gallery {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--sp-4);
   }
 
-  .portfolio-detail__gallery-item {
+  .highlights-detail__gallery-item {
     border: none;
     padding: 0;
     border-radius: var(--radius-lg);
@@ -315,16 +315,16 @@
     aspect-ratio: 4 / 3;
   }
 
-  .portfolio-detail__gallery-item img {
+  .highlights-detail__gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform var(--duration-medium) var(--ease-out);
   }
 
-  .portfolio-detail__gallery-item:hover img { transform: scale(1.06); }
+  .highlights-detail__gallery-item:hover img { transform: scale(1.06); }
 
-  .portfolio-detail__related {
+  .highlights-detail__related {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--sp-4);
@@ -358,12 +358,12 @@
   }
 
   @media (max-width: 880px) {
-    .portfolio-detail__related { grid-template-columns: repeat(2, 1fr); }
-    .portfolio-detail__gallery { grid-template-columns: repeat(2, 1fr); }
+    .highlights-detail__related { grid-template-columns: repeat(2, 1fr); }
+    .highlights-detail__gallery { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 480px) {
-    .portfolio-detail__related { grid-template-columns: 1fr; }
-    .portfolio-detail__gallery { grid-template-columns: 1fr; }
+    .highlights-detail__related { grid-template-columns: 1fr; }
+    .highlights-detail__gallery { grid-template-columns: 1fr; }
   }
 </style>
