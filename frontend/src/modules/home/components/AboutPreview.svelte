@@ -172,7 +172,13 @@
     border-radius: 30px;
     overflow: hidden;
     cursor: pointer;
-    background: linear-gradient(135deg, var(--color-red), var(--color-gold-dark));
+    background:
+      linear-gradient(135deg,
+        var(--color-red) 0%,
+        var(--color-gold-dark) 50%,
+        var(--color-red) 100%) padding-box;
+    background-size: 200% 200%;
+    background-position: 0% 50%;
     transform: var(--tx);
     z-index: var(--z);
     box-shadow: var(--shadow);
@@ -180,15 +186,23 @@
       transform 0.85s cubic-bezier(0.3, 1.15, 0.4, 1),
       box-shadow 0.85s ease;
     will-change: transform;
+    animation: stack-gradient-pan 6s linear infinite;
   }
 
   .stack__frame {
     position: relative;
+    display: block;
     width: 100%;
     height: 100%;
     border-radius: 28px;
     overflow: hidden;
     z-index: 1;
+  }
+
+  @keyframes stack-gradient-pan {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
   }
 
   .stack__card:focus-visible {
@@ -240,6 +254,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .stack__card {
+      animation: none;
       transition: transform 0.2s linear, box-shadow 0.2s linear;
     }
     .stack__scrim {
