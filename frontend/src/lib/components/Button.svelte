@@ -188,20 +188,37 @@
   }
 
   .btn--gradient-outline {
-    background:
-      var(--color-surface) padding-box,
-      linear-gradient(135deg,
-        var(--color-red) 0%,
-        var(--color-gold-dark) 50%,
-        var(--color-red) 100%) border-box;
-    background-size: 100% 100%, 200% 200%;
-    background-position: 0% 50%, 0% 50%;
+    position: relative;
+    background: var(--color-surface);
     color: var(--color-text);
-    border: 2px solid transparent;
-    animation: btn-gradient-pan 6s linear infinite;
+    border: none;
+    isolation: isolate;
+  }
+  .btn--gradient-outline::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg,
+      var(--color-red) 0%,
+      var(--color-gold-dark) 50%,
+      var(--color-red) 100%);
+    background-size: 200% 200%;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    animation: btn-gradient-pan-border 6s linear infinite;
+    pointer-events: none;
+    z-index: -1;
   }
   .btn--gradient-outline:not(:disabled):hover {
-    color: var(--color-red);
+    color: var(--color-text);
   }
 
   @keyframes btn-gradient-pan {
@@ -210,9 +227,16 @@
     100% { background-position:   0% 50%,   0% 50%; }
   }
 
+  @keyframes btn-gradient-pan-border {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .btn--gradient,
-    .btn--gradient-outline {
+    .btn--gradient-outline,
+    .btn--gradient-outline::before {
       animation: none;
     }
   }
