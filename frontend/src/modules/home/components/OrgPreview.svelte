@@ -11,7 +11,7 @@
   let sectionEl = $state<HTMLElement | null>(null);
 
   onMount(() => {
-    organizationStore.fetchList();
+    organizationStore.fetchFeatured();
     if (sectionEl) {
       const c1 = revealOnScroll(sectionEl, { y: 30, duration: 0.6 });
       const c2 = staggerReveal(sectionEl, '.org-card', { stagger: 0.12, duration: 0.5 });
@@ -19,13 +19,9 @@
     }
   });
 
-  const previewPositions = ['Chairperson', 'Ketua', 'Secretary', 'Sekretaris', 'Treasurer', 'Bendahara'];
-
-  const previewMembers = $derived(
-    (organizationStore.members || [])
-      .filter((m: OrganizationMember) => m.published && previewPositions.some((p) => m.position.toLowerCase().includes(p.toLowerCase())))
-      .slice(0, 3)
-  );
+  function getPhoto(member: OrganizationMember): string {
+    return member.photo ? uploadUrl(member.photo) : imageUrl(`member-${member.id}`, 400, 400);
+  }
 </script>
 
 <section bind:this={sectionEl} class="section org-preview">
@@ -34,17 +30,17 @@
 
     {#if organizationStore.loading}
       <div class="org-preview__grid">
-        {#each [0, 1, 2] as i (i)}
+        {#each [0, 1, 2, 3] as i (i)}
           <div class="org-preview__skeleton"></div>
         {/each}
       </div>
-    {:else if previewMembers.length > 0}
+    {:else if organizationStore.featured.length > 0}
       <div class="org-preview__grid">
-        {#each previewMembers as member (member.id)}
+        {#each organizationStore.featured as member (member.id)}
           <div class="org-card">
             <div class="org-card__photo">
               <img
-                src={member.photo ? uploadUrl(member.photo) : imageUrl(`member-${member.id}`, 400, 400)}
+                src={getPhoto(member)}
                 alt={member.name}
                 loading="lazy"
               />
@@ -55,7 +51,7 @@
         {/each}
       </div>
       <div class="org-preview__cta">
-        <Button variant="secondary" size="md" href="/organization">
+        <Button variant="soft-ink" size="md" href="/organization">
           {t('org_view_all')}
           <ArrowRight size={16} />
         </Button>
@@ -69,8 +65,8 @@
 <style>
   .org-preview__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--sp-6);
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-5);
     margin-top: var(--sp-10);
   }
 
@@ -83,9 +79,9 @@
   }
 
   .org-card__photo {
-    width: 8rem;
-    height: 8rem;
-    border-radius: var(--radius-full);
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-2xl);
     overflow: hidden;
     border: 3px solid var(--color-gold);
     box-shadow: var(--shadow-md);
@@ -94,7 +90,7 @@
   }
 
   .org-card__photo:hover {
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
 
   .org-card__photo img {
@@ -123,7 +119,7 @@
   }
 
   .org-preview__skeleton {
-    height: 14rem;
+    height: 18rem;
     border-radius: var(--radius-lg);
     background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
     background-size: 200% 100%;
@@ -141,7 +137,14 @@
     100% { background-position: -200% 0; }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
+    .org-preview__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--sp-4);
+    }
+  }
+
+  @media (max-width: 480px) {
     .org-preview__grid {
       grid-template-columns: 1fr;
       gap: var(--sp-5);
