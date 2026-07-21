@@ -234,7 +234,6 @@
   "admin_org_field_biography_id": "Biography (ID)",
   "admin_org_field_display_order": "Display Order",
   "admin_org_field_featured_slot": "Homepage Featured Slot",
-  "admin_org_field_published": "Published",
 
   "admin_settings_title": "Settings",
   "admin_settings_field_site_name": "Website Name",
@@ -281,5 +280,8 @@
   "error_validation": "Please fix the errors below.",
 
   "empty_organization": "No organization members available.",
-  "empty_search": "No results found."
+  "empty_search": "No results found.",
+  "admin_org_cancel_replace": "Cancel",
+  "admin_org_replace_photo": "Replace photo",
+  "admin_org_current_photo": "Current photo"
 }

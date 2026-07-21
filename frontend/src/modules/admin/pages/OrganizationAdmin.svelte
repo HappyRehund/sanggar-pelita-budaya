@@ -9,12 +9,11 @@
   import Input from '$lib/components/Input.svelte';
   import Textarea from '$lib/components/Textarea.svelte';
   import Select from '$lib/components/Select.svelte';
-  import Checkbox from '$lib/components/Checkbox.svelte';
   import FileUpload from '$lib/components/FileUpload.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import EmptyState from '$lib/components/EmptyState.svelte';
   import ConfirmDialog from '../components/ConfirmDialog.svelte';
-  import { Plus, Pencil, Trash2, ArrowLeft } from '@lucide/svelte';
+  import { Plus, Pencil, Trash2, ArrowLeft, X } from '@lucide/svelte';
 
   let mode = $state<'list' | 'edit' | 'create'>('list');
   let members = $state<OrganizationMember[]>([]);
@@ -31,9 +30,10 @@
     biography_id: '',
     featured_slot: '' as string | number,
     display_order: 0,
-    published: true,
   });
-  let photo = $state<string | null>(null);
+
+  let currentPhoto = $state<string | null>(null);
+  let stagedPhoto = $state<{ file: File; previewUrl: string } | null>(null);
 
   onMount(() => loadList());
 
@@ -48,14 +48,22 @@
     }
   }
 
+  function revokeStagedPhoto(): void {
+    if (stagedPhoto) {
+      URL.revokeObjectURL(stagedPhoto.previewUrl);
+      stagedPhoto = null;
+    }
+  }
+
   function startCreate(): void {
     mode = 'create';
     editId = null;
     formData = {
       name: '', position_en: '', position_id: '', biography_en: '', biography_id: '',
-      featured_slot: '', display_order: 0, published: true,
+      featured_slot: '', display_order: 0,
     };
-    photo = null;
+    currentPhoto = null;
+    revokeStagedPhoto();
   }
 
   async function startEdit(member: OrganizationMember): Promise<void> {
@@ -69,31 +77,55 @@
       biography_id: member.biography_id ?? '',
       featured_slot: member.featured_slot ?? '',
       display_order: member.display_order,
-      published: member.published,
     };
-    photo = member.photo;
+    currentPhoto = member.photo;
+    revokeStagedPhoto();
   }
 
   function backToList(): void {
     mode = 'list';
     editId = null;
+    revokeStagedPhoto();
+  }
+
+  function handlePhotoSelect(files: File[]): void {
+    if (files.length === 0) return;
+    revokeStagedPhoto();
+    const file = files[0];
+    stagedPhoto = { file, previewUrl: URL.createObjectURL(file) };
   }
 
   async function handleSave(): Promise<void> {
     saving = true;
     const payload = {
-      ...formData,
+      name: formData.name,
+      position_en: formData.position_en,
+      position_id: formData.position_id,
+      biography_en: formData.biography_en.trim() || null,
+      biography_id: formData.biography_id.trim() || null,
+      display_order: formData.display_order,
       featured_slot: formData.featured_slot === '' ? null : Number(formData.featured_slot),
     };
     try {
+      let savedId: number;
       if (editId !== null) {
-        await organizationApi.update(editId, payload);
+        const updated = await organizationApi.update(editId, payload);
+        savedId = updated.id;
         notifications.success(t('toast_org_updated'));
       } else {
         const created = await organizationApi.create(payload);
-        editId = created.id;
+        savedId = created.id;
         notifications.success(t('toast_org_created'));
       }
+
+      if (stagedPhoto) {
+        try {
+          await organizationApi.uploadPhoto(savedId, stagedPhoto.file);
+        } catch {
+          notifications.error(t('upload_failed'));
+        }
+      }
+
       await loadList();
       backToList();
     } catch (e) {
@@ -114,17 +146,6 @@
       notifications.error(t('toast_error'));
     } finally {
       deleteTarget = null;
-    }
-  }
-
-  async function handlePhotoUpload(files: File[]): Promise<void> {
-    if (!editId || files.length === 0) return;
-    try {
-      const updated = await organizationApi.uploadPhoto(editId, files[0]);
-      photo = updated.photo;
-      notifications.success(t('upload_success'));
-    } catch {
-      notifications.error(t('upload_failed'));
     }
   }
 
@@ -201,26 +222,34 @@
           <Select label={t('admin_org_field_featured_slot')} value={formData.featured_slot} options={slotOptions} onchange={(e) => (formData.featured_slot = (e.target as HTMLSelectElement).value)} />
           <Input label={t('admin_org_field_display_order')} type="number" value={String(formData.display_order)} oninput={(e) => (formData.display_order = Number((e.target as HTMLInputElement).value))} />
         </div>
-        <Checkbox label={t('admin_org_field_published')} checked={formData.published} onchange={(e) => (formData.published = (e.target as HTMLInputElement).checked)} />
       </div>
 
       <div class="org-form__sidebar">
         <div class="form-section">
           <h3 class="form-section__title">{t('admin_org_field_photo')}</h3>
-          {#if editId === null}
-            <p class="form-hint">{t('save')} first to upload photo.</p>
+
+          {#if stagedPhoto}
+            <div class="media-preview">
+              <img src={stagedPhoto.previewUrl} alt="" />
+              <button type="button" class="media-preview__cancel" onclick={revokeStagedPhoto} aria-label={t('admin_org_cancel_replace')}>
+                <X size={14} />
+              </button>
+            </div>
+            <p class="form-hint">{stagedPhoto.file.name}</p>
+            <FileUpload label={t('admin_org_replace_photo')} accept="image/jpeg,image/png,image/webp" onselect={handlePhotoSelect} />
+          {:else if currentPhoto && editId !== null}
+            <div class="media-preview">
+              <p class="form-hint">{t('admin_org_current_photo')}</p>
+              <img src={uploadUrl(currentPhoto)} alt="" />
+            </div>
+            <FileUpload label={t('admin_org_replace_photo')} accept="image/jpeg,image/png,image/webp" onselect={handlePhotoSelect} />
           {:else}
-            {#if photo}
-              <div class="media-preview">
-                <img src={uploadUrl(photo)} alt="" />
-              </div>
-            {/if}
-            <FileUpload label="" accept="image/jpeg,image/png,image/webp" onselect={handlePhotoUpload} />
+            <FileUpload label="" accept="image/jpeg,image/png,image/webp" onselect={handlePhotoSelect} />
           {/if}
         </div>
 
         <div class="form-actions">
-          <Button variant="primary" size="md" onclick={handleSave} disabled={saving}>{t('save')}</Button>
+          <Button variant="primary" size="md" onclick={handleSave} disabled={saving}>{editId ? t('save') : t('admin_org_new')}</Button>
           <Button variant="ghost" size="md" onclick={backToList}>{t('cancel')}</Button>
         </div>
       </div>
@@ -264,8 +293,10 @@
   .form-section__title { font-size: var(--fs-body-sm); font-weight: var(--fw-semibold); margin-bottom: var(--sp-3); }
   .form-hint { font-size: var(--fs-caption); color: var(--color-text-subtle); }
   .form-actions { display: flex; flex-direction: column; gap: var(--sp-2); }
-  .media-preview { margin-bottom: var(--sp-3); }
-  .media-preview img { width: 100%; border-radius: var(--radius-md); aspect-ratio: 1; object-fit: cover; }
+  .media-preview { position: relative; margin-bottom: var(--sp-3); }
+  .media-preview img { width: 100%; border-radius: var(--radius-md); aspect-ratio: 1; object-fit: cover; display: block; }
+  .media-preview__cancel { position: absolute; top: var(--sp-2); right: var(--sp-2); width: 1.75rem; height: 1.75rem; display: inline-flex; align-items: center; justify-content: center; background: var(--color-ink); color: var(--color-ivory); border-radius: var(--radius-full); border: none; cursor: pointer; transition: background var(--duration-fast) var(--ease-smooth); }
+  .media-preview__cancel:hover { background: var(--color-red); }
 
   @media (max-width: 880px) {
     .org-form { grid-template-columns: 1fr; }

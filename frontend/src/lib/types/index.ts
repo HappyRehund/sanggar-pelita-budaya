@@ -85,7 +85,6 @@ export interface OrganizationMember {
   photo: string | null;
   display_order: number;
   featured_slot: number | null;
-  published: boolean;
   created_at: string;
   updated_at: string;
 }

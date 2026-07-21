@@ -234,7 +234,6 @@
   "admin_org_field_biography_id": "Biografi (ID)",
   "admin_org_field_display_order": "Urutan Tampil",
   "admin_org_field_featured_slot": "Slot Unggulan Beranda",
-  "admin_org_field_published": "Terbit",
 
   "admin_settings_title": "Pengaturan",
   "admin_settings_field_site_name": "Nama Situs",
@@ -281,5 +280,8 @@
   "error_validation": "Silakan perbaiki kesalahan di bawah ini.",
 
   "empty_organization": "Tidak ada anggota organisasi tersedia.",
-  "empty_search": "Tidak ada hasil ditemukan."
+  "empty_search": "Tidak ada hasil ditemukan.",
+  "admin_org_cancel_replace": "Batal",
+  "admin_org_replace_photo": "Ganti foto",
+  "admin_org_current_photo": "Foto saat ini"
 }
