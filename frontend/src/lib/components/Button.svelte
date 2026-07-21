@@ -2,7 +2,18 @@
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
-  type Variant = 'primary' | 'secondary' | 'ghost' | 'icon' | 'gold' | 'outline-red' | 'outline-gold' | 'gradient' | 'gradient-outline';
+  type Variant =
+    | 'primary'
+    | 'secondary'
+    | 'ghost'
+    | 'ink'
+    | 'icon'
+    | 'gold'
+    | 'outline-red'
+    | 'outline-gold'
+    | 'outline-ink'
+    | 'gradient'
+    | 'outline-gradient';
   type Size = 'sm' | 'md' | 'lg';
 
   interface CommonProps {
@@ -136,6 +147,19 @@
     background-color: var(--color-surface-alt);
   }
 
+  .btn--ink {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+    border: 1px solid var(--color-ink);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn--ink:not(:disabled):hover {
+    background-color: var(--color-ink-soft);
+    border-color: var(--color-ink-soft);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
+  }
+
   .btn--gold {
     background-color: var(--color-gold);
     color: var(--color-brown);
@@ -170,6 +194,17 @@
     border-color: var(--color-gold);
   }
 
+  .btn--outline-ink {
+    background-color: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-ink);
+  }
+  .btn--outline-ink:not(:disabled):hover {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+    border-color: var(--color-ink);
+  }
+
   .btn--gradient {
     background:
       linear-gradient(135deg,
@@ -187,7 +222,7 @@
     box-shadow: var(--shadow-md);
   }
 
-  .btn--gradient-outline {
+  .btn--outline-gradient {
     position: relative;
     background: var(--color-surface);
     color: transparent;
@@ -204,7 +239,7 @@
     -webkit-text-fill-color: transparent;
     animation: btn-gradient-pan-text 6s linear infinite;
   }
-  .btn--gradient-outline::before {
+  .btn--outline-gradient::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -227,7 +262,7 @@
     pointer-events: none;
     z-index: -1;
   }
-  .btn--gradient-outline:not(:disabled):hover {
+  .btn--outline-gradient:not(:disabled):hover {
     background-position: 100% 50%;
   }
 
@@ -251,8 +286,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .btn--gradient,
-    .btn--gradient-outline,
-    .btn--gradient-outline::before {
+    .btn--outline-gradient,
+    .btn--outline-gradient::before {
       animation: none;
     }
   }
