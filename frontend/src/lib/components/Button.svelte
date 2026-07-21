@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
-  type Variant = 'primary' | 'secondary' | 'ghost' | 'icon' | 'gold' | 'outline-red' | 'outline-gold';
+  type Variant = 'primary' | 'secondary' | 'ghost' | 'icon' | 'gold' | 'outline-red' | 'outline-gold' | 'gradient' | 'gradient-outline';
   type Size = 'sm' | 'md' | 'lg';
 
   interface CommonProps {
@@ -168,6 +168,53 @@
     background-color: var(--color-gold);
     color: var(--color-brown);
     border-color: var(--color-gold);
+  }
+
+  .btn--gradient {
+    background:
+      linear-gradient(135deg,
+        var(--color-red) 0%,
+        var(--color-gold-dark) 50%,
+        var(--color-red) 100%) padding-box;
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    color: var(--color-white);
+    border: 1px solid transparent;
+    box-shadow: var(--shadow-sm);
+    animation: btn-gradient-pan 6s linear infinite;
+  }
+  .btn--gradient:not(:disabled):hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn--gradient-outline {
+    background:
+      var(--color-surface) padding-box,
+      linear-gradient(135deg,
+        var(--color-red) 0%,
+        var(--color-gold-dark) 50%,
+        var(--color-red) 100%) border-box;
+    background-size: 100% 100%, 200% 200%;
+    background-position: 0% 50%, 0% 50%;
+    color: var(--color-text);
+    border: 2px solid transparent;
+    animation: btn-gradient-pan 6s linear infinite;
+  }
+  .btn--gradient-outline:not(:disabled):hover {
+    color: var(--color-red);
+  }
+
+  @keyframes btn-gradient-pan {
+    0%   { background-position:   0% 50%,   0% 50%; }
+    50%  { background-position: 100% 50%, 100% 50%; }
+    100% { background-position:   0% 50%,   0% 50%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn--gradient,
+    .btn--gradient-outline {
+      animation: none;
+    }
   }
 
   .btn--icon {
