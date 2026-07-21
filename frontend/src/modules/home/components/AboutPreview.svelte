@@ -125,7 +125,7 @@
       <span class="eyebrow">{t('about_eyebrow')}</span>
       <h2 class="about-preview__title">{t('about_title')}</h2>
       <p class="about-preview__desc text-pretty">{t('about_description')}</p>
-      <Button variant="outline-gradient" size="md" href="/about" class="about-preview__cta-button">
+      <Button variant="outline-ink" size="md" href="/about" class="about-preview__cta-button">
         {t('about_read_more')}
       </Button>
     </div>
