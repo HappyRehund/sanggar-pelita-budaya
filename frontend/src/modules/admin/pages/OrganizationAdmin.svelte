@@ -24,7 +24,14 @@
   let editId = $state<number | null>(null);
 
   let formData = $state({
-    name: '', position: '', biography: '', featured_slot: '' as string | number, display_order: 0, published: true,
+    name: '',
+    position_en: '',
+    position_id: '',
+    biography_en: '',
+    biography_id: '',
+    featured_slot: '' as string | number,
+    display_order: 0,
+    published: true,
   });
   let photo = $state<string | null>(null);
 
@@ -44,7 +51,10 @@
   function startCreate(): void {
     mode = 'create';
     editId = null;
-    formData = { name: '', position: '', biography: '', featured_slot: '', display_order: 0, published: true };
+    formData = {
+      name: '', position_en: '', position_id: '', biography_en: '', biography_id: '',
+      featured_slot: '', display_order: 0, published: true,
+    };
     photo = null;
   }
 
@@ -52,8 +62,14 @@
     mode = 'edit';
     editId = member.id;
     formData = {
-      name: member.name, position: member.position, biography: member.biography || '',
-      featured_slot: member.featured_slot ?? '', display_order: member.display_order, published: member.published,
+      name: member.name,
+      position_en: member.position_en,
+      position_id: member.position_id,
+      biography_en: member.biography_en ?? '',
+      biography_id: member.biography_id ?? '',
+      featured_slot: member.featured_slot ?? '',
+      display_order: member.display_order,
+      published: member.published,
     };
     photo = member.photo;
   }
@@ -147,7 +163,7 @@
                   <span class="member-row__badge">★ {member.featured_slot}</span>
                 {/if}
               </span>
-              <span class="member-row__position">{member.position}</span>
+              <span class="member-row__position">{member.position_en} / {member.position_id}</span>
             </div>
             <div class="member-row__actions">
               <button onclick={() => startEdit(member)} aria-label={t('edit')}><Pencil size={16} /></button>
@@ -168,8 +184,19 @@
     <div class="org-form">
       <div class="org-form__main">
         <Input label={t('admin_org_field_name')} value={formData.name} oninput={(e) => (formData.name = (e.target as HTMLInputElement).value)} />
-        <Input label={t('admin_org_field_position')} value={formData.position} oninput={(e) => (formData.position = (e.target as HTMLInputElement).value)} />
-        <Textarea label={t('admin_org_field_biography')} value={formData.biography} oninput={(e) => (formData.biography = (e.target as HTMLTextAreaElement).value)} />
+
+        <div class="lang-block">
+          <span class="lang-block__label">EN</span>
+          <Input label={t('admin_org_field_position_en')} value={formData.position_en} oninput={(e) => (formData.position_en = (e.target as HTMLInputElement).value)} />
+          <Textarea label={t('admin_org_field_biography_en')} value={formData.biography_en} oninput={(e) => (formData.biography_en = (e.target as HTMLTextAreaElement).value)} />
+        </div>
+
+        <div class="lang-block">
+          <span class="lang-block__label">ID</span>
+          <Input label={t('admin_org_field_position_id')} value={formData.position_id} oninput={(e) => (formData.position_id = (e.target as HTMLInputElement).value)} />
+          <Textarea label={t('admin_org_field_biography_id')} value={formData.biography_id} oninput={(e) => (formData.biography_id = (e.target as HTMLTextAreaElement).value)} />
+        </div>
+
         <div class="form-row">
           <Select label={t('admin_org_field_featured_slot')} value={formData.featured_slot} options={slotOptions} onchange={(e) => (formData.featured_slot = (e.target as HTMLSelectElement).value)} />
           <Input label={t('admin_org_field_display_order')} type="number" value={String(formData.display_order)} oninput={(e) => (formData.display_order = Number((e.target as HTMLInputElement).value))} />
@@ -231,6 +258,8 @@
   .org-form__main { display: flex; flex-direction: column; gap: var(--sp-4); }
   .org-form__sidebar { display: flex; flex-direction: column; gap: var(--sp-4); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .lang-block { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); background: var(--color-surface-alt); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+  .lang-block__label { font-size: var(--fs-caption); font-weight: var(--fw-semibold); color: var(--color-text-muted); letter-spacing: var(--tracking-widest); }
   .form-section { padding: var(--sp-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
   .form-section__title { font-size: var(--fs-body-sm); font-weight: var(--fw-semibold); margin-bottom: var(--sp-3); }
   .form-hint { font-size: var(--fs-caption); color: var(--color-text-subtle); }
