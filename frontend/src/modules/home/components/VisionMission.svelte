@@ -7,8 +7,8 @@
   import { t } from '$lib/i18n/index.svelte';
   import { revealOnScroll } from '$lib/utils';
 
-  import visionImg from '$assets/images/about/about-2.jpg';
-  import missionImg from '$assets/images/about/about-3.jpg';
+  import visionImg from '$assets/images/vision-mission/vision.webp';
+  import missionImg from '$assets/images/vision-mission/mission.webp';
 
   let sectionEl = $state<HTMLElement | null>(null);
   let desktopEl = $state<HTMLElement | null>(null);
