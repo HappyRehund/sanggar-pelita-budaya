@@ -5,27 +5,27 @@ declare(strict_types=1);
 class DashboardService
 {
     private PDO $db;
-    private PortfolioRepository $portfolioRepo;
+    private HighlightRepository $highlightRepo;
     private OrganizationRepository $orgRepo;
-    private PortfolioMediaRepository $mediaRepo;
+    private HighlightMediaRepository $mediaRepo;
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
-        $this->portfolioRepo = new PortfolioRepository($db);
+        $this->highlightRepo = new HighlightRepository($db);
         $this->orgRepo = new OrganizationRepository($db);
-        $this->mediaRepo = new PortfolioMediaRepository($db);
+        $this->mediaRepo = new HighlightMediaRepository($db);
     }
 
     public function getData(): array
     {
         $stats = [
-            'total_portfolio' => $this->portfolioRepo->count([]),
-            'achievements' => $this->portfolioRepo->countByCategory('achievement'),
-            'activities' => $this->portfolioRepo->countByCategory('activity'),
+            'total_highlights' => $this->highlightRepo->count([]),
+            'achievements' => $this->highlightRepo->countByCategory('achievement'),
+            'activities' => $this->highlightRepo->countByCategory('activity'),
             'organization_members' => $this->orgRepo->count(),
-            'published_portfolio' => $this->portfolioRepo->countPublished(),
-            'draft_portfolio' => $this->portfolioRepo->countDrafts(),
+            'published_highlights' => $this->highlightRepo->countPublished(),
+            'draft_highlights' => $this->highlightRepo->countDrafts(),
         ];
 
         $recentUploads = array_map(function ($row) {
@@ -34,7 +34,7 @@ class DashboardService
                 'filename' => $row['filename'],
                 'original_filename' => $row['original_filename'],
                 'created_at' => $row['created_at'],
-                'portfolio_id' => $row['portfolio_id'] !== null ? (int) $row['portfolio_id'] : null,
+                'highlight_id' => $row['highlight_id'] !== null ? (int) $row['highlight_id'] : null,
             ];
         }, $this->mediaRepo->findRecent(10));
 

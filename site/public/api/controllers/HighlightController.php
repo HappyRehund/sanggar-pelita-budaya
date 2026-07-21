@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-class PortfolioController
+class HighlightController
 {
-    private PortfolioService $portfolioService;
-    private PortfolioMediaService $mediaService;
+    private HighlightService $highlightService;
+    private HighlightMediaService $mediaService;
 
     public function __construct()
     {
         $db = getPDO();
-        $this->portfolioService = new PortfolioService($db);
-        $this->mediaService = new PortfolioMediaService($db);
+        $this->highlightService = new HighlightService($db);
+        $this->mediaService = new HighlightMediaService($db);
     }
 
-    /* ---- Portfolio CRUD --------------------------------------------- */
+    /* ---- Highlights CRUD --------------------------------------------- */
 
     public function list(array $params): void
     {
@@ -36,24 +36,24 @@ class PortfolioController
         }
 
         $page = (int) ($query['page'] ?? 1);
-        $perPage = (int) ($query['per_page'] ?? PORTFOLIO_PER_PAGE);
+        $perPage = (int) ($query['per_page'] ?? HIGHLIGHTS_PER_PAGE);
 
-        $result = $this->portfolioService->list($filters, $page, $perPage);
-        success_response($result, 'Portfolio list');
+        $result = $this->highlightService->list($filters, $page, $perPage);
+        success_response($result, 'Highlights list');
     }
 
     public function getById(array $params): void
     {
         $id = (int) $params['id'];
-        $portfolio = $this->portfolioService->getById($id);
-        success_response($portfolio, 'Portfolio detail');
+        $highlight = $this->highlightService->getById($id);
+        success_response($highlight, 'Highlights detail');
     }
 
     public function getBySlug(array $params): void
     {
         $slug = $params['slug'];
-        $portfolio = $this->portfolioService->getBySlug($slug);
-        success_response($portfolio, 'Portfolio detail');
+        $highlight = $this->highlightService->getBySlug($slug);
+        success_response($highlight, 'Highlights detail');
     }
 
     public function create(array $params): void
@@ -62,9 +62,9 @@ class PortfolioController
         require_csrf();
 
         $input = $this->extractBody();
-        $input = $this->normalizePortfolioInput($input);
-        $portfolio = $this->portfolioService->create($input);
-        success_response($portfolio, 'Portfolio created');
+        $input = $this->normalizeHighlightInput($input);
+        $highlight = $this->highlightService->create($input);
+        success_response($highlight, 'Highlights created');
     }
 
     public function update(array $params): void
@@ -74,9 +74,9 @@ class PortfolioController
 
         $id = (int) $params['id'];
         $input = $this->extractBody();
-        $input = $this->normalizePortfolioInput($input);
-        $portfolio = $this->portfolioService->update($id, $input);
-        success_response($portfolio, 'Portfolio updated');
+        $input = $this->normalizeHighlightInput($input);
+        $highlight = $this->highlightService->update($id, $input);
+        success_response($highlight, 'Highlights updated');
     }
 
     public function delete(array $params): void
@@ -85,31 +85,31 @@ class PortfolioController
         require_csrf();
 
         $id = (int) $params['id'];
-        $this->portfolioService->delete($id);
-        success_response(null, 'Portfolio deleted');
+        $this->highlightService->delete($id);
+        success_response(null, 'Highlights deleted');
     }
 
     public function featured(array $params): void
     {
-        $limit = (int) ($_GET['limit'] ?? FEATURED_PORTFOLIO_LIMIT);
-        $items = $this->portfolioService->listFeatured($limit);
-        success_response($items, 'Featured portfolio');
+        $limit = (int) ($_GET['limit'] ?? FEATURED_HIGHLIGHTS_LIMIT);
+        $items = $this->highlightService->listFeatured($limit);
+        success_response($items, 'Featured highlights');
     }
 
     public function galleryImages(array $params): void
     {
-        $items = $this->portfolioService->listGalleryImages();
+        $items = $this->highlightService->listGalleryImages();
         success_response($items, 'Gallery images');
     }
 
-    /* ---- Portfolio Media --------------------------------------------- */
+    /* ---- Highlights Media -------------------------------------------- */
 
     public function uploadMedia(array $params): void
     {
         require_auth();
         require_csrf();
 
-        $portfolioId = (int) $params['id'];
+        $highlightId = (int) $params['id'];
         $file = get_uploaded_file('file');
         if ($file === null) {
             error_response('No file uploaded.', 400);
@@ -118,7 +118,7 @@ class PortfolioController
         $type = $_POST['type'] ?? 'gallery';
         $altText = $_POST['alt_text'] ?? null;
 
-        $media = $this->mediaService->upload($portfolioId, $file, $type, $altText);
+        $media = $this->mediaService->upload($highlightId, $file, $type, $altText);
         success_response($media, 'Upload successful');
     }
 
@@ -149,9 +149,9 @@ class PortfolioController
 
     public function listMedia(array $params): void
     {
-        $portfolioId = (int) $params['id'];
-        $media = $this->mediaService->findByPortfolioId($portfolioId);
-        success_response($media, 'Portfolio media');
+        $highlightId = (int) $params['id'];
+        $media = $this->mediaService->findByHighlightId($highlightId);
+        success_response($media, 'Highlights media');
     }
 
     /* ---- Helpers ---------------------------------------------------- */
@@ -169,7 +169,7 @@ class PortfolioController
         return $_POST;
     }
 
-    private function normalizePortfolioInput(array $input): array
+    private function normalizeHighlightInput(array $input): array
     {
         return [
             'title' => trim($input['title'] ?? ''),
@@ -184,8 +184,8 @@ class PortfolioController
             'published' => !empty($input['published']) ? 1 : 0,
             'seo_title' => trim($input['seo_title'] ?? '') ?: null,
             'seo_description' => trim($input['seo_description'] ?? '') ?: null,
-            'cover_image_id' => isset($input['cover_image_id']) ? (int) $input['cover_image_id'] : null,
-            'og_image_id' => isset($input['og_image_id']) ? (int) $input['og_image_id'] : null,
+            'cover_media_id' => isset($input['cover_media_id']) ? (int) $input['cover_media_id'] : null,
+            'og_media_id' => isset($input['og_media_id']) ? (int) $input['og_media_id'] : null,
         ];
     }
 }

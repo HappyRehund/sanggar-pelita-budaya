@@ -2,31 +2,31 @@
 
 declare(strict_types=1);
 
-class PortfolioService
+class HighlightService
 {
     private PDO $db;
-    private PortfolioRepository $portfolioRepo;
-    private PortfolioMediaRepository $mediaRepo;
+    private HighlightRepository $highlightRepo;
+    private HighlightMediaRepository $mediaRepo;
     private UploadService $uploadService;
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
-        $this->portfolioRepo = new PortfolioRepository($db);
-        $this->mediaRepo = new PortfolioMediaRepository($db);
+        $this->highlightRepo = new HighlightRepository($db);
+        $this->mediaRepo = new HighlightMediaRepository($db);
         $this->uploadService = new UploadService();
     }
 
     public function create(array $data): array
     {
-        $this->validatePortfolioFields($data, null);
+        $this->validateHighlightFields($data, null);
 
         $this->db->beginTransaction();
         try {
-            $id = $this->portfolioRepo->insert($data);
-            $row = $this->portfolioRepo->findById($id);
+            $id = $this->highlightRepo->insert($data);
+            $row = $this->highlightRepo->findById($id);
             $this->db->commit();
-            return formatPortfolioRow($row);
+            return formatHighlightRow($row);
         } catch (Throwable $e) {
             $this->db->rollBack();
             throw $e;
@@ -35,19 +35,19 @@ class PortfolioService
 
     public function update(int $id, array $data): array
     {
-        $existing = $this->portfolioRepo->findById($id);
+        $existing = $this->highlightRepo->findById($id);
         if (!$existing) {
-            not_found_response('Portfolio not found');
+            not_found_response('Highlight not found');
         }
 
-        $this->validatePortfolioFields($data, $id);
+        $this->validateHighlightFields($data, $id);
 
         $this->db->beginTransaction();
         try {
-            $this->portfolioRepo->update($id, $data);
-            $row = $this->portfolioRepo->findById($id);
+            $this->highlightRepo->update($id, $data);
+            $row = $this->highlightRepo->findById($id);
             $this->db->commit();
-            return formatPortfolioRow($row);
+            return formatHighlightRow($row);
         } catch (Throwable $e) {
             $this->db->rollBack();
             throw $e;
@@ -56,20 +56,20 @@ class PortfolioService
 
     public function delete(int $id): void
     {
-        $existing = $this->portfolioRepo->findById($id);
+        $existing = $this->highlightRepo->findById($id);
         if (!$existing) {
-            not_found_response('Portfolio not found');
+            not_found_response('Highlight not found');
         }
 
         $this->db->beginTransaction();
         try {
-            $media = $this->mediaRepo->findByPortfolioId($id);
+            $media = $this->mediaRepo->findByHighlightId($id);
 
             foreach ($media as $file) {
                 $this->uploadService->delete($file['filename']);
             }
 
-            $this->portfolioRepo->delete($id);
+            $this->highlightRepo->delete($id);
             $this->db->commit();
         } catch (Throwable $e) {
             $this->db->rollBack();
@@ -79,36 +79,36 @@ class PortfolioService
 
     public function getById(int $id): array
     {
-        $row = $this->portfolioRepo->findById($id);
+        $row = $this->highlightRepo->findById($id);
         if (!$row) {
-            not_found_response('Portfolio not found');
+            not_found_response('Highlight not found');
         }
 
-        $portfolio = formatPortfolioRow($row);
-        $media = $this->mediaRepo->findByPortfolioId($id);
-        $portfolio['cover'] = $this->findMediaById($media, $row['cover_image_id']);
-        $portfolio['og_image'] = $this->findMediaById($media, $row['og_image_id']);
-        $portfolio['gallery'] = $this->filterGallery($media);
-        return $portfolio;
+        $highlight = formatHighlightRow($row);
+        $media = $this->mediaRepo->findByHighlightId($id);
+        $highlight['cover'] = $this->findMediaById($media, $row['cover_media_id']);
+        $highlight['og_media'] = $this->findMediaById($media, $row['og_media_id']);
+        $highlight['gallery'] = $this->filterGallery($media);
+        return $highlight;
     }
 
     public function getBySlug(string $slug): array
     {
-        $row = $this->portfolioRepo->findBySlug($slug);
+        $row = $this->highlightRepo->findBySlug($slug);
         if (!$row) {
-            not_found_response('Portfolio not found');
+            not_found_response('Highlight not found');
         }
 
-        $portfolio = $this->getById((int) $row['id']);
+        $highlight = $this->getById((int) $row['id']);
 
-        $related = $this->portfolioRepo->findRelated(
+        $related = $this->highlightRepo->findRelated(
             (int) $row['id'],
             $row['category'],
-            RELATED_PORTFOLIO_LIMIT
+            RELATED_HIGHLIGHTS_LIMIT
         );
-        $portfolio['related'] = array_map('formatPortfolioRow', $related);
+        $highlight['related'] = array_map('formatHighlightRow', $related);
 
-        return $portfolio;
+        return $highlight;
     }
 
     public function list(array $filters, int $page, int $perPage): array
@@ -116,14 +116,14 @@ class PortfolioService
         $page = max(1, $page);
         $perPage = max(1, min($perPage, 100));
 
-        $total = $this->portfolioRepo->count($filters);
-        $rows = $this->portfolioRepo->find($filters, $page, $perPage);
+        $total = $this->highlightRepo->count($filters);
+        $rows = $this->highlightRepo->find($filters, $page, $perPage);
 
         $items = [];
         foreach ($rows as $row) {
-            $item = formatPortfolioRow($row);
-            $coverMedia = $row['cover_image_id'] !== null
-                ? $this->mediaRepo->findById((int) $row['cover_image_id'])
+            $item = formatHighlightRow($row);
+            $coverMedia = $row['cover_media_id'] !== null
+                ? $this->mediaRepo->findById((int) $row['cover_media_id'])
                 : null;
             $item['cover'] = $coverMedia ? formatMediaRow($coverMedia) : null;
             $items[] = $item;
@@ -137,12 +137,12 @@ class PortfolioService
 
     public function listFeatured(int $limit): array
     {
-        $rows = $this->portfolioRepo->findFeatured($limit);
+        $rows = $this->highlightRepo->findFeatured($limit);
         $items = [];
         foreach ($rows as $row) {
-            $item = formatPortfolioRow($row);
-            $coverMedia = $row['cover_image_id'] !== null
-                ? $this->mediaRepo->findById((int) $row['cover_image_id'])
+            $item = formatHighlightRow($row);
+            $coverMedia = $row['cover_media_id'] !== null
+                ? $this->mediaRepo->findById((int) $row['cover_media_id'])
                 : null;
             $item['cover'] = $coverMedia ? formatMediaRow($coverMedia) : null;
             $items[] = $item;
@@ -152,11 +152,11 @@ class PortfolioService
 
     public function listGalleryImages(): array
     {
-        $rows = $this->portfolioRepo->findAllGalleryImages();
+        $rows = $this->highlightRepo->findAllGalleryImages();
         return array_map('formatMediaRow', $rows);
     }
 
-    private function validatePortfolioFields(array $data, ?int $ignoreId): void
+    private function validateHighlightFields(array $data, ?int $ignoreId): void
     {
         $validator = new ValidationService();
         $validator->required('title', $data['title'] ?? null);
@@ -172,7 +172,7 @@ class PortfolioService
             $validator->failOrContinue();
         }
 
-        if ($this->portfolioRepo->slugExists($data['slug'], $ignoreId)) {
+        if ($this->highlightRepo->slugExists($data['slug'], $ignoreId)) {
             validation_error_response(['slug' => 'Slug already exists.']);
         }
     }

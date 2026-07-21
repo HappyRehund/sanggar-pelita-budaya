@@ -11,7 +11,7 @@ function formatMediaRow(array $row): array
 {
     return [
         'id' => (int) $row['id'],
-        'portfolio_id' => (int) $row['portfolio_id'],
+        'highlight_id' => (int) $row['highlight_id'],
         'type' => $row['type'],
         'filename' => $row['filename'],
         'original_filename' => $row['original_filename'],
@@ -26,7 +26,7 @@ function formatMediaRow(array $row): array
     ];
 }
 
-function formatPortfolioRow(array $row): array
+function formatHighlightRow(array $row): array
 {
     return [
         'id' => (int) $row['id'],
@@ -35,7 +35,7 @@ function formatPortfolioRow(array $row): array
         'category' => $row['category'],
         'short_description' => $row['short_description'],
         'content' => $row['content'] ?? '',
-        'cover_image_id' => $row['cover_image_id'] !== null ? (int) $row['cover_image_id'] : null,
+        'cover_media_id' => $row['cover_media_id'] !== null ? (int) $row['cover_media_id'] : null,
         'event_date' => $row['event_date'] ?? null,
         'location' => $row['location'] ?? null,
         'youtube_url' => $row['youtube_url'] ?? null,
@@ -43,7 +43,7 @@ function formatPortfolioRow(array $row): array
         'published' => (int) $row['published'] === 1,
         'seo_title' => $row['seo_title'] ?? null,
         'seo_description' => $row['seo_description'] ?? null,
-        'og_image_id' => $row['og_image_id'] !== null ? (int) $row['og_image_id'] : null,
+        'og_media_id' => $row['og_media_id'] !== null ? (int) $row['og_media_id'] : null,
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
     ];

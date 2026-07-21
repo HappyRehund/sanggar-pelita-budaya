@@ -55,7 +55,7 @@ function apply_cors(): void
 /* ---- Controllers (autoloader resolves class files) --------------- */
 $authController = new AuthController();
 $csrfController = new CsrfController();
-$portfolioController = new PortfolioController();
+$highlightController = new HighlightController();
 $organizationController = new OrganizationController();
 $settingsController = new SettingsController();
 $dashboardController = new DashboardController();
@@ -95,21 +95,21 @@ route('POST', '/api/auth/login', [$authController, 'login']);
 route('POST', '/api/auth/logout', [$authController, 'logout']);
 route('GET', '/api/auth/me', [$authController, 'session']);
 
-/* ---- Portfolio (public + admin) --------------------------------- */
-route('GET',    '/api/portfolio',              [$portfolioController, 'list']);
-route('GET',    '/api/portfolio/featured',     [$portfolioController, 'featured']);
-route('GET',    '/api/portfolio/gallery',       [$portfolioController, 'galleryImages']);
-route('GET',    '/api/portfolio/slug/{slug}',   [$portfolioController, 'getBySlug']);
-route('GET',    '/api/portfolio/{id}',         [$portfolioController, 'getById']);
-route('POST',   '/api/portfolio',              [$portfolioController, 'create']);
-route('PUT',    '/api/portfolio/{id}',         [$portfolioController, 'update']);
-route('DELETE', '/api/portfolio/{id}',         [$portfolioController, 'delete']);
+/* ---- Highlights (public + admin) --------------------------------- */
+route('GET',    '/api/highlights',              [$highlightController, 'list']);
+route('GET',    '/api/highlights/featured',     [$highlightController, 'featured']);
+route('GET',    '/api/highlights/gallery',      [$highlightController, 'galleryImages']);
+route('GET',    '/api/highlights/slug/{slug}',  [$highlightController, 'getBySlug']);
+route('GET',    '/api/highlights/{id}',         [$highlightController, 'getById']);
+route('POST',   '/api/highlights',              [$highlightController, 'create']);
+route('PUT',    '/api/highlights/{id}',         [$highlightController, 'update']);
+route('DELETE', '/api/highlights/{id}',         [$highlightController, 'delete']);
 
-/* ---- Portfolio Media --------------------------------------------- */
-route('PUT',    '/api/portfolio/media/reorder',   [$portfolioController, 'reorderMedia']);
-route('GET',    '/api/portfolio/{id}/media',      [$portfolioController, 'listMedia']);
-route('POST',   '/api/portfolio/{id}/media',      [$portfolioController, 'uploadMedia']);
-route('DELETE', '/api/portfolio/media/{id}',      [$portfolioController, 'deleteMedia']);
+/* ---- Highlights Media -------------------------------------------- */
+route('PUT',    '/api/highlights/media/reorder',   [$highlightController, 'reorderMedia']);
+route('GET',    '/api/highlights/{id}/media',      [$highlightController, 'listMedia']);
+route('POST',   '/api/highlights/{id}/media',      [$highlightController, 'uploadMedia']);
+route('DELETE', '/api/highlights/media/{id}',      [$highlightController, 'deleteMedia']);
 
 /* ---- Organization (public GETs + admin CRUD) --------------------- */
 route('GET',    '/api/organization',              [$organizationController, 'list']);

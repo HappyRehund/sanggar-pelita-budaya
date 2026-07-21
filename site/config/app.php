@@ -19,16 +19,16 @@ define('UPLOAD_BASE_PATH', BASE_PATH . '/public/uploads');
 define('UPLOAD_PUBLIC_PATH', '/uploads');
 
 define('UPLOAD_FOLDERS', [
-    'portfolio' => 'portfolio',
+    'highlights' => 'highlights',
     'organization' => 'organization',
     'settings' => 'settings',
     'documents' => 'documents',
 ]);
 
-define('PORTFOLIO_PER_PAGE', 12);
-define('FEATURED_PORTFOLIO_LIMIT', 6);
-define('RELATED_PORTFOLIO_LIMIT', 4);
-define('GALLERY_IMAGE_LIMIT', 10);
+define('HIGHLIGHTS_PER_PAGE', 12);
+define('FEATURED_HIGHLIGHTS_LIMIT', 6);
+define('RELATED_HIGHLIGHTS_LIMIT', 4);
+define('HIGHLIGHTS_GALLERY_IMAGE_LIMIT', 10);
 
 $directories = [
     BASE_PATH . '/data',

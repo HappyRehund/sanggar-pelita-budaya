@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-class PortfolioMediaService
+class HighlightMediaService
 {
     private PDO $db;
-    private PortfolioRepository $portfolioRepo;
-    private PortfolioMediaRepository $mediaRepo;
+    private HighlightRepository $highlightRepo;
+    private HighlightMediaRepository $mediaRepo;
     private UploadService $uploadService;
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
-        $this->portfolioRepo = new PortfolioRepository($db);
-        $this->mediaRepo = new PortfolioMediaRepository($db);
+        $this->highlightRepo = new HighlightRepository($db);
+        $this->mediaRepo = new HighlightMediaRepository($db);
         $this->uploadService = new UploadService();
     }
 
-    public function upload(int $portfolioId, array $file, string $type, ?string $altText = null): array
+    public function upload(int $highlightId, array $file, string $type, ?string $altText = null): array
     {
-        $portfolio = $this->portfolioRepo->findById($portfolioId);
-        if (!$portfolio) {
-            not_found_response('Portfolio not found');
+        $highlight = $this->highlightRepo->findById($highlightId);
+        if (!$highlight) {
+            not_found_response('Highlight not found');
         }
 
         $validTypes = ['cover', 'gallery', 'og'];
@@ -29,16 +29,16 @@ class PortfolioMediaService
             validation_error_response(['type' => 'Media type must be cover, gallery, or og.']);
         }
 
-        $stored = $this->uploadService->store($file, 'portfolio');
+        $stored = $this->uploadService->store($file, 'highlights');
 
         $this->db->beginTransaction();
         try {
             $sortOrder = $type === 'gallery'
-                ? $this->mediaRepo->nextSortOrder($portfolioId)
+                ? $this->mediaRepo->nextSortOrder($highlightId)
                 : 0;
 
             $mediaId = $this->mediaRepo->insert([
-                'portfolio_id' => $portfolioId,
+                'highlight_id' => $highlightId,
                 'type' => $type,
                 'filename' => $stored['filename'],
                 'original_filename' => $stored['original_filename'],
@@ -52,9 +52,9 @@ class PortfolioMediaService
             ]);
 
             if ($type === 'cover') {
-                $this->portfolioRepo->setCoverImage($portfolioId, $mediaId);
+                $this->highlightRepo->setCoverMedia($highlightId, $mediaId);
             } elseif ($type === 'og') {
-                $this->portfolioRepo->setOgImage($portfolioId, $mediaId);
+                $this->highlightRepo->setOgMedia($highlightId, $mediaId);
             }
 
             $row = $this->mediaRepo->findById($mediaId);
@@ -76,12 +76,12 @@ class PortfolioMediaService
 
         $this->db->beginTransaction();
         try {
-            $portfolioId = (int) $media['portfolio_id'];
+            $highlightId = (int) $media['highlight_id'];
 
             if ($media['type'] === 'cover') {
-                $this->portfolioRepo->setCoverImage($portfolioId, null);
+                $this->highlightRepo->setCoverMedia($highlightId, null);
             } elseif ($media['type'] === 'og') {
-                $this->portfolioRepo->setOgImage($portfolioId, null);
+                $this->highlightRepo->setOgMedia($highlightId, null);
             }
 
             $this->mediaRepo->delete($mediaId);
@@ -108,13 +108,13 @@ class PortfolioMediaService
         }
     }
 
-    public function findByPortfolioId(int $portfolioId): array
+    public function findByHighlightId(int $highlightId): array
     {
-        $portfolio = $this->portfolioRepo->findById($portfolioId);
-        if (!$portfolio) {
-            not_found_response('Portfolio not found');
+        $highlight = $this->highlightRepo->findById($highlightId);
+        if (!$highlight) {
+            not_found_response('Highlight not found');
         }
-        $rows = $this->mediaRepo->findByPortfolioId($portfolioId);
+        $rows = $this->mediaRepo->findByHighlightId($highlightId);
         return array_map('formatMediaRow', $rows);
     }
 }
