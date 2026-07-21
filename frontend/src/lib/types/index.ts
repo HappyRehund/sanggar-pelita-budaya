@@ -78,9 +78,11 @@ export interface HighlightListSummary {
 export interface OrganizationMember {
   id: number;
   name: string;
-  position: string;
+  position_en: string;
+  position_id: string;
+  biography_en: string | null;
+  biography_id: string | null;
   photo: string | null;
-  biography: string | null;
   display_order: number;
   featured_slot: number | null;
   published: boolean;
