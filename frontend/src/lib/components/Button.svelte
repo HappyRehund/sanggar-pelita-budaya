@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte';
   import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
-  type Variant = 'primary' | 'secondary' | 'ghost' | 'icon' | 'gold';
+  type Variant = 'primary' | 'secondary' | 'ghost' | 'icon' | 'gold' | 'outline-red' | 'outline-gold';
   type Size = 'sm' | 'md' | 'lg';
 
   interface CommonProps {
@@ -146,6 +146,28 @@
     background-color: var(--color-gold-dark);
     color: var(--color-white);
     border-color: var(--color-gold-dark);
+  }
+
+  .btn--outline-red {
+    background-color: transparent;
+    color: var(--color-red);
+    border: 1px solid var(--color-red);
+  }
+  .btn--outline-red:not(:disabled):hover {
+    background-color: var(--color-red);
+    color: var(--color-white);
+    border-color: var(--color-red);
+  }
+
+  .btn--outline-gold {
+    background-color: transparent;
+    color: var(--color-gold-dark);
+    border: 1px solid var(--color-gold-dark);
+  }
+  .btn--outline-gold:not(:disabled):hover {
+    background-color: var(--color-gold);
+    color: var(--color-brown);
+    border-color: var(--color-gold);
   }
 
   .btn--icon {
