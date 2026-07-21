@@ -126,7 +126,7 @@
       <h2 class="about-preview__title">{t('about_title')}</h2>
       <div class="divider-gold"></div>
       <p class="about-preview__desc text-pretty">{t('about_description')}</p>
-      <Button variant="outline-red" size="md" href="/about" class="about-preview__cta-button">
+      <Button variant="gradient-outline" size="md" href="/about" class="about-preview__cta-button">
         {t('about_read_more')}
       </Button>
     </div>
