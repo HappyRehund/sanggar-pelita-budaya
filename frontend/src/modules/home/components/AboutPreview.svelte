@@ -166,7 +166,7 @@
     margin-left: -180px;
     border: 0;
     padding: 2px;
-    border-radius: 30px;
+    /* border-radius: var(--radius-xl); */
     overflow: hidden;
     cursor: pointer;
     background:
@@ -191,7 +191,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    border-radius: 28px;
+    /* border-radius: var(--radius-lg); */
     overflow: hidden;
     z-index: 1;
   }
