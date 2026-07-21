@@ -51,14 +51,14 @@ function initSchema(): void
     ");
 
     $pdo->exec("
-        CREATE TABLE IF NOT EXISTS portfolio (
+        CREATE TABLE IF NOT EXISTS highlights (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             slug TEXT UNIQUE NOT NULL,
             category TEXT NOT NULL CHECK(category IN ('achievement','activity')),
             short_description TEXT NOT NULL,
             content TEXT NOT NULL DEFAULT '',
-            cover_image_id INTEGER,
+            cover_media_id INTEGER,
             event_date DATE,
             location TEXT,
             youtube_url TEXT,
@@ -66,18 +66,18 @@ function initSchema(): void
             published INTEGER NOT NULL DEFAULT 0,
             seo_title TEXT,
             seo_description TEXT,
-            og_image_id INTEGER,
+            og_media_id INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (cover_image_id) REFERENCES portfolio_media(id) ON DELETE SET NULL,
-            FOREIGN KEY (og_image_id) REFERENCES portfolio_media(id) ON DELETE SET NULL
+            FOREIGN KEY (cover_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL,
+            FOREIGN KEY (og_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL
         );
     ");
 
     $pdo->exec("
-        CREATE TABLE IF NOT EXISTS portfolio_media (
+        CREATE TABLE IF NOT EXISTS highlights_media (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            portfolio_id INTEGER NOT NULL,
+            highlight_id INTEGER NOT NULL,
             type TEXT NOT NULL CHECK(type IN ('cover','gallery','og')),
             filename TEXT NOT NULL,
             original_filename TEXT NOT NULL,
@@ -89,7 +89,7 @@ function initSchema(): void
             alt_text TEXT,
             sort_order INTEGER NOT NULL DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (portfolio_id) REFERENCES portfolio(id) ON DELETE CASCADE
+            FOREIGN KEY (highlight_id) REFERENCES highlights(id) ON DELETE CASCADE
         );
     ");
 
@@ -133,13 +133,13 @@ function initSchema(): void
 function createIndexes(PDO $pdo): void
 {
     $indexes = [
-        'CREATE INDEX IF NOT EXISTS idx_portfolio_slug ON portfolio(slug);',
-        'CREATE INDEX IF NOT EXISTS idx_portfolio_category ON portfolio(category);',
-        'CREATE INDEX IF NOT EXISTS idx_portfolio_published ON portfolio(published);',
-        'CREATE INDEX IF NOT EXISTS idx_portfolio_featured ON portfolio(featured);',
-        'CREATE INDEX IF NOT EXISTS idx_portfolio_event_date ON portfolio(event_date);',
+        'CREATE INDEX IF NOT EXISTS idx_highlights_slug ON highlights(slug);',
+        'CREATE INDEX IF NOT EXISTS idx_highlights_category ON highlights(category);',
+        'CREATE INDEX IF NOT EXISTS idx_highlights_published ON highlights(published);',
+        'CREATE INDEX IF NOT EXISTS idx_highlights_featured ON highlights(featured);',
+        'CREATE INDEX IF NOT EXISTS idx_highlights_event_date ON highlights(event_date);',
         'CREATE INDEX IF NOT EXISTS idx_org_display_order ON organization_members(display_order);',
-        'CREATE INDEX IF NOT EXISTS idx_media_portfolio_id ON portfolio_media(portfolio_id);',
+        'CREATE INDEX IF NOT EXISTS idx_media_highlight_id ON highlights_media(highlight_id);',
     ];
 
     foreach ($indexes as $sql) {
