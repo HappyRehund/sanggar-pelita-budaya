@@ -80,7 +80,7 @@
         <span class="vm-tile__rule__mission" aria-hidden="true"></span>
         <p class="vm-tile__desc__mission text-pretty">{t('mission_description')}</p>
         <div class="vm-tile__cta-wrap">
-          <Button variant="outline-red" size="md" href="/about">
+          <Button variant="outline-ink" size="md" href="/about">
             {t('read_more')}
           </Button>
         </div>
