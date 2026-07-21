@@ -13,15 +13,13 @@ class OrganizationController
 
     public function list(array $params): void
     {
-        $publishedOnly = !is_authenticated();
-        $items = $this->service->list($publishedOnly);
+        $items = $this->service->list();
         success_response($items, 'Organization members');
     }
 
     public function featured(array $params): void
     {
-        $publishedOnly = !is_authenticated();
-        $items = $this->service->listFeatured($publishedOnly);
+        $items = $this->service->listFeatured();
         success_response($items, 'Featured organization members');
     }
 
@@ -117,7 +115,6 @@ class OrganizationController
             'featured_slot' => ($featuredSlot !== null && $featuredSlot !== '' && $featuredSlot !== 0)
                 ? (int) $featuredSlot
                 : null,
-            'published' => !empty($input['published']) ? 1 : 0,
         ];
     }
 }

@@ -61,7 +61,6 @@ function formatOrganizationRow(array $row): array
         'biography_id' => $row['biography_id'] ?? null,
         'display_order' => (int) $row['display_order'],
         'featured_slot' => $row['featured_slot'] !== null ? (int) $row['featured_slot'] : null,
-        'published' => (int) $row['published'] === 1,
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,
     ];

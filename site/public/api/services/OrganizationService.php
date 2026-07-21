@@ -15,15 +15,15 @@ class OrganizationService
         $this->uploadService = new UploadService();
     }
 
-    public function list(bool $publishedOnly = false): array
+    public function list(): array
     {
-        $rows = $this->repo->findAll($publishedOnly);
+        $rows = $this->repo->findAll();
         return array_map('formatOrganizationRow', $rows);
     }
 
-    public function listFeatured(bool $publishedOnly = false): array
+    public function listFeatured(): array
     {
-        $rows = $this->repo->findFeatured($publishedOnly);
+        $rows = $this->repo->findFeatured();
         return array_map('formatOrganizationRow', $rows);
     }
 

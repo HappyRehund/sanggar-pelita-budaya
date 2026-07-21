@@ -15,9 +15,9 @@ class OrganizationRepository
     {
         $stmt = $this->db->prepare("
             INSERT INTO organization_members
-                (name, position_en, position_id, photo, biography_en, biography_id, display_order, featured_slot, published)
+                (name, position_en, position_id, photo, biography_en, biography_id, display_order, featured_slot)
             VALUES
-                (:name, :position_en, :position_id, :photo, :biography_en, :biography_id, :display_order, :featured_slot, :published)
+                (:name, :position_en, :position_id, :photo, :biography_en, :biography_id, :display_order, :featured_slot)
         ");
 
         $featuredSlot = $data['featured_slot'] ?? null;
@@ -29,7 +29,6 @@ class OrganizationRepository
         $stmt->bindValue(':biography_id', $data['biography_id'] ?? null);
         $stmt->bindValue(':display_order', $data['display_order'] ?? 0, PDO::PARAM_INT);
         $stmt->bindValue(':featured_slot', $featuredSlot, $featuredSlot === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-        $stmt->bindValue(':published', $data['published'] ?? 1, PDO::PARAM_INT);
         $stmt->execute();
         return (int) $this->db->lastInsertId();
     }
@@ -46,7 +45,6 @@ class OrganizationRepository
                 biography_id = :biography_id,
                 display_order = :display_order,
                 featured_slot = :featured_slot,
-                published = :published,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = :id
         ");
@@ -60,7 +58,6 @@ class OrganizationRepository
         $stmt->bindValue(':biography_id', $data['biography_id'] ?? null);
         $stmt->bindValue(':display_order', $data['display_order'] ?? 0, PDO::PARAM_INT);
         $stmt->bindValue(':featured_slot', $featuredSlot, $featuredSlot === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-        $stmt->bindValue(':published', $data['published'] ?? 1, PDO::PARAM_INT);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
     }
@@ -79,13 +76,8 @@ class OrganizationRepository
         return $row ?: null;
     }
 
-    public function findAll(bool $publishedOnly = false): array
+    public function findAll(): array
     {
-        if ($publishedOnly) {
-            return $this->db->query(
-                "SELECT * FROM organization_members WHERE published = 1 ORDER BY display_order ASC, created_at ASC"
-            )->fetchAll();
-        }
         return $this->db->query(
             "SELECT * FROM organization_members ORDER BY display_order ASC, created_at ASC"
         )->fetchAll();
@@ -97,14 +89,6 @@ class OrganizationRepository
         return (int) $row['count'];
     }
 
-    public function countPublished(): int
-    {
-        $row = $this->db->query(
-            "SELECT COUNT(*) as count FROM organization_members WHERE published = 1"
-        )->fetch();
-        return (int) $row['count'];
-    }
-
     public function updateDisplayOrder(int $id, int $order): void
     {
         $stmt = $this->db->prepare(
@@ -113,14 +97,11 @@ class OrganizationRepository
         $stmt->execute([$order, $id]);
     }
 
-    public function findFeatured(bool $publishedOnly = false): array
+    public function findFeatured(): array
     {
-        $sql = "SELECT * FROM organization_members WHERE featured_slot IS NOT NULL";
-        if ($publishedOnly) {
-            $sql .= " AND published = 1";
-        }
-        $sql .= " ORDER BY featured_slot ASC LIMIT 4";
-        return $this->db->query($sql)->fetchAll();
+        return $this->db->query(
+            "SELECT * FROM organization_members WHERE featured_slot IS NOT NULL ORDER BY featured_slot ASC LIMIT 4"
+        )->fetchAll();
     }
 
     public function clearSlot(int $slot, ?int $exceptId = null): void

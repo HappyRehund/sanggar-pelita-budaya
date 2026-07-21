@@ -100,10 +100,10 @@ function initSchema(): void
         );
     ");
 
-    // Recreate organization_members with bilingual position + biography (EN/ID).
+    // Recreate organization_members without the `published` column (no longer needed in admin).
     // Safe to wipe: no data to preserve. Guarded by schema-version marker so it only runs once.
-    $orgSchemaV3 = $pdo->query("SELECT value FROM schema_meta WHERE key = 'organization_v3'")->fetchColumn();
-    if ($orgSchemaV3 === false) {
+    $orgSchemaV4 = $pdo->query("SELECT value FROM schema_meta WHERE key = 'organization_v4'")->fetchColumn();
+    if ($orgSchemaV4 === false) {
         $pdo->exec('DROP TABLE IF EXISTS organization_members;');
         $pdo->exec('DROP INDEX IF EXISTS idx_org_display_order;');
         $pdo->exec('DROP INDEX IF EXISTS idx_org_featured_slot;');
@@ -120,14 +120,13 @@ function initSchema(): void
             biography_id TEXT,
             display_order INTEGER NOT NULL DEFAULT 0,
             featured_slot INTEGER,
-            published INTEGER NOT NULL DEFAULT 1,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     ");
 
-    if ($orgSchemaV3 === false) {
-        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('organization_v3', '1');");
+    if ($orgSchemaV4 === false) {
+        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('organization_v4', '1');");
     }
 
     // Drop legacy hero/footer tables (content now static frontend-only)
