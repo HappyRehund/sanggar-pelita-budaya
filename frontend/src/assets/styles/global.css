@@ -204,6 +204,21 @@ p {
   animation: eyebrow-gradient-pan 6s linear infinite;
 }
 
+.eyebrow::before,
+.eyebrow--centered::after {
+  content: '';
+  display: inline-block;
+  width: var(--sp-5);
+  height: 1px;
+  background: linear-gradient(135deg,
+    var(--color-red) 0%,
+    var(--color-gold-dark) 50%,
+    var(--color-red) 100%);
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  animation: eyebrow-gradient-pan 6s linear infinite;
+}
+
 @keyframes eyebrow-gradient-pan {
   0%   { background-position:   0% 50%; }
   50%  { background-position: 100% 50%; }
