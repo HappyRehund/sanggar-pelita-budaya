@@ -26,7 +26,7 @@ export const API = {
 
   // Organization
   ORGANIZATION: '/api/organization',
-  ORGANIZATION_TREE: '/api/organization/tree',
+  ORGANIZATION_FEATURED: '/api/organization/featured',
   ORGANIZATION_DETAIL: (id: number) => `/api/organization/${id}`,
   ORGANIZATION_REORDER: '/api/organization/reorder',
   ORGANIZATION_PHOTO: (id: number) => `/api/organization/${id}/photo`,

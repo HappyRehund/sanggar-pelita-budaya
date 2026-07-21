@@ -80,7 +80,7 @@ export const highlightsApi = {
 export const organizationApi = {
   list: () => api.get<OrganizationMember[]>(API.ORGANIZATION),
 
-  tree: () => api.get<OrganizationMember[]>(API.ORGANIZATION_TREE),
+  featured: () => api.get<OrganizationMember[]>(API.ORGANIZATION_FEATURED),
 
   getById: (id: number) => api.get<OrganizationMember>(API.ORGANIZATION_DETAIL(id)),
 

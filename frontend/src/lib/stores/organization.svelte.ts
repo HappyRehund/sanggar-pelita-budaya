@@ -3,7 +3,7 @@ import type { OrganizationMember } from '$lib/types';
 
 class OrganizationStore {
   members = $state<OrganizationMember[]>([]);
-  tree = $state<OrganizationMember[]>([]);
+  featured = $state<OrganizationMember[]>([]);
   loading = $state(false);
   error = $state<string | null>(null);
 
@@ -19,13 +19,13 @@ class OrganizationStore {
     }
   }
 
-  async fetchTree(): Promise<void> {
+  async fetchFeatured(): Promise<void> {
     this.loading = true;
     this.error = null;
     try {
-      this.tree = await organizationApi.tree();
+      this.featured = await organizationApi.featured();
     } catch (e) {
-      this.error = e instanceof Error ? e.message : 'Failed to load organization tree';
+      this.error = e instanceof Error ? e.message : 'Failed to load featured members';
     } finally {
       this.loading = false;
     }
@@ -33,7 +33,7 @@ class OrganizationStore {
 
   reset(): void {
     this.members = [];
-    this.tree = [];
+    this.featured = [];
     this.error = null;
   }
 }

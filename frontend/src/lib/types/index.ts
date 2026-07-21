@@ -77,14 +77,13 @@ export interface HighlightListSummary {
 /* ---- Organization --------------------------------------------------- */
 export interface OrganizationMember {
   id: number;
-  parent_id: number | null;
   name: string;
   position: string;
   photo: string | null;
   biography: string | null;
   display_order: number;
+  featured_slot: number | null;
   published: boolean;
-  children?: OrganizationMember[];
   created_at: string;
   updated_at: string;
 }
