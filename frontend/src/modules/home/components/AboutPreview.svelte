@@ -3,7 +3,6 @@
   import { t } from '$lib/i18n/index.svelte';
   import { revealOnScroll } from '$lib/utils';
   import Button from '$lib/components/Button.svelte';
-  import { ArrowRight } from '@lucide/svelte';
   import img1 from '$assets/images/about/about-1.jpg';
   import img2 from '$assets/images/about/about-2.jpg';
   import img3 from '$assets/images/about/about-3.jpg';
@@ -127,9 +126,8 @@
       <h2 class="about-preview__title">{t('about_title')}</h2>
       <div class="divider-gold"></div>
       <p class="about-preview__desc text-pretty">{t('about_description')}</p>
-      <Button variant="ghost" size="md" href="/about" class="about-preview__cta-button">
+      <Button variant="outline-red" size="md" href="/about" class="about-preview__cta-button">
         {t('about_read_more')}
-        <ArrowRight size={16} />
       </Button>
     </div>
   </div>
