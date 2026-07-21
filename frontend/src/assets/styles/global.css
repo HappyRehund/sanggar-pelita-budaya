@@ -205,7 +205,7 @@ p {
 }
 
 .eyebrow::before,
-.eyebrow--centered::after {
+.eyebrow::after {
   content: '';
   display: inline-block;
   width: var(--sp-5);
