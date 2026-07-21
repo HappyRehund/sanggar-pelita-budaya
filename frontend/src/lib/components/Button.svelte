@@ -7,6 +7,7 @@
     | 'secondary'
     | 'ghost'
     | 'ink'
+    | 'soft-ink'
     | 'icon'
     | 'gold'
     | 'outline-red'
@@ -156,6 +157,19 @@
   .btn--ink:not(:disabled):hover {
     background-color: var(--color-ink-soft);
     border-color: var(--color-ink-soft);
+    color: var(--color-white);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn--soft-ink {
+    background-color: var(--color-ink-soft);
+    color: var(--color-white);
+    border: 1px solid var(--color-ink-soft);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn--soft-ink:not(:disabled):hover {
+    background-color: var(--color-ink);
+    border-color: var(--color-ink);
     color: var(--color-white);
     box-shadow: var(--shadow-md);
   }
