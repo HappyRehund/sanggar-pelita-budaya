@@ -112,7 +112,7 @@
   }
 
   .hero__desc {
-    font-size: var(--fs-body-lg);
+    font-size: var(--fs-body);
     color: var(--color-beige);
     max-width: 36rem;
     line-height: var(--lh-relaxed);
