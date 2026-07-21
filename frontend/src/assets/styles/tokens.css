@@ -45,6 +45,7 @@
   /* ---- Color · Ink — the "black" replacement (very dark red) --------- */
   --color-ink:        #240003;   /* #D2001A darkened ~85% — text/dark bg */
   --color-ink-soft:   #3D0008;   /* slightly lighter — secondary dark text */
+  --color-ink-muted: #7A3338;
 
   /* ---- Legacy aliases (kept so existing components keep working) ----- */
   --color-brown:       var(--color-ink);        /* alias */
