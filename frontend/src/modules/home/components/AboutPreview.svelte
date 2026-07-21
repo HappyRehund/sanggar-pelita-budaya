@@ -172,7 +172,7 @@
     background:
       linear-gradient(135deg,
         var(--color-red) 0%,
-        var(--color-gold-dark) 50%,
+        var(--color-gold-soft) 50%,
         var(--color-red) 100%) padding-box;
     background-size: 200% 200%;
     background-position: 0% 50%;
