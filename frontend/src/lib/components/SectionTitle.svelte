@@ -56,7 +56,7 @@
   }
 
   .section-title__desc {
-    font-size: var(--fs-body-lg);
+    font-size: var(--fs-body-md);
     color: var(--color-text-muted);
     max-width: 40rem;
     line-height: var(--lh-relaxed);
