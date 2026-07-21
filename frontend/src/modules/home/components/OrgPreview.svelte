@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { organizationStore } from '$lib/stores/organization.svelte';
-  import { t } from '$lib/i18n/index.svelte';
+  import { t, i18n } from '$lib/i18n/index.svelte';
   import { uploadUrl, imageUrl, revealOnScroll, staggerReveal } from '$lib/utils';
   import Button from '$lib/components/Button.svelte';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
@@ -21,6 +21,10 @@
 
   function getPhoto(member: OrganizationMember): string {
     return member.photo ? uploadUrl(member.photo) : imageUrl(`member-${member.id}`, 400, 400);
+  }
+
+  function position(member: OrganizationMember): string {
+    return i18n.current === 'id' ? member.position_id : member.position_en;
   }
 </script>
 
@@ -46,7 +50,7 @@
               />
             </div>
             <h3 class="org-card__name">{member.name}</h3>
-            <p class="org-card__position">{member.position}</p>
+            <p class="org-card__position">{position(member)}</p>
           </div>
         {/each}
       </div>

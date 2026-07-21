@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { organizationStore } from '$lib/stores/organization.svelte';
-  import { t } from '$lib/i18n/index.svelte';
+  import { t, i18n } from '$lib/i18n/index.svelte';
   import { uploadUrl, imageUrl, revealOnScroll, staggerReveal } from '$lib/utils';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import EmptyState from '$lib/components/EmptyState.svelte';
@@ -20,6 +20,15 @@
 
   function getPhoto(member: OrganizationMember): string {
     return member.photo ? uploadUrl(member.photo) : imageUrl(`member-${member.id}`, 400, 400);
+  }
+
+  function position(member: OrganizationMember): string {
+    return i18n.current === 'id' ? member.position_id : member.position_en;
+  }
+
+  function biography(member: OrganizationMember): string | null {
+    const bio = i18n.current === 'id' ? member.biography_id : member.biography_en;
+    return bio && bio.trim() ? bio : null;
   }
 </script>
 
@@ -61,9 +70,9 @@
             </div>
             <div class="org-card__body">
               <h3 class="org-card__name">{member.name}</h3>
-              <p class="org-card__position">{member.position}</p>
-              {#if member.biography}
-                <p class="org-card__bio text-pretty">{member.biography}</p>
+              <p class="org-card__position">{position(member)}</p>
+              {#if biography(member)}
+                <p class="org-card__bio text-pretty">{biography(member)}</p>
               {/if}
             </div>
           </article>
