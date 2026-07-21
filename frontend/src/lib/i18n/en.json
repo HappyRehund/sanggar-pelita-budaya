@@ -231,7 +231,7 @@
   "admin_org_field_photo": "Photo",
   "admin_org_field_biography": "Biography",
   "admin_org_field_display_order": "Display Order",
-  "admin_org_field_parent": "Parent Member",
+  "admin_org_field_featured_slot": "Homepage Featured Slot",
   "admin_org_field_published": "Published",
 
   "admin_settings_title": "Settings",

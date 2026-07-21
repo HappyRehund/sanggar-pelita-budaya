@@ -24,7 +24,7 @@
   let editId = $state<number | null>(null);
 
   let formData = $state({
-    name: '', position: '', biography: '', parent_id: '' as string | number, display_order: 0, published: true,
+    name: '', position: '', biography: '', featured_slot: '' as string | number, display_order: 0, published: true,
   });
   let photo = $state<string | null>(null);
 
@@ -44,7 +44,7 @@
   function startCreate(): void {
     mode = 'create';
     editId = null;
-    formData = { name: '', position: '', biography: '', parent_id: '', display_order: 0, published: true };
+    formData = { name: '', position: '', biography: '', featured_slot: '', display_order: 0, published: true };
     photo = null;
   }
 
@@ -53,7 +53,7 @@
     editId = member.id;
     formData = {
       name: member.name, position: member.position, biography: member.biography || '',
-      parent_id: member.parent_id ?? '', display_order: member.display_order, published: member.published,
+      featured_slot: member.featured_slot ?? '', display_order: member.display_order, published: member.published,
     };
     photo = member.photo;
   }
@@ -67,7 +67,7 @@
     saving = true;
     const payload = {
       ...formData,
-      parent_id: formData.parent_id === '' ? null : Number(formData.parent_id),
+      featured_slot: formData.featured_slot === '' ? null : Number(formData.featured_slot),
     };
     try {
       if (editId !== null) {
@@ -112,9 +112,13 @@
     }
   }
 
-  const parentOptions = $derived(
-    members.filter((m) => m.id !== editId).map((m) => ({ value: m.id, label: `${m.name} (${m.position})` }))
-  );
+  const slotOptions = $derived([
+    { value: '', label: '— None —' },
+    { value: 1, label: 'Slot 1' },
+    { value: 2, label: 'Slot 2' },
+    { value: 3, label: 'Slot 3' },
+    { value: 4, label: 'Slot 4' },
+  ]);
 </script>
 
 {#if mode === 'list'}
@@ -137,7 +141,12 @@
           <div class="member-row">
             <img src={member.photo ? uploadUrl(member.photo) : imageUrl(`m-${member.id}`, 48, 48)} alt={member.name} class="member-row__photo" />
             <div class="member-row__info">
-              <span class="member-row__name">{member.name}</span>
+              <span class="member-row__name">
+                {member.name}
+                {#if member.featured_slot}
+                  <span class="member-row__badge">★ {member.featured_slot}</span>
+                {/if}
+              </span>
               <span class="member-row__position">{member.position}</span>
             </div>
             <div class="member-row__actions">
@@ -162,7 +171,7 @@
         <Input label={t('admin_org_field_position')} value={formData.position} oninput={(e) => (formData.position = (e.target as HTMLInputElement).value)} />
         <Textarea label={t('admin_org_field_biography')} value={formData.biography} oninput={(e) => (formData.biography = (e.target as HTMLTextAreaElement).value)} />
         <div class="form-row">
-          <Select label={t('admin_org_field_parent')} value={formData.parent_id} options={[{value:'',label:'— None —'}, ...parentOptions]} onchange={(e) => (formData.parent_id = (e.target as HTMLSelectElement).value)} />
+          <Select label={t('admin_org_field_featured_slot')} value={formData.featured_slot} options={slotOptions} onchange={(e) => (formData.featured_slot = (e.target as HTMLSelectElement).value)} />
           <Input label={t('admin_org_field_display_order')} type="number" value={String(formData.display_order)} oninput={(e) => (formData.display_order = Number((e.target as HTMLInputElement).value))} />
         </div>
         <Checkbox label={t('admin_org_field_published')} checked={formData.published} onchange={(e) => (formData.published = (e.target as HTMLInputElement).checked)} />
@@ -176,7 +185,7 @@
           {:else}
             {#if photo}
               <div class="media-preview">
-                <img src={uploadUrl(photo)} alt="Photo" />
+                <img src={uploadUrl(photo)} alt="" />
               </div>
             {/if}
             <FileUpload label="" accept="image/jpeg,image/png,image/webp" onselect={handlePhotoUpload} />
@@ -211,8 +220,9 @@
   .member-row { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-3) var(--sp-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
   .member-row__photo { width: 3rem; height: 3rem; border-radius: var(--radius-full); object-fit: cover; flex-shrink: 0; }
   .member-row__info { flex: 1; display: flex; flex-direction: column; }
-  .member-row__name { font-weight: var(--fw-medium); font-size: var(--fs-body-sm); }
+  .member-row__name { font-weight: var(--fw-medium); font-size: var(--fs-body-sm); display: flex; align-items: center; gap: var(--sp-2); }
   .member-row__position { font-size: var(--fs-caption); color: var(--color-text-muted); }
+  .member-row__badge { display: inline-flex; align-items: center; font-size: var(--fs-caption); font-weight: var(--fw-semibold); color: var(--color-ink); background: var(--color-gold); padding: 1px var(--sp-2); border-radius: var(--radius-full); }
   .member-row__actions { display: flex; gap: var(--sp-2); }
   .member-row__actions button { color: var(--color-text-muted); padding: 4px; border-radius: var(--radius-sm); }
   .member-row__actions button:hover { color: var(--color-accent); }

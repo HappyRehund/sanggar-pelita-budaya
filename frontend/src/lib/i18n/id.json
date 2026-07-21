@@ -231,7 +231,7 @@
   "admin_org_field_photo": "Foto",
   "admin_org_field_biography": "Biografi",
   "admin_org_field_display_order": "Urutan Tampil",
-  "admin_org_field_parent": "Anggota Induk",
+  "admin_org_field_featured_slot": "Slot Unggulan Beranda",
   "admin_org_field_published": "Terbit",
 
   "admin_settings_title": "Pengaturan",
