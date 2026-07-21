@@ -174,7 +174,7 @@
     background:
       linear-gradient(135deg,
         var(--color-red) 0%,
-        var(--color-gold-dark) 50%,
+        var(--color-gold-soft) 50%,
         var(--color-red) 100%) padding-box;
     background-size: 200% 200%;
     background-position: 0% 50%;
@@ -190,9 +190,19 @@
   .btn--gradient-outline {
     position: relative;
     background: var(--color-surface);
-    color: var(--color-text);
+    color: transparent;
     border: none;
     isolation: isolate;
+    background-image: linear-gradient(135deg,
+      var(--color-red) 0%,
+      var(--color-gold-soft) 50%,
+      var(--color-red) 100%);
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: btn-gradient-pan-text 6s linear infinite;
   }
   .btn--gradient-outline::before {
     content: '';
@@ -202,7 +212,7 @@
     padding: 2px;
     background: linear-gradient(135deg,
       var(--color-red) 0%,
-      var(--color-gold-dark) 50%,
+      var(--color-gold-soft) 50%,
       var(--color-red) 100%);
     background-size: 200% 200%;
     -webkit-mask:
@@ -218,7 +228,7 @@
     z-index: -1;
   }
   .btn--gradient-outline:not(:disabled):hover {
-    color: var(--color-text);
+    background-position: 100% 50%;
   }
 
   @keyframes btn-gradient-pan {
@@ -228,6 +238,12 @@
   }
 
   @keyframes btn-gradient-pan-border {
+    0%   { background-position:   0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position:   0% 50%; }
+  }
+
+  @keyframes btn-gradient-pan-text {
     0%   { background-position:   0% 50%; }
     50%  { background-position: 100% 50%; }
     100% { background-position:   0% 50%; }
