@@ -54,9 +54,11 @@ function formatOrganizationRow(array $row): array
     return [
         'id' => (int) $row['id'],
         'name' => $row['name'],
-        'position' => $row['position'],
+        'position_en' => $row['position_en'],
+        'position_id' => $row['position_id'],
         'photo' => $row['photo'] ?? null,
-        'biography' => $row['biography'] ?? null,
+        'biography_en' => $row['biography_en'] ?? null,
+        'biography_id' => $row['biography_id'] ?? null,
         'display_order' => (int) $row['display_order'],
         'featured_slot' => $row['featured_slot'] !== null ? (int) $row['featured_slot'] : null,
         'published' => (int) $row['published'] === 1,

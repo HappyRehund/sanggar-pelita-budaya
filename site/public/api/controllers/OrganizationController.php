@@ -109,8 +109,10 @@ class OrganizationController
         $featuredSlot = $input['featured_slot'] ?? null;
         return [
             'name' => trim($input['name'] ?? ''),
-            'position' => trim($input['position'] ?? ''),
-            'biography' => trim($input['biography'] ?? '') ?: null,
+            'position_en' => trim($input['position_en'] ?? ''),
+            'position_id' => trim($input['position_id'] ?? ''),
+            'biography_en' => trim($input['biography_en'] ?? '') ?: null,
+            'biography_id' => trim($input['biography_id'] ?? '') ?: null,
             'display_order' => (int) ($input['display_order'] ?? 0),
             'featured_slot' => ($featuredSlot !== null && $featuredSlot !== '' && $featuredSlot !== 0)
                 ? (int) $featuredSlot

@@ -147,9 +147,11 @@ class OrganizationService
     {
         $validator = new ValidationService();
         $validator->required('name', $data['name'] ?? null);
-        $validator->required('position', $data['position'] ?? null);
+        $validator->required('position_en', $data['position_en'] ?? null);
+        $validator->required('position_id', $data['position_id'] ?? null);
         $validator->maxLength('name', $data['name'] ?? '', 255);
-        $validator->maxLength('position', $data['position'] ?? '', 255);
+        $validator->maxLength('position_en', $data['position_en'] ?? '', 255);
+        $validator->maxLength('position_id', $data['position_id'] ?? '', 255);
 
         $slot = $data['featured_slot'] ?? null;
         if ($slot !== null && $slot !== '' && $slot !== 0) {

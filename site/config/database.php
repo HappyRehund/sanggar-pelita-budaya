@@ -100,10 +100,10 @@ function initSchema(): void
         );
     ");
 
-    // Recreate organization_members without parent_id tree structure (now flat + featured_slot).
+    // Recreate organization_members with bilingual position + biography (EN/ID).
     // Safe to wipe: no data to preserve. Guarded by schema-version marker so it only runs once.
-    $orgSchemaVersion = $pdo->query("SELECT value FROM schema_meta WHERE key = 'organization_v2'")->fetchColumn();
-    if ($orgSchemaVersion === false) {
+    $orgSchemaV3 = $pdo->query("SELECT value FROM schema_meta WHERE key = 'organization_v3'")->fetchColumn();
+    if ($orgSchemaV3 === false) {
         $pdo->exec('DROP TABLE IF EXISTS organization_members;');
         $pdo->exec('DROP INDEX IF EXISTS idx_org_display_order;');
         $pdo->exec('DROP INDEX IF EXISTS idx_org_featured_slot;');
@@ -113,9 +113,11 @@ function initSchema(): void
         CREATE TABLE IF NOT EXISTS organization_members (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            position TEXT NOT NULL,
+            position_en TEXT NOT NULL,
+            position_id TEXT NOT NULL,
             photo TEXT,
-            biography TEXT,
+            biography_en TEXT,
+            biography_id TEXT,
             display_order INTEGER NOT NULL DEFAULT 0,
             featured_slot INTEGER,
             published INTEGER NOT NULL DEFAULT 1,
@@ -124,8 +126,8 @@ function initSchema(): void
         );
     ");
 
-    if ($orgSchemaVersion === false) {
-        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('organization_v2', '1');");
+    if ($orgSchemaV3 === false) {
+        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('organization_v3', '1');");
     }
 
     // Drop legacy hero/footer tables (content now static frontend-only)

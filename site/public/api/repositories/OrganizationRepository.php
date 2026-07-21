@@ -15,16 +15,18 @@ class OrganizationRepository
     {
         $stmt = $this->db->prepare("
             INSERT INTO organization_members
-                (name, position, photo, biography, display_order, featured_slot, published)
+                (name, position_en, position_id, photo, biography_en, biography_id, display_order, featured_slot, published)
             VALUES
-                (:name, :position, :photo, :biography, :display_order, :featured_slot, :published)
+                (:name, :position_en, :position_id, :photo, :biography_en, :biography_id, :display_order, :featured_slot, :published)
         ");
 
         $featuredSlot = $data['featured_slot'] ?? null;
         $stmt->bindValue(':name', $data['name']);
-        $stmt->bindValue(':position', $data['position']);
+        $stmt->bindValue(':position_en', $data['position_en']);
+        $stmt->bindValue(':position_id', $data['position_id']);
         $stmt->bindValue(':photo', $data['photo'] ?? null);
-        $stmt->bindValue(':biography', $data['biography'] ?? null);
+        $stmt->bindValue(':biography_en', $data['biography_en'] ?? null);
+        $stmt->bindValue(':biography_id', $data['biography_id'] ?? null);
         $stmt->bindValue(':display_order', $data['display_order'] ?? 0, PDO::PARAM_INT);
         $stmt->bindValue(':featured_slot', $featuredSlot, $featuredSlot === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':published', $data['published'] ?? 1, PDO::PARAM_INT);
@@ -37,9 +39,11 @@ class OrganizationRepository
         $stmt = $this->db->prepare("
             UPDATE organization_members SET
                 name = :name,
-                position = :position,
+                position_en = :position_en,
+                position_id = :position_id,
                 photo = :photo,
-                biography = :biography,
+                biography_en = :biography_en,
+                biography_id = :biography_id,
                 display_order = :display_order,
                 featured_slot = :featured_slot,
                 published = :published,
@@ -49,9 +53,11 @@ class OrganizationRepository
 
         $featuredSlot = $data['featured_slot'] ?? null;
         $stmt->bindValue(':name', $data['name']);
-        $stmt->bindValue(':position', $data['position']);
+        $stmt->bindValue(':position_en', $data['position_en']);
+        $stmt->bindValue(':position_id', $data['position_id']);
         $stmt->bindValue(':photo', $data['photo'] ?? null);
-        $stmt->bindValue(':biography', $data['biography'] ?? null);
+        $stmt->bindValue(':biography_en', $data['biography_en'] ?? null);
+        $stmt->bindValue(':biography_id', $data['biography_id'] ?? null);
         $stmt->bindValue(':display_order', $data['display_order'] ?? 0, PDO::PARAM_INT);
         $stmt->bindValue(':featured_slot', $featuredSlot, $featuredSlot === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':published', $data['published'] ?? 1, PDO::PARAM_INT);
