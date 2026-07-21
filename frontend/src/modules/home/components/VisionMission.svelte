@@ -63,9 +63,9 @@
 
     <div class="vm-tile vm-tile--text vm-tile--vision">
       <div class="vm-tile__inner">
-        <h2 class="vm-tile__title">{t('vision_title')}</h2>
-        <span class="vm-tile__rule" aria-hidden="true"></span>
-        <p class="vm-tile__desc text-pretty">{t('vision_description')}</p>
+        <h2 class="vm-tile__title__vision">{t('vision_title')}</h2>
+        <span class="vm-tile__rule__vision" aria-hidden="true"></span>
+        <p class="vm-tile__desc__vision text-pretty">{t('vision_description')}</p>
         <div class="vm-tile__cta-wrap">
           <Button variant="outline-gold" size="md" href="/about">
             {t('learn_more')}
@@ -76,9 +76,9 @@
 
     <div class="vm-tile vm-tile--text vm-tile--mission">
       <div class="vm-tile__inner">
-        <h2 class="vm-tile__title">{t('mission_title')}</h2>
-        <span class="vm-tile__rule" aria-hidden="true"></span>
-        <p class="vm-tile__desc text-pretty">{t('mission_description')}</p>
+        <h2 class="vm-tile__title__mission">{t('mission_title')}</h2>
+        <span class="vm-tile__rule__mission" aria-hidden="true"></span>
+        <p class="vm-tile__desc__mission text-pretty">{t('mission_description')}</p>
         <div class="vm-tile__cta-wrap">
           <Button variant="outline-red" size="md" href="/about">
             {t('read_more')}
@@ -188,24 +188,13 @@
   }
 
   .vm-tile--vision {
-    background: var(--color-red);
+    background: var(--color-ink-soft);
     color: var(--color-ivory);
   }
 
   .vm-tile--mission {
     background: var(--color-gold-soft);
     color: var(--color-ink);
-  }
-
-  /* Triangle pointers — vision points LEFT at image, mission points RIGHT at image */
-  .vm-tile--text::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    z-index: 3;
   }
 
   .vm-tile__inner {
@@ -219,26 +208,52 @@
     gap: var(--sp-3);
   }
 
-  .vm-tile__title {
+  .vm-tile__title__mission {
     font-family: var(--font-script);
     font-size: var(--fs-h1);
     font-weight: var(--fw-regular);
     line-height: var(--lh-tight);
     letter-spacing: var(--tracking-normal);
+    color: var(--color-ink-soft);
   }
 
-  .vm-tile__rule {
+  .vm-tile__title__vision {
+    font-family: var(--font-script);
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-regular);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-normal);
+    color: var(--color-gold-soft);
+  }
+
+  .vm-tile__rule__vision {
     display: block;
     width: var(--sp-12);
-    height: 2px;
-    background: var(--color-ink);
+    height: 1px;
+    background-color: var(--color-gold-soft);
     opacity: 0.4;
-    margin-block: var(--sp-2);
+    margin-block: var(--sp-1);
   }
 
-  .vm-tile__desc {
+  .vm-tile__rule__mission {
+    display: block;
+    width: var(--sp-12);
+    height: 1px;
+    background-color: var(--color-ink-soft);
+    opacity: 0.4;
+    margin-block: var(--sp-1);
+  }
+
+  .vm-tile__desc__vision {
     font-size: var(--fs-body);
     color: var(--color-ink-soft);
+    line-height: var(--lh-relaxed);
+    opacity: 0.92;
+  }
+
+  .vm-tile__desc__vision {
+    font-size: var(--fs-body);
+    color: var(--color-gold-soft);
     line-height: var(--lh-relaxed);
     opacity: 0.92;
   }
@@ -307,7 +322,7 @@
   }
 
   .vm-accordion__item--vision .vm-accordion__summary {
-    background: var(--color-red);
+    background: var(--color-ink-soft);
     color: var(--color-ivory);
   }
 
