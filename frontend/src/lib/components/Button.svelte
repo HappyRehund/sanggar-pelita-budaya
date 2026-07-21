@@ -78,11 +78,11 @@
   }
 
   .btn:not(:disabled):hover {
-    transform: translateY(-1px);
+    transform: scale(1.03);
   }
 
   .btn:not(:disabled):active {
-    transform: translateY(0);
+    transform: scale(1);
   }
 
   .btn--sm {
