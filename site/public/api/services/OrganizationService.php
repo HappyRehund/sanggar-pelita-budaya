@@ -21,10 +21,10 @@ class OrganizationService
         return array_map('formatOrganizationRow', $rows);
     }
 
-    public function listTree(bool $publishedOnly = false): array
+    public function listFeatured(bool $publishedOnly = false): array
     {
-        $rows = $this->repo->findAll($publishedOnly);
-        return $this->buildTree($rows);
+        $rows = $this->repo->findFeatured($publishedOnly);
+        return array_map('formatOrganizationRow', $rows);
     }
 
     public function getById(int $id): array
@@ -42,6 +42,10 @@ class OrganizationService
 
         $this->db->beginTransaction();
         try {
+            $newSlot = $data['featured_slot'] ?? null;
+            if ($newSlot !== null) {
+                $this->repo->clearSlot((int) $newSlot);
+            }
             $id = $this->repo->insert($data);
             $row = $this->repo->findById($id);
             $this->db->commit();
@@ -61,12 +65,13 @@ class OrganizationService
 
         $this->validateMemberFields($data, $id);
 
-        if (!empty($data['parent_id']) && (int) $data['parent_id'] === $id) {
-            validation_error_response(['parent_id' => 'A member cannot be their own parent.']);
-        }
-
         $this->db->beginTransaction();
         try {
+            // If assigning a featured slot, clear it from any other member first (unique constraint).
+            $newSlot = $data['featured_slot'] ?? null;
+            if ($newSlot !== null) {
+                $this->repo->clearSlot((int) $newSlot, $id);
+            }
             $this->repo->update($id, $data);
             $row = $this->repo->findById($id);
             $this->db->commit();
@@ -145,26 +150,15 @@ class OrganizationService
         $validator->required('position', $data['position'] ?? null);
         $validator->maxLength('name', $data['name'] ?? '', 255);
         $validator->maxLength('position', $data['position'] ?? '', 255);
-        $validator->failOrContinue();
-    }
 
-    private function buildTree(array $rows): array
-    {
-        $byId = [];
-        foreach ($rows as $row) {
-            $byId[(int) $row['id']] = formatOrganizationRow($row);
-            $byId[(int) $row['id']]['children'] = [];
-        }
-
-        $roots = [];
-        foreach ($byId as $id => &$node) {
-            $parentId = $node['parent_id'];
-            if ($parentId !== null && isset($byId[$parentId])) {
-                $byId[$parentId]['children'][] = &$node;
-            } else {
-                $roots[] = &$node;
+        $slot = $data['featured_slot'] ?? null;
+        if ($slot !== null && $slot !== '' && $slot !== 0) {
+            $slotInt = (int) $slot;
+            if ($slotInt < 1 || $slotInt > 4) {
+                $validator->addError('featured_slot', 'Featured slot must be between 1 and 4.');
             }
         }
-        return $roots;
+
+        $validator->failOrContinue();
     }
 }

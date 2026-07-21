@@ -40,6 +40,13 @@ function initSchema(): void
     migrateLegacyUsersTable($pdo);
 
     $pdo->exec("
+        CREATE TABLE IF NOT EXISTS schema_meta (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
+    ");
+
+    $pdo->exec("
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
@@ -93,21 +100,33 @@ function initSchema(): void
         );
     ");
 
+    // Recreate organization_members without parent_id tree structure (now flat + featured_slot).
+    // Safe to wipe: no data to preserve. Guarded by schema-version marker so it only runs once.
+    $orgSchemaVersion = $pdo->query("SELECT value FROM schema_meta WHERE key = 'organization_v2'")->fetchColumn();
+    if ($orgSchemaVersion === false) {
+        $pdo->exec('DROP TABLE IF EXISTS organization_members;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_org_display_order;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_org_featured_slot;');
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS organization_members (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            parent_id INTEGER,
             name TEXT NOT NULL,
             position TEXT NOT NULL,
             photo TEXT,
             biography TEXT,
             display_order INTEGER NOT NULL DEFAULT 0,
+            featured_slot INTEGER,
             published INTEGER NOT NULL DEFAULT 1,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (parent_id) REFERENCES organization_members(id) ON DELETE SET NULL
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     ");
+
+    if ($orgSchemaVersion === false) {
+        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('organization_v2', '1');");
+    }
 
     // Drop legacy hero/footer tables (content now static frontend-only)
     $pdo->exec("DROP TABLE IF EXISTS hero");
@@ -139,6 +158,7 @@ function createIndexes(PDO $pdo): void
         'CREATE INDEX IF NOT EXISTS idx_highlights_featured ON highlights(featured);',
         'CREATE INDEX IF NOT EXISTS idx_highlights_event_date ON highlights(event_date);',
         'CREATE INDEX IF NOT EXISTS idx_org_display_order ON organization_members(display_order);',
+        'CREATE UNIQUE INDEX IF NOT EXISTS idx_org_featured_slot ON organization_members(featured_slot) WHERE featured_slot IS NOT NULL;',
         'CREATE INDEX IF NOT EXISTS idx_media_highlight_id ON highlights_media(highlight_id);',
     ];
 

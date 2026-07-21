@@ -53,12 +53,12 @@ function formatOrganizationRow(array $row): array
 {
     return [
         'id' => (int) $row['id'],
-        'parent_id' => $row['parent_id'] !== null ? (int) $row['parent_id'] : null,
         'name' => $row['name'],
         'position' => $row['position'],
         'photo' => $row['photo'] ?? null,
         'biography' => $row['biography'] ?? null,
         'display_order' => (int) $row['display_order'],
+        'featured_slot' => $row['featured_slot'] !== null ? (int) $row['featured_slot'] : null,
         'published' => (int) $row['published'] === 1,
         'created_at' => $row['created_at'] ?? null,
         'updated_at' => $row['updated_at'] ?? null,

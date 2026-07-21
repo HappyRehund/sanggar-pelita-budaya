@@ -18,11 +18,11 @@ class OrganizationController
         success_response($items, 'Organization members');
     }
 
-    public function tree(array $params): void
+    public function featured(array $params): void
     {
         $publishedOnly = !is_authenticated();
-        $tree = $this->service->listTree($publishedOnly);
-        success_response($tree, 'Organization tree');
+        $items = $this->service->listFeatured($publishedOnly);
+        success_response($items, 'Featured organization members');
     }
 
     public function getById(array $params): void
@@ -106,13 +106,15 @@ class OrganizationController
 
     private function normalizeInput(array $input): array
     {
-        $parentId = $input['parent_id'] ?? null;
+        $featuredSlot = $input['featured_slot'] ?? null;
         return [
             'name' => trim($input['name'] ?? ''),
             'position' => trim($input['position'] ?? ''),
             'biography' => trim($input['biography'] ?? '') ?: null,
-            'parent_id' => $parentId !== null && $parentId !== '' ? (int) $parentId : null,
             'display_order' => (int) ($input['display_order'] ?? 0),
+            'featured_slot' => ($featuredSlot !== null && $featuredSlot !== '' && $featuredSlot !== 0)
+                ? (int) $featuredSlot
+                : null,
             'published' => !empty($input['published']) ? 1 : 0,
         ];
     }

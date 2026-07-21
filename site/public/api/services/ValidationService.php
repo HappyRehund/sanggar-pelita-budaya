@@ -71,6 +71,12 @@ class ValidationService
         return $this;
     }
 
+    public function addError(string $field, string $message): self
+    {
+        $this->errors[$field] = $message;
+        return $this;
+    }
+
     public function hasErrors(): bool
     {
         return !empty($this->errors);

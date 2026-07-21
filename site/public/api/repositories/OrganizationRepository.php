@@ -15,18 +15,18 @@ class OrganizationRepository
     {
         $stmt = $this->db->prepare("
             INSERT INTO organization_members
-                (parent_id, name, position, photo, biography, display_order, published)
+                (name, position, photo, biography, display_order, featured_slot, published)
             VALUES
-                (:parent_id, :name, :position, :photo, :biography, :display_order, :published)
+                (:name, :position, :photo, :biography, :display_order, :featured_slot, :published)
         ");
 
-        $parentId = $data['parent_id'] ?? null;
-        $stmt->bindValue(':parent_id', $parentId, $parentId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $featuredSlot = $data['featured_slot'] ?? null;
         $stmt->bindValue(':name', $data['name']);
         $stmt->bindValue(':position', $data['position']);
         $stmt->bindValue(':photo', $data['photo'] ?? null);
         $stmt->bindValue(':biography', $data['biography'] ?? null);
         $stmt->bindValue(':display_order', $data['display_order'] ?? 0, PDO::PARAM_INT);
+        $stmt->bindValue(':featured_slot', $featuredSlot, $featuredSlot === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':published', $data['published'] ?? 1, PDO::PARAM_INT);
         $stmt->execute();
         return (int) $this->db->lastInsertId();
@@ -36,24 +36,24 @@ class OrganizationRepository
     {
         $stmt = $this->db->prepare("
             UPDATE organization_members SET
-                parent_id = :parent_id,
                 name = :name,
                 position = :position,
                 photo = :photo,
                 biography = :biography,
                 display_order = :display_order,
+                featured_slot = :featured_slot,
                 published = :published,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = :id
         ");
 
-        $parentId = $data['parent_id'] ?? null;
-        $stmt->bindValue(':parent_id', $parentId, $parentId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $featuredSlot = $data['featured_slot'] ?? null;
         $stmt->bindValue(':name', $data['name']);
         $stmt->bindValue(':position', $data['position']);
         $stmt->bindValue(':photo', $data['photo'] ?? null);
         $stmt->bindValue(':biography', $data['biography'] ?? null);
         $stmt->bindValue(':display_order', $data['display_order'] ?? 0, PDO::PARAM_INT);
+        $stmt->bindValue(':featured_slot', $featuredSlot, $featuredSlot === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':published', $data['published'] ?? 1, PDO::PARAM_INT);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
@@ -107,30 +107,28 @@ class OrganizationRepository
         $stmt->execute([$order, $id]);
     }
 
-    public function findTopLevel(bool $publishedOnly = false): array
+    public function findFeatured(bool $publishedOnly = false): array
     {
+        $sql = "SELECT * FROM organization_members WHERE featured_slot IS NOT NULL";
         if ($publishedOnly) {
-            return $this->db->query(
-                "SELECT * FROM organization_members WHERE parent_id IS NULL AND published = 1 ORDER BY display_order ASC"
-            )->fetchAll();
+            $sql .= " AND published = 1";
         }
-        return $this->db->query(
-            "SELECT * FROM organization_members WHERE parent_id IS NULL ORDER BY display_order ASC"
-        )->fetchAll();
+        $sql .= " ORDER BY featured_slot ASC LIMIT 4";
+        return $this->db->query($sql)->fetchAll();
     }
 
-    public function findChildren(int $parentId, bool $publishedOnly = false): array
+    public function clearSlot(int $slot, ?int $exceptId = null): void
     {
-        if ($publishedOnly) {
+        if ($exceptId !== null) {
             $stmt = $this->db->prepare(
-                "SELECT * FROM organization_members WHERE parent_id = ? AND published = 1 ORDER BY display_order ASC"
+                'UPDATE organization_members SET featured_slot = NULL, updated_at = CURRENT_TIMESTAMP WHERE featured_slot = ? AND id != ?'
             );
+            $stmt->execute([$slot, $exceptId]);
         } else {
             $stmt = $this->db->prepare(
-                "SELECT * FROM organization_members WHERE parent_id = ? ORDER BY display_order ASC"
+                'UPDATE organization_members SET featured_slot = NULL, updated_at = CURRENT_TIMESTAMP WHERE featured_slot = ?'
             );
+            $stmt->execute([$slot]);
         }
-        $stmt->execute([$parentId]);
-        return $stmt->fetchAll();
     }
 }

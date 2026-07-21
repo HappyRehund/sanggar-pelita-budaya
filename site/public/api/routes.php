@@ -113,12 +113,12 @@ route('DELETE', '/api/highlights/media/{id}',      [$highlightController, 'delet
 
 /* ---- Organization (public GETs + admin CRUD) --------------------- */
 route('GET',    '/api/organization',              [$organizationController, 'list']);
-route('GET',    '/api/organization/tree',         [$organizationController, 'tree']);
+route('GET',    '/api/organization/featured',     [$organizationController, 'featured']);
 route('PUT',    '/api/organization/reorder',      [$organizationController, 'reorder']);
-route('GET',    '/api/organization/{id}',        [$organizationController, 'getById']);
+route('GET',    '/api/organization/{id}',         [$organizationController, 'getById']);
 route('POST',   '/api/organization',              [$organizationController, 'create']);
-route('PUT',    '/api/organization/{id}',        [$organizationController, 'update']);
-route('DELETE', '/api/organization/{id}',        [$organizationController, 'delete']);
+route('PUT',    '/api/organization/{id}',         [$organizationController, 'update']);
+route('DELETE', '/api/organization/{id}',         [$organizationController, 'delete']);
 route('POST',   '/api/organization/{id}/photo',  [$organizationController, 'uploadPhoto']);
 
 /* ---- Settings (public GET + admin PUT) -------------------------- */
