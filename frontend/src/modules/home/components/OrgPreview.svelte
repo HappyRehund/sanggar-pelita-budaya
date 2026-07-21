@@ -127,13 +127,13 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     overflow: hidden;
-    border-radius: var(--radius-lg);
+    /* border-radius: var(--radius-lg); */
     box-shadow: var(--shadow-md);
     transition: transform var(--duration-medium) var(--ease-out), box-shadow var(--duration-medium) var(--ease-out);
   }
 
   .org-card.is-active .org-card__photo {
-    transform: scale(1.04);
+    transform: scale(1.09);
     box-shadow: var(--shadow-lg);
   }
 
@@ -201,7 +201,7 @@
   .org-preview__cta {
     display: flex;
     justify-content: center;
-    margin-top: var(--sp-8);
+    margin-top: var(--sp-10);
   }
 
   .org-preview__skeleton {
