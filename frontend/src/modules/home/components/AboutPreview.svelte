@@ -165,7 +165,7 @@
   .about-preview__divider {
     display: block;
     width: 100%;
-    height: clamp(40px, 6vw, 71px);
+    height: 71px;
     margin: 0;
     border: 0;
     background: linear-gradient(135deg,
@@ -174,8 +174,8 @@
       var(--color-red) 100%);
     background-size: 200% 200%;
     background-position: 0% 50%;
-    -webkit-mask: var(--divider-mask) center / contain no-repeat;
-            mask: var(--divider-mask) center / contain no-repeat;
+    -webkit-mask: var(--divider-mask) top left / auto 71px repeat-x;
+            mask: var(--divider-mask) top left / auto 71px repeat-x;
     animation: eyebrow-gradient-pan 6s linear infinite;
   }
 
