@@ -23,3 +23,6 @@ docker-compose.override.yml
 
 # Deployment zip
 deployment/
+
+# Agentic Things
+image-for-agent/
