@@ -12,8 +12,6 @@
   import Input from '$lib/components/Input.svelte';
   import Textarea from '$lib/components/Textarea.svelte';
   import Select from '$lib/components/Select.svelte';
-  import Checkbox from '$lib/components/Checkbox.svelte';
-  import RichTextEditor from '$lib/components/RichTextEditor.svelte';
   import FileUpload from '$lib/components/FileUpload.svelte';
   import Badge from '$lib/components/Badge.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
@@ -30,9 +28,8 @@
 
   let formData = $state({
     title: '', slug: '', category: 'activity' as HighlightCategory,
-    short_description: '', content: '', event_date: '', location: '',
-    youtube_url: '', featured: false, published: false,
-    seo_title: '', seo_description: '',
+    short_description: '', event_date: '', location: '',
+    youtube_url: '', seo_title: '', seo_description: '',
   });
   let coverMedia = $state<HighlightMedia | null>(null);
   let galleryMedia = $state<HighlightMedia[]>([]);
@@ -59,7 +56,7 @@
   function startCreate(): void {
     mode = 'create';
     editId = null;
-    formData = { title: '', slug: '', category: 'activity', short_description: '', content: '', event_date: '', location: '', youtube_url: '', featured: false, published: false, seo_title: '', seo_description: '' };
+    formData = { title: '', slug: '', category: 'activity', short_description: '', event_date: '', location: '', youtube_url: '', seo_title: '', seo_description: '' };
     coverMedia = null;
     galleryMedia = [];
     slugTouched = false;
@@ -75,9 +72,9 @@
       galleryMedia = full.gallery ?? [];
       formData = {
         title: full.title, slug: full.slug, category: full.category,
-        short_description: full.short_description, content: full.content,
+        short_description: full.short_description,
         event_date: formatDateInput(full.event_date), location: full.location || '',
-        youtube_url: full.youtube_url || '', featured: full.featured, published: full.published,
+        youtube_url: full.youtube_url || '',
         seo_title: full.seo_title || '', seo_description: full.seo_description || '',
       };
       slugTouched = true;
@@ -104,15 +101,14 @@
     slugTouched = true;
   }
 
-  async function handleSave(publish = false): Promise<void> {
+  async function handleSave(): Promise<void> {
     saving = true;
-    const payload = { ...formData, published: publish ? true : formData.published };
     try {
       if (editId !== null) {
-        await highlightsApi.update(editId, payload);
+        await highlightsApi.update(editId, formData);
         notifications.success(t('toast_highlights_updated'));
       } else {
-        const created = await highlightsApi.create(payload);
+        const created = await highlightsApi.create(formData);
         editId = created.id;
         notifications.success(t('toast_highlights_created'));
       }
@@ -220,7 +216,6 @@
               <th>{t('admin_highlights_col_title')}</th>
               <th>{t('admin_highlights_col_category')}</th>
               <th>{t('admin_highlights_col_location')}</th>
-              <th>{t('admin_highlights_col_status')}</th>
               <th>{t('admin_highlights_col_actions')}</th>
             </tr>
           </thead>
@@ -233,11 +228,6 @@
                 <td>{item.title}</td>
                 <td><Badge variant={item.category}>{categoryLabel(item.category, langStore.current)}</Badge></td>
                 <td>{item.location || '—'}</td>
-                <td>
-                  <span class="status-badge" class:status-badge--published={item.published} class:status-badge--draft={!item.published}>
-                    {item.published ? t('admin_highlights_status_published') : t('admin_highlights_status_draft')}
-                  </span>
-                </td>
                 <td>
                   <div class="table-actions">
                     <button onclick={() => startEdit(item)} aria-label={t('edit')}><Pencil size={16} /></button>
@@ -271,10 +261,6 @@
           </div>
           <Input label={t('admin_highlights_field_location')} value={formData.location} oninput={(e) => (formData.location = (e.target as HTMLInputElement).value)} placeholder="Jakarta, Indonesia" />
           <Textarea label={t('admin_highlights_field_short_description')} value={formData.short_description} oninput={(e) => (formData.short_description = (e.target as HTMLTextAreaElement).value)} />
-          <div class="form-field">
-            <label class="form-label">{t('admin_highlights_field_content')}</label>
-            <RichTextEditor value={formData.content} placeholder="Write the full description..." onchange={(html) => (formData.content = html)} />
-          </div>
           <Input label={t('admin_highlights_field_youtube')} value={formData.youtube_url} oninput={(e) => (formData.youtube_url = (e.target as HTMLInputElement).value)} placeholder="https://youtube.com/watch?v=..." />
           <div class="form-row">
             <Input label={t('admin_highlights_field_seo_title')} value={formData.seo_title} oninput={(e) => (formData.seo_title = (e.target as HTMLInputElement).value)} />
@@ -317,14 +303,8 @@
             {/if}
           </div>
 
-          <div class="form-section">
-            <Checkbox label={t('admin_highlights_field_featured')} checked={formData.featured} onchange={(e) => (formData.featured = (e.target as HTMLInputElement).checked)} />
-            <Checkbox label={t('admin_highlights_field_published')} checked={formData.published} onchange={(e) => (formData.published = (e.target as HTMLInputElement).checked)} />
-          </div>
-
           <div class="form-actions">
-            <Button variant="secondary" size="md" onclick={() => handleSave(false)} disabled={saving}>{t('save_draft')}</Button>
-            <Button variant="primary" size="md" onclick={() => handleSave(true)} disabled={saving}>{t('publish')}</Button>
+            <Button variant="primary" size="md" onclick={handleSave} disabled={saving}>{t('save')}</Button>
             <Button variant="ghost" size="md" onclick={backToList}>{t('cancel')}</Button>
           </div>
         </div>
@@ -359,10 +339,6 @@
   .admin-table td { padding: var(--sp-3) var(--sp-4); font-size: var(--fs-body-sm); border-bottom: 1px solid var(--color-border); }
   .table-thumb { width: 3rem; height: 2.25rem; object-fit: cover; border-radius: var(--radius-sm); }
 
-  .status-badge { font-size: var(--fs-caption); padding: 2px 8px; border-radius: var(--radius-full); font-weight: var(--fw-medium); }
-  .status-badge--published { background: rgba(74,124,78,0.12); color: var(--color-success); }
-  .status-badge--draft { background: var(--color-surface-alt); color: var(--color-text-muted); }
-
   .table-actions { display: flex; gap: var(--sp-2); }
   .table-actions button { color: var(--color-text-muted); padding: 4px; border-radius: var(--radius-sm); transition: color var(--duration-fast) var(--ease-smooth); }
   .table-actions button:hover { color: var(--color-accent); }
@@ -373,10 +349,8 @@
   .form-sidebar { display: flex; flex-direction: column; gap: var(--sp-6); }
   .form-section { padding: var(--sp-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
   .form-section__title { font-size: var(--fs-body-sm); font-weight: var(--fw-semibold); margin-bottom: var(--sp-3); }
-  .form-label { display: block; font-size: var(--fs-body-sm); font-weight: var(--fw-medium); color: var(--color-text); margin-bottom: var(--sp-2); }
   .form-hint { font-size: var(--fs-caption); color: var(--color-text-subtle); }
   .form-actions { display: flex; flex-direction: column; gap: var(--sp-2); }
-  .form-field { display: flex; flex-direction: column; gap: var(--sp-2); }
 
   .media-preview { position: relative; margin-bottom: var(--sp-3); }
   .media-preview img { width: 100%; border-radius: var(--radius-md); aspect-ratio: 4/3; object-fit: cover; }
