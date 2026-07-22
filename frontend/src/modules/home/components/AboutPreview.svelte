@@ -93,7 +93,7 @@
 
 <section bind:this={sectionEl} class="section about-preview">
   <hr
-    class="about-preview__divider"
+    class="about-preview__divider about-preview__divider--top"
     aria-hidden="true"
     style:--divider-mask={`url(${dividerPattern})`}
   />
@@ -155,7 +155,7 @@
     </div>
   </div>
   <hr
-    class="about-preview__divider"
+    class="about-preview__divider about-preview__divider--bottom"
     aria-hidden="true"
     style:--divider-mask={`url(${dividerPattern})`}
   />
@@ -165,7 +165,7 @@
   .about-preview__divider {
     display: block;
     width: 100%;
-    height: 130px;
+    height: 60px;
     margin: 0;
     border: 0;
     background: linear-gradient(135deg,
@@ -174,9 +174,17 @@
       var(--color-red) 100%);
     background-size: 200% 200%;
     background-position: 0% 50%;
-    -webkit-mask: var(--divider-mask) top left / auto 130px repeat-x;
-            mask: var(--divider-mask) top left / auto 130px repeat-x;
+    -webkit-mask: var(--divider-mask) top left / auto 60px repeat-x;
+            mask: var(--divider-mask) top left / auto 60px repeat-x;
     animation: eyebrow-gradient-pan 6s linear infinite;
+  }
+
+  .about-preview__divider--top {
+    margin-block-start: calc(-1 * var(--section-padding-y));
+  }
+
+  .about-preview__divider--bottom {
+    margin-block-end: calc(-1 * var(--section-padding-y));
   }
 
   .about-preview__inner {
