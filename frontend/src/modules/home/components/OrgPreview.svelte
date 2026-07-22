@@ -6,6 +6,7 @@
   import Button from '$lib/components/Button.svelte';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
   import type { OrganizationMember } from '$lib/types';
+  import PatternDivider from '$lib/components/PatternDivider.svelte';
 
   let sectionEl = $state<HTMLElement | null>(null);
   let activeIndex = $state(0);
@@ -64,6 +65,7 @@
 </script>
 
 <section bind:this={sectionEl} class="section org-preview">
+  <PatternDivider position="top" />
   <div class="container">
     <SectionTitle eyebrow={t('org_eyebrow')} title={t('org_title')} description={t('org_description')} align="center" />
 
@@ -108,6 +110,7 @@
       <p class="org-preview__empty">{t('empty_organization')}</p>
     {/if}
   </div>
+  <PatternDivider position="bottom" />
 </section>
 
 <style>
