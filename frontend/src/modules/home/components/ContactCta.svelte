@@ -21,12 +21,12 @@
     <h2 class="contact-cta__title">{t('contact_title')}</h2>
     <p class="contact-cta__desc text-pretty">{t('contact_description')}</p>
     <div class="contact-cta__actions">
-      <Button variant="primary" size="lg" href="https://wa.me/62819864460" target="_blank" rel="noopener noreferrer">
+      <Button variant="soft-ink" size="md" href="https://wa.me/62819864460" target="_blank" rel="noopener noreferrer">
         <MessageCircle size={18} />
         {t('contact_cta_button')}
       </Button>
       {#if mapsUrl}
-        <Button variant="secondary" size="lg" href={mapsUrl}>
+        <Button variant="gradient" size="md" href={mapsUrl}>
           <MapPin size={18} />
           {t('contact_cta_maps')}
         </Button>
@@ -52,15 +52,15 @@
   }
 
   .contact-cta__title {
-    font-family: var(--font-serif);
+    font-family: var(--font-script);
     font-size: var(--fs-h1);
-    font-weight: var(--fw-semibold);
-    color: var(--color-ivory);
+    font-weight: var(--fw-regular);
+    color: var(--color-beige);
     max-width: 36rem;
   }
 
   .contact-cta__desc {
-    font-size: var(--fs-body-lg);
+    font-size: var(--fs-body-md);
     color: var(--color-beige);
     max-width: 32rem;
     line-height: var(--lh-relaxed);
