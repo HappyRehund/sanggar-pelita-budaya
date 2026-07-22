@@ -34,16 +34,17 @@
     return imageUrl(`highlights-${slug}`, 1200, 600);
   }
 
-  function getGalleryImages(): LightboxImage[] {
-    if (!highlight?.gallery) return [];
-    return highlight.gallery.map((img: { filename: string; alt_text: string | null }) => ({
-      src: uploadUrl(img.filename),
-      alt: img.alt_text ?? 'Highlights image',
-    }));
+  function getCoverLightboxImages(): LightboxImage[] {
+    if (!highlight?.cover) return [];
+    return [{
+      src: uploadUrl(highlight.cover.filename),
+      alt: highlight.title,
+    }];
   }
 
-  function openLightbox(index: number): void {
-    lightbox.open(getGalleryImages(), index);
+  function openCoverLightbox(): void {
+    const images = getCoverLightboxImages();
+    if (images.length > 0) lightbox.open(images, 0);
   }
 
   function getYouTubeEmbed(url: string): string | null {
@@ -86,7 +87,9 @@
 {:else if highlight}
   <article class="highlights-detail">
     <div class="highlights-detail__hero">
-      <img src={getCoverUrl()} alt={highlight.title} class="highlights-detail__hero-img" />
+      <button class="highlights-detail__hero-btn" onclick={openCoverLightbox} aria-label={t('highlights_detail_view_image')}>
+        <img src={getCoverUrl()} alt={highlight.title} class="highlights-detail__hero-img" />
+      </button>
       <div class="highlights-detail__hero-overlay"></div>
       <div class="container highlights-detail__hero-content">
         <Badge variant={highlight.category}>{categoryLabel(highlight.category, langStore.current)}</Badge>
@@ -125,21 +128,6 @@
           </div>
         </div>
       {/if}
-    {/if}
-
-    {#if highlight.gallery && highlight.gallery.length > 0}
-      <section class="section">
-        <div class="container">
-          <h2 class="highlights-detail__section-title">{t('highlights_detail_gallery')}</h2>
-          <div class="highlights-detail__gallery">
-            {#each highlight.gallery as img, i (img.id)}
-              <button class="highlights-detail__gallery-item" onclick={() => openLightbox(i)} aria-label="View image">
-                <img src={uploadUrl(img.filename)} alt={img.alt_text ?? 'Highlights image'} loading="lazy" />
-              </button>
-            {/each}
-          </div>
-        </div>
-      </section>
     {/if}
 
     {#if highlight.related && highlight.related.length > 0}
@@ -188,6 +176,16 @@
     height: 60vh;
     min-height: 24rem;
     overflow: hidden;
+  }
+
+  .highlights-detail__hero-btn {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
   }
 
   .highlights-detail__hero-img {
@@ -274,30 +272,6 @@
     margin-bottom: var(--sp-6);
   }
 
-  .highlights-detail__gallery {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--sp-4);
-  }
-
-  .highlights-detail__gallery-item {
-    border: none;
-    padding: 0;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    cursor: pointer;
-    aspect-ratio: 4 / 3;
-  }
-
-  .highlights-detail__gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--duration-medium) var(--ease-out);
-  }
-
-  .highlights-detail__gallery-item:hover img { transform: scale(1.06); }
-
   .highlights-detail__related {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -333,11 +307,9 @@
 
   @media (max-width: 880px) {
     .highlights-detail__related { grid-template-columns: repeat(2, 1fr); }
-    .highlights-detail__gallery { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 480px) {
     .highlights-detail__related { grid-template-columns: 1fr; }
-    .highlights-detail__gallery { grid-template-columns: 1fr; }
   }
 </style>
