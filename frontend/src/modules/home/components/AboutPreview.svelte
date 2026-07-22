@@ -273,7 +273,7 @@
     display: inline-block;
     color: var(--color-red);
     animation: subtitle-color-cycle 4.5s ease-in-out infinite;
-    animation-delay: calc(var(--idx) * -0.32s);
+    animation-delay: calc(var(--idx) * -0.12s);
     will-change: color;
   }
 
