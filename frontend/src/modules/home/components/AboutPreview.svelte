@@ -272,8 +272,8 @@
   .about-preview__subtitle-word {
     display: inline-block;
     color: var(--color-red);
-    animation: subtitle-color-cycle 2.4s ease-in-out infinite;
-    animation-delay: calc(var(--idx) * -0.18s);
+    animation: subtitle-color-cycle 4.5s ease-in-out infinite;
+    animation-delay: calc(var(--idx) * -0.32s);
     will-change: color;
   }
 
