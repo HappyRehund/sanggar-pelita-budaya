@@ -79,12 +79,6 @@ class HighlightController
         success_response(null, 'Highlights deleted');
     }
 
-    public function galleryImages(array $params): void
-    {
-        $items = $this->highlightService->listGalleryImages();
-        success_response($items, 'Gallery images');
-    }
-
     /* ---- Highlights Media -------------------------------------------- */
 
     public function uploadMedia(array $params): void
@@ -98,7 +92,7 @@ class HighlightController
             error_response('No file uploaded.', 400);
         }
 
-        $type = $_POST['type'] ?? 'gallery';
+        $type = $_POST['type'] ?? 'cover';
         $altText = $_POST['alt_text'] ?? null;
 
         $media = $this->mediaService->upload($highlightId, $file, $type, $altText);
@@ -113,21 +107,6 @@ class HighlightController
         $mediaId = (int) $params['id'];
         $this->mediaService->delete($mediaId);
         success_response(null, 'Media deleted');
-    }
-
-    public function reorderMedia(array $params): void
-    {
-        require_auth();
-        require_csrf();
-
-        $input = get_json_input();
-        $orderMap = $input['order'] ?? [];
-        if (empty($orderMap) || !is_array($orderMap)) {
-            validation_error_response(['order' => 'Order map is required.']);
-        }
-
-        $this->mediaService->reorder($orderMap);
-        success_response(null, 'Media reordered');
     }
 
     public function listMedia(array $params): void

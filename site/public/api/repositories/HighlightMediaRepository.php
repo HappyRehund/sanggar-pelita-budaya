@@ -54,15 +54,6 @@ class HighlightMediaRepository
         return $stmt->fetchAll();
     }
 
-    public function findGalleryByHighlightId(int $highlightId): array
-    {
-        $stmt = $this->db->prepare(
-            "SELECT * FROM highlights_media WHERE highlight_id = ? AND type = 'gallery' ORDER BY sort_order ASC"
-        );
-        $stmt->execute([$highlightId]);
-        return $stmt->fetchAll();
-    }
-
     public function findCoverByHighlightId(int $highlightId): ?array
     {
         $stmt = $this->db->prepare(
@@ -85,12 +76,6 @@ class HighlightMediaRepository
         $stmt->execute([$highlightId]);
     }
 
-    public function updateSortOrder(int $id, int $sortOrder): void
-    {
-        $stmt = $this->db->prepare('UPDATE highlights_media SET sort_order = ? WHERE id = ?');
-        $stmt->execute([$sortOrder, $id]);
-    }
-
     public function findRecent(int $limit = 10): array
     {
         $stmt = $this->db->prepare(
@@ -102,15 +87,5 @@ class HighlightMediaRepository
         $stmt->bindValue(1, $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
-    }
-
-    public function nextSortOrder(int $highlightId): int
-    {
-        $stmt = $this->db->prepare(
-            "SELECT MAX(sort_order) as max_sort FROM highlights_media WHERE highlight_id = ?"
-        );
-        $stmt->execute([$highlightId]);
-        $row = $stmt->fetch();
-        return ((int) ($row['max_sort'] ?? -1)) + 1;
     }
 }

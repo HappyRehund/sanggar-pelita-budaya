@@ -87,7 +87,6 @@ class HighlightService
         $highlight = formatHighlightRow($row);
         $media = $this->mediaRepo->findByHighlightId($id);
         $highlight['cover'] = $this->findMediaById($media, $row['cover_media_id']);
-        $highlight['gallery'] = $this->filterGallery($media);
         return $highlight;
     }
 
@@ -134,12 +133,6 @@ class HighlightService
         ];
     }
 
-    public function listGalleryImages(): array
-    {
-        $rows = $this->highlightRepo->findAllGalleryImages();
-        return array_map('formatMediaRow', $rows);
-    }
-
     private function validateHighlightFields(array $data, ?int $ignoreId): void
     {
         $validator = new ValidationService();
@@ -172,11 +165,5 @@ class HighlightService
             }
         }
         return null;
-    }
-
-    private function filterGallery(array $media): array
-    {
-        $gallery = array_filter($media, fn($m) => $m['type'] === 'gallery');
-        return array_map('formatMediaRow', array_values($gallery));
     }
 }

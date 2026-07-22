@@ -24,22 +24,17 @@ class HighlightMediaService
             not_found_response('Highlight not found');
         }
 
-        $validTypes = ['cover', 'gallery'];
-        if (!in_array($type, $validTypes, true)) {
-            validation_error_response(['type' => 'Media type must be cover or gallery.']);
+        if ($type !== 'cover') {
+            validation_error_response(['type' => 'Media type must be cover.']);
         }
 
         $stored = $this->uploadService->store($file, 'highlights');
 
         $this->db->beginTransaction();
         try {
-            $sortOrder = $type === 'gallery'
-                ? $this->mediaRepo->nextSortOrder($highlightId)
-                : 0;
-
             $mediaId = $this->mediaRepo->insert([
                 'highlight_id' => $highlightId,
-                'type' => $type,
+                'type' => 'cover',
                 'filename' => $stored['filename'],
                 'original_filename' => $stored['original_filename'],
                 'mime_type' => $stored['mime_type'],
@@ -48,12 +43,10 @@ class HighlightMediaService
                 'height' => $stored['height'],
                 'size_bytes' => $stored['size_bytes'],
                 'alt_text' => $altText,
-                'sort_order' => $sortOrder,
+                'sort_order' => 0,
             ]);
 
-            if ($type === 'cover') {
-                $this->highlightRepo->setCoverMedia($highlightId, $mediaId);
-            }
+            $this->highlightRepo->setCoverMedia($highlightId, $mediaId);
 
             $row = $this->mediaRepo->findById($mediaId);
             $this->db->commit();
@@ -88,20 +81,6 @@ class HighlightMediaService
         }
 
         $this->uploadService->delete($media['filename']);
-    }
-
-    public function reorder(array $orderMap): void
-    {
-        $this->db->beginTransaction();
-        try {
-            foreach ($orderMap as $mediaId => $sortOrder) {
-                $this->mediaRepo->updateSortOrder((int) $mediaId, (int) $sortOrder);
-            }
-            $this->db->commit();
-        } catch (Throwable $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
     }
 
     public function findByHighlightId(int $highlightId): array

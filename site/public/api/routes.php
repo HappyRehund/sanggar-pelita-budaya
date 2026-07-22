@@ -97,7 +97,6 @@ route('GET', '/api/auth/me', [$authController, 'session']);
 
 /* ---- Highlights (public + admin) --------------------------------- */
 route('GET',    '/api/highlights',              [$highlightController, 'list']);
-route('GET',    '/api/highlights/gallery',      [$highlightController, 'galleryImages']);
 route('GET',    '/api/highlights/slug/{slug}',  [$highlightController, 'getBySlug']);
 route('GET',    '/api/highlights/{id}',         [$highlightController, 'getById']);
 route('POST',   '/api/highlights',              [$highlightController, 'create']);
@@ -105,7 +104,6 @@ route('PUT',    '/api/highlights/{id}',         [$highlightController, 'update']
 route('DELETE', '/api/highlights/{id}',         [$highlightController, 'delete']);
 
 /* ---- Highlights Media -------------------------------------------- */
-route('PUT',    '/api/highlights/media/reorder',   [$highlightController, 'reorderMedia']);
 route('GET',    '/api/highlights/{id}/media',      [$highlightController, 'listMedia']);
 route('POST',   '/api/highlights/{id}/media',      [$highlightController, 'uploadMedia']);
 route('DELETE', '/api/highlights/media/{id}',      [$highlightController, 'deleteMedia']);

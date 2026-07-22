@@ -90,11 +90,19 @@ function initSchema(): void
         );
     ");
 
+    // Further simplify highlights: a highlight has a single cover image (no gallery).
+    // Destructive, guarded by schema-version marker so it only runs once.
+    $highlightsSimplifyV2 = $pdo->query("SELECT value FROM schema_meta WHERE key = 'highlights_simplify_v2'")->fetchColumn();
+    if ($highlightsSimplifyV2 === false) {
+        $pdo->exec('DROP TABLE IF EXISTS highlights_media;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_media_highlight_id;');
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS highlights_media (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             highlight_id INTEGER NOT NULL,
-            type TEXT NOT NULL CHECK(type IN ('cover','gallery')),
+            type TEXT NOT NULL CHECK(type IN ('cover')),
             filename TEXT NOT NULL,
             original_filename TEXT NOT NULL,
             mime_type TEXT NOT NULL,
@@ -111,6 +119,10 @@ function initSchema(): void
 
     if ($highlightsSimplifyV1 === false) {
         $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('highlights_simplify_v1', '1');");
+    }
+
+    if ($highlightsSimplifyV2 === false) {
+        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('highlights_simplify_v2', '1');");
     }
 
     // Recreate organization_members without the `published` column (no longer needed in admin).

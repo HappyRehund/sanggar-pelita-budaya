@@ -100,17 +100,6 @@ class HighlightRepository
         return $stmt->fetchAll();
     }
 
-    public function findAllGalleryImages(): array
-    {
-        $stmt = $this->db->query(
-            "SELECT hm.* FROM highlights_media hm
-             INNER JOIN highlights h ON hm.highlight_id = h.id
-             WHERE hm.type = 'gallery'
-             ORDER BY hm.created_at DESC"
-        );
-        return $stmt->fetchAll();
-    }
-
     public function count(array $filters = []): int
     {
         [$where, $params] = $this->buildWhereClause($filters);
