@@ -13,6 +13,7 @@
   import Lightbox from '$lib/components/Lightbox.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import Button from '$lib/components/Button.svelte';
+  import PatternDivider from '$lib/components/PatternDivider.svelte';
   import { ArrowRight } from '@lucide/svelte';
 
   let highlightsImages = $state<HighlightMedia[]>([]);
@@ -65,6 +66,7 @@
 </script>
 
 <section bind:this={sectionEl} class="section section--alt highlights">
+  <PatternDivider position="top" />
   <div class="container">
     <SectionTitle eyebrow={t('highlights_eyebrow')} title={t('highlights_title')} description={t('highlights_description')} align="center" />
 
@@ -97,6 +99,7 @@
       <EmptyState title={t('highlights_empty')} />
     {/if}
   </div>
+  <PatternDivider position="bottom" />
 </section>
 
 <Lightbox
