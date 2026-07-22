@@ -179,7 +179,8 @@
 
   .org-card__position {
     color: var(--color-gold);
-    font-size: var(--fs-body-sm);
+    font-family: var(--font-script);
+    font-size: var(--fs-body-md);
     font-weight: var(--fw-medium);
     letter-spacing: var(--tracking-wide);
     max-height: 0;
