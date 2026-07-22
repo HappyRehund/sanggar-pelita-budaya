@@ -6,6 +6,7 @@
   import img1 from '$assets/images/about/about-1.jpg';
   import img2 from '$assets/images/about/about-2.jpg';
   import img3 from '$assets/images/about/about-3.jpg';
+  import dividerPattern from '$assets/pattern-divider/pattern-divider-1.webp';
 
   type SlotName = 'front' | 'left' | 'right';
   type Card = { key: string; src: string; outline: string };
@@ -91,6 +92,11 @@
 </script>
 
 <section bind:this={sectionEl} class="section about-preview">
+  <hr
+    class="about-preview__divider"
+    aria-hidden="true"
+    style:--divider-mask={`url(${dividerPattern})`}
+  />
   {#snippet subtitleWord(word: string, idx: number)}
     <span
       class="about-preview__subtitle-word"
@@ -148,9 +154,31 @@
       </Button>
     </div>
   </div>
+  <hr
+    class="about-preview__divider"
+    aria-hidden="true"
+    style:--divider-mask={`url(${dividerPattern})`}
+  />
 </section>
 
 <style>
+  .about-preview__divider {
+    display: block;
+    width: 100%;
+    height: clamp(40px, 6vw, 71px);
+    margin: 0;
+    border: 0;
+    background: linear-gradient(135deg,
+      var(--color-red) 0%,
+      var(--color-gold-soft) 50%,
+      var(--color-red) 100%);
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    -webkit-mask: var(--divider-mask) center / contain no-repeat;
+            mask: var(--divider-mask) center / contain no-repeat;
+    animation: eyebrow-gradient-pan 6s linear infinite;
+  }
+
   .about-preview__inner {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -302,6 +330,9 @@
       transition: opacity 0.2s linear;
     }
     .about-preview__subtitle-word {
+      animation: none;
+    }
+    .about-preview__divider {
       animation: none;
     }
   }
