@@ -224,7 +224,8 @@
     font-size: var(--fs-h3);
   }
 
-  /* Collapsed target → vertical title, centered */
+  /* Collapsed target → vertical title, centered. Always visible (subtle
+     hierarchy vs the active card) so users can see what each panel is. */
   .service-card[data-active='false'] .service-card__title {
     writing-mode: vertical-rl;
     transform: translate(-50%, -50%) rotate(180deg);
@@ -236,6 +237,10 @@
     left: 50%;
     max-width: none;
     font-size: var(--fs-body);
+    opacity: 0.85;
+    color: var(--color-beige);
+    font-weight: var(--fw-regular);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
   }
 
   .service-card[data-active='false'] .service-card__body {
