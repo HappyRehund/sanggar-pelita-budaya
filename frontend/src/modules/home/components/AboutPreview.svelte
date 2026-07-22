@@ -241,12 +241,15 @@
 
   .about-preview__subtitle {
     font-family: var(--font-script);
-    font-size: var(--fs-body-md);
+    font-size: var(--fs-h3);
     font-weight: var(--fw-medium);
     color: var(--color-gold-soft);
     line-height: var(--lh-tight);
     letter-spacing: var(--tracking-wide);
     margin: 0;
+    text-shadow:
+      0 1px 0 rgba(255, 250, 231, 0.6),
+      0 2px 6px rgba(122, 51, 56, 0.18);
   }
 
   .about-preview__desc {
