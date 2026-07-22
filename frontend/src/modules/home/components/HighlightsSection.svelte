@@ -67,7 +67,7 @@
 
 <section bind:this={sectionEl} class="section section--alt highlights">
   <PatternDivider position="top" />
-  <div class="container">
+  <div class="container highlights-container">
     <SectionTitle eyebrow={t('highlights_eyebrow')} title={t('highlights_title')} description={t('highlights_description')} align="center" />
 
     {#if loading}
@@ -112,6 +112,11 @@
 />
 
 <style>
+  .highlights-container {
+    /* background-color: green; */
+    margin-top: var(--sp-12);
+    margin-bottom: var(--sp-12)
+  }
   .highlights__collage {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
