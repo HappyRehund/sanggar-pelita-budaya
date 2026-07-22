@@ -1,9 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { Tween, prefersReducedMotion } from 'svelte/motion';
+  import { cubicOut } from 'svelte/easing';
   import { t } from '$lib/i18n/index.svelte';
   import { imageUrl, revealOnScroll } from '$lib/utils';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
-  import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 
   let sectionEl = $state<HTMLElement | null>(null);
 
@@ -16,130 +17,313 @@
     { img: 'dance-training', title: t('service_dance_training_title'), desc: t('service_dance_training_desc') },
     { img: 'costume-rental', title: t('service_costume_rental_title'), desc: t('service_costume_rental_desc') },
     { img: 'traditional-makeup', title: t('service_makeup_title'), desc: t('service_makeup_desc') },
-    { img: 'cultural-workshops', title: t('service_workshops_title'), desc: t('service_workshops_desc') },
     { img: 'stage-decoration', title: t('service_stage_decoration_title'), desc: t('service_stage_decoration_desc') },
   ];
 
-  let scrollEl = $state<HTMLElement | null>(null);
-  let current = $state(0);
+  let activeIndex = $state(0);
 
-  function scrollBy(dir: number): void {
-    if (!scrollEl) return;
-    const cardWidth = scrollEl.querySelector('.service-card')?.getBoundingClientRect().width ?? 400;
-    const gap = 24;
-    scrollEl.scrollBy({ left: dir * (cardWidth + gap), behavior: 'smooth' });
-    current = Math.max(0, Math.min(current + dir, services.length - 1));
-  }
+  const reduce = prefersReducedMotion.current;
+
+  // Three-phase fully sequential transition (~520ms total, 0 with reduced motion):
+  //   Phase 1 (0   – FADE_OUT  ms): old content fades opacity 1 → 0
+  //   Phase 2 (FADE_OUT – FADE_OUT+WIDTH  ms): width tweens; data-active flips
+  //           (writing-mode, font-size, max-height, min-height all swap while
+  //            content is fully invisible, so no mid-state visibility)
+  //   Phase 3 (FADE_IN_DELAY – FADE_IN_DELAY+FADE_IN ms): new content fades 0 → 1
+  const FADE_OUT = reduce ? 0.001 : 140;
+  const FADE_IN_DELAY = reduce ? 0 : 360;
+  const FADE_IN = reduce ? 0.001 : 180;
+  const WIDTH = reduce ? 0.001 : 200;
+  const MODE_FLIP = reduce ? 0 : 140; // start of phase 2
+
+  // --p drives flex-grow (width tween)
+  const widthTween = services.map(() =>
+    new Tween(0, { duration: WIDTH, easing: cubicOut })
+  );
+  // --c drives opacity / image scale / brightness (content tween)
+  const fadeTween = services.map(() =>
+    new Tween(0, { duration: FADE_IN, easing: cubicOut })
+  );
+  // modeTween drives data-active (writing-mode + layout flip).
+  // Nearly-instant (0.001ms) so the flip is a hard cut, but delayed so it
+  // only happens AFTER the content has fully faded out.
+  const modeTween = services.map(() =>
+    new Tween(0, { duration: 0.001, easing: cubicOut })
+  );
+
+  $effect(() => {
+    const newActive = activeIndex;
+    for (let i = 0; i < services.length; i++) {
+      const target = i === newActive ? 1 : 0;
+
+      // Width: 200ms, delayed by FADE_OUT so it starts after fade-out finishes.
+      // (Same delay for both directions — width always animates in phase 2.)
+      widthTween[i].set(target, {
+        duration: WIDTH,
+        delay: reduce ? 0 : FADE_OUT,
+        easing: cubicOut,
+      });
+
+      // Mode flip: hard cut at 140ms (start of phase 2).
+      modeTween[i].set(target, {
+        duration: 0.001,
+        delay: MODE_FLIP,
+      });
+
+      // Fade: asymmetric — fast out (no delay), slow in (with delay).
+      fadeTween[i].set(target, {
+        duration: target === 1 ? FADE_IN : FADE_OUT,
+        delay: target === 1 ? FADE_IN_DELAY : 0,
+        easing: cubicOut,
+      });
+    }
+  });
 </script>
 
 <section bind:this={sectionEl} class="section section--dark services">
   <div class="container">
-    <SectionTitle eyebrow={t('services_eyebrow')} title={t('services_title')} description={t('services_description')} align="center" variant="light" />
+    <SectionTitle
+      eyebrow={t('services_eyebrow')}
+      title={t('services_title')}
+      description={t('services_description')}
+      align="center"
+      variant="light"
+    />
   </div>
 
   <div class="services__wrap">
-    <button class="services__nav services__nav--prev" onclick={() => scrollBy(-1)} aria-label="Previous">
-      <ChevronLeft size={24} />
-    </button>
-    <div class="services__scroll" bind:this={scrollEl}>
-      {#each services as service (service.title)}
-        <div class="service-card">
-          <div class="service-card__image">
-            <img src={imageUrl(service.img, 800, 500)} alt={service.title} loading="lazy" />
-          </div>
+    {#each services as service, i (service.img)}
+      {@const p = widthTween[i].current}
+      {@const c = fadeTween[i].current}
+      {@const m = modeTween[i].current}
+      <button
+        type="button"
+        class="service-card"
+        data-active={m === 1 ? 'true' : 'false'}
+        style:--p={p}
+        style:--c={c}
+        onclick={() => (activeIndex = i)}
+        aria-pressed={i === activeIndex}
+        aria-label={i === activeIndex ? `Currently expanded: ${service.title}` : `Expand: ${service.title}`}
+      >
+        <div class="service-card__media">
+          <img src={imageUrl(service.img, 1000, 700)} alt={service.title} loading="lazy" />
+        </div>
+        <div class="service-card__scrim"></div>
+        <div class="service-card__body">
+          <span class="service-card__index">{String(i + 1).padStart(2, '0')}</span>
           <h3 class="service-card__title">{service.title}</h3>
           <p class="service-card__desc text-pretty">{service.desc}</p>
         </div>
-      {/each}
-    </div>
-    <button class="services__nav services__nav--next" onclick={() => scrollBy(1)} aria-label="Next">
-      <ChevronRight size={24} />
-    </button>
+      </button>
+    {/each}
   </div>
 </section>
 
 <style>
   .services__wrap {
-    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: var(--sp-3);
+    width: 100%;
+    height: clamp(20rem, 34vw, 30rem);
     margin-top: var(--sp-10);
-    max-width: var(--container-max);
-    margin-inline: auto;
     padding-inline: var(--sp-5);
   }
 
-  .services__scroll {
-    display: flex;
-    gap: var(--sp-6);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    padding-bottom: var(--sp-4);
-  }
-
-  .services__scroll::-webkit-scrollbar { display: none; }
-
   .service-card {
-    flex: 0 0 400px;
-    scroll-snap-align: center;
-  }
-
-  .service-card__image {
+    --expanded: 3; /* flex-grow when fully active */
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    background: var(--color-ink);
+    position: relative;
+    flex-basis: 0;
+    flex-shrink: 1;
+    /* Width driven by --p (widthTween). Content fades via --c below. */
+    flex-grow: calc(1 + var(--p) * var(--expanded));
+    min-width: 0;
     border-radius: var(--radius-2xl);
     overflow: hidden;
-    aspect-ratio: 16 / 10;
-    margin-bottom: var(--sp-4);
+    cursor: pointer;
+    transition: box-shadow var(--duration-medium) var(--ease-smooth),
+      transform var(--duration-medium) var(--ease-smooth);
   }
 
-  .service-card__image img {
+  .service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  .service-card:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+  }
+
+  .service-card__media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .service-card__media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--duration-medium) var(--ease-out);
+    /* Image "wakes up" with the content (driven by --c, not --p). */
+    transform: scale(calc(1 + var(--c) * 0.05));
+    filter: saturate(calc(0.85 + var(--c) * 0.15)) brightness(calc(0.7 + var(--c) * 0.3));
   }
 
-  .service-card:hover .service-card__image img {
-    transform: scale(1.05);
+  .service-card__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, calc(0.15 * (1 - var(--c)))) 0%,
+      rgba(10, 16, 13, calc(0.88 + var(--c) * 0.04)) 100%
+    );
+  }
+
+  .service-card__body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: var(--sp-5);
+    color: var(--color-ivory);
+    z-index: 1;
+  }
+
+  /* Index chip — fades in with content */
+  .service-card__index {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: var(--fs-caption);
+    letter-spacing: 0.12em;
+    color: var(--color-gold);
+    margin-bottom: var(--sp-2);
+    opacity: var(--c);
   }
 
   .service-card__title {
     font-family: var(--font-serif);
-    font-size: var(--fs-h3);
     font-weight: var(--fw-semibold);
+    line-height: var(--lh-snug);
     color: var(--color-ivory);
-    margin-bottom: var(--sp-2);
+    margin: 0;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+    opacity: var(--c);
+    /* Font-size + writing-mode + layout switch instantly on target flip
+       (the title is invisible during the swap because opacity is 0). */
+    font-size: var(--fs-h3);
   }
 
-  .service-card__desc {
-    font-size: var(--fs-body);
-    color: var(--color-beige);
-    line-height: var(--lh-relaxed);
-  }
-
-  .services__nav {
+  /* Collapsed target → vertical title, centered */
+  .service-card[data-active='false'] .service-card__title {
+    writing-mode: vertical-rl;
+    transform: translate(-50%, -50%) rotate(180deg);
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
     position: absolute;
-    top: 35%;
-    transform: translateY(-50%);
-    z-index: var(--z-base);
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    font-size: var(--fs-body);
+  }
+
+  .service-card[data-active='false'] .service-card__body {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--color-ivory);
-    transition: background-color var(--duration-fast) var(--ease-smooth);
+    padding: var(--sp-3);
   }
 
-  .services__nav:hover {
-    background: rgba(255, 255, 255, 0.3);
+  .service-card[data-active='false'] .service-card__index {
+    display: none;
   }
 
-  .services__nav--prev { left: var(--sp-2); }
-  .services__nav--next { right: var(--sp-2); }
+  .service-card__desc {
+    font-size: var(--fs-body-sm);
+    color: var(--color-beige);
+    line-height: var(--lh-relaxed);
+    margin-top: var(--sp-3);
+    max-width: 38rem;
+    /* Desc visibility: max-height + opacity driven by --c, font-size fixed */
+    max-height: 14rem;
+    opacity: var(--c);
+    overflow: hidden;
+  }
 
-  @media (max-width: 768px) {
-    .service-card { flex: 0 0 85%; }
-    .services__nav { display: none; }
+  /* ===== Tablet (≤1024px) ===== */
+  @media (max-width: 1024px) {
+    .services__wrap {
+      height: clamp(18rem, 38vw, 24rem);
+      gap: var(--sp-2);
+    }
+    .service-card__body {
+      padding: var(--sp-4);
+    }
+    .service-card__title {
+      font-size: clamp(1.3rem, 2.5vw, 1.75rem);
+    }
+    .service-card__desc {
+      font-size: var(--fs-caption);
+    }
+  }
+
+  /* ===== Mobile (<520px): vertical accordion ===== */
+  @media (max-width: 520px) {
+    .services__wrap {
+      flex-direction: column;
+      height: auto;
+      min-height: 60vh;
+      gap: var(--sp-2);
+    }
+
+    .service-card {
+      --expanded: 7;
+      flex-basis: 0;
+      min-height: 4rem;
+      transition: box-shadow var(--duration-medium) var(--ease-smooth);
+    }
+
+    .service-card[data-active='true'] {
+      min-height: 16rem;
+    }
+
+    /* Mobile is a vertical accordion: collapsed cards are short horizontal
+       bars, so titles read horizontally (not rotated). */
+    .service-card[data-active='false'] .service-card__title {
+      writing-mode: horizontal-tb;
+      transform: none;
+      position: static;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .service-card[data-active='false'] .service-card__body {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: auto;
+      padding: var(--sp-3);
+      display: block;
+    }
+
+    .service-card[data-active='true'] .service-card__body {
+      padding: var(--sp-5);
+    }
   }
 </style>
