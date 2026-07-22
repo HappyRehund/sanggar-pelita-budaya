@@ -72,6 +72,9 @@
 
   let sectionEl = $state<HTMLElement | null>(null);
 
+  const subtitleText = $derived(t('about_subtitle'));
+  const subtitleWords = $derived(subtitleText.split(/(\s+)/));
+
   onMount(() => {
     if (sectionEl) revealOnScroll(sectionEl, { y: 30, duration: 0.7 });
     reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -88,6 +91,12 @@
 </script>
 
 <section bind:this={sectionEl} class="section about-preview">
+  {#snippet subtitleWord(word: string, idx: number)}
+    <span
+      class="about-preview__subtitle-word"
+      style:--idx={idx}
+      aria-hidden="true">{word}</span>
+  {/snippet}
   <div class="container about-preview__inner">
     <div
       class="about-preview__image"
@@ -124,7 +133,15 @@
     <div class="about-preview__content">
       <span class="eyebrow">{t('about_eyebrow')}</span>
       <h2 class="about-preview__title">{t('about_title')}</h2>
-      <p class="about-preview__subtitle">{t('about_subtitle')}</p>
+      <p class="about-preview__subtitle" aria-label={subtitleText}>
+        {#each subtitleWords as w, i (i)}
+          {#if /^\s+$/.test(w)}
+            {w}
+          {:else}
+            {@render subtitleWord(w, i)}
+          {/if}
+        {/each}
+      </p>
       <p class="about-preview__desc text-pretty">{t('about_description')}</p>
       <Button variant="outline-gradient" size="md" href="/about" class="about-preview__cta-button">
         {t('about_read_more')}
@@ -241,15 +258,28 @@
 
   .about-preview__subtitle {
     font-family: var(--font-script);
-    font-size: var(--fs-h3);
+    font-size: var(--fs-body-lg);
     font-weight: var(--fw-medium);
-    color: var(--color-gold-soft);
+    color: var(--color-red);
     line-height: var(--lh-tight);
     letter-spacing: var(--tracking-wide);
     margin: 0;
     text-shadow:
       0 1px 0 rgba(255, 250, 231, 0.6),
       0 2px 6px rgba(122, 51, 56, 0.18);
+  }
+
+  .about-preview__subtitle-word {
+    display: inline-block;
+    color: var(--color-red);
+    animation: subtitle-color-cycle 2.4s ease-in-out infinite;
+    animation-delay: calc(var(--idx) * -0.18s);
+    will-change: color;
+  }
+
+  @keyframes subtitle-color-cycle {
+    0%, 100% { color: var(--color-red); }
+    50%      { color: var(--color-gold); }
   }
 
   .about-preview__desc {
@@ -270,6 +300,9 @@
     }
     .stack__scrim {
       transition: opacity 0.2s linear;
+    }
+    .about-preview__subtitle-word {
+      animation: none;
     }
   }
 
