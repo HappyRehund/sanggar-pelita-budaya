@@ -2,12 +2,11 @@
   import { onMount } from 'svelte';
   import { highlightsApi } from '$lib/api';
   import { t } from '$lib/i18n/index.svelte';
-  import { uploadUrl } from '$lib/utils';
+  import { uploadUrl, imageUrl } from '$lib/utils';
   import { revealOnScroll, staggerReveal } from '$lib/utils';
-  import { HIGHLIGHTS_GALLERY_IMAGE_LIMIT } from '$lib/constants/uploadLimits';
   import { useLightbox } from '$lib/hooks/useLightbox.svelte';
   import type { LightboxImage } from '$lib/hooks/useLightbox.svelte';
-  import type { HighlightMedia } from '$lib/types';
+  import type { HighlightListSummary } from '$lib/types';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
   import EmptyState from '$lib/components/EmptyState.svelte';
   import Lightbox from '$lib/components/Lightbox.svelte';
@@ -16,7 +15,9 @@
   import PatternDivider from '$lib/components/PatternDivider.svelte';
   import { ArrowRight } from '@lucide/svelte';
 
-  let highlightsImages = $state<HighlightMedia[]>([]);
+  const COLLAGE_LIMIT = 8;
+
+  let highlights = $state<HighlightListSummary[]>([]);
   let loading = $state(true);
   let sectionEl = $state<HTMLElement | null>(null);
 
@@ -27,10 +28,12 @@
 
     (async () => {
       try {
-        const all = await highlightsApi.galleryImages();
-        highlightsImages = shuffle(all).slice(0, HIGHLIGHTS_GALLERY_IMAGE_LIMIT);
+        const result = await highlightsApi.list({ per_page: 50 });
+        highlights = result.items
+          .filter((h) => h.cover)
+          .slice(0, COLLAGE_LIMIT);
       } catch {
-        highlightsImages = [];
+        highlights = [];
       } finally {
         loading = false;
       }
@@ -43,25 +46,16 @@
     return () => { cleanups.forEach((c) => c()); };
   });
 
-  function shuffle<T>(arr: T[]): T[] {
-    const copy = [...arr];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-  }
-
   function openLightbox(index: number): void {
-    const items: LightboxImage[] = highlightsImages.map((img) => ({
-      src: uploadUrl(img.filename),
-      alt: img.alt_text ?? 'Highlights image',
+    const items: LightboxImage[] = highlights.map((h) => ({
+      src: h.cover ? uploadUrl(h.cover.filename) : imageUrl(`highlights-${h.slug}`, 400, 300),
+      alt: h.title,
     }));
     lightbox.open(items, index);
   }
 
-  function getImageSrc(img: HighlightMedia): string {
-    return uploadUrl(img.filename);
+  function getImageSrc(item: HighlightListSummary): string {
+    return item.cover ? uploadUrl(item.cover.filename) : imageUrl(`highlights-${item.slug}`, 400, 300);
   }
 </script>
 
@@ -72,20 +66,20 @@
 
     {#if loading}
       <div class="highlights__collage">
-        {#each Array(10) as _, i (i)}
+        {#each Array(COLLAGE_LIMIT) as _, i (i)}
           <Skeleton variant="rect" />
         {/each}
       </div>
-    {:else if highlightsImages.length > 0}
+    {:else if highlights.length > 0}
       <div class="highlights__collage">
-        {#each highlightsImages as img, i (img.id)}
+        {#each highlights as item, i (item.id)}
           <button
             class="highlights__item"
             class:highlights__item--large={i === 0 || i === 5}
             onclick={() => openLightbox(i)}
-            aria-label="View image"
+            aria-label={item.title}
           >
-            <img src={getImageSrc(img)} alt={img.alt_text ?? 'Highlights image'} loading="lazy" />
+            <img src={getImageSrc(item)} alt={item.title} loading="lazy" />
           </button>
         {/each}
       </div>
@@ -113,7 +107,6 @@
 
 <style>
   .highlights-container {
-    /* background-color: green; */
     margin-top: var(--sp-12);
     margin-bottom: var(--sp-12)
   }
