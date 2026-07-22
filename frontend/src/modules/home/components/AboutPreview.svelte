@@ -124,6 +124,7 @@
     <div class="about-preview__content">
       <span class="eyebrow">{t('about_eyebrow')}</span>
       <h2 class="about-preview__title">{t('about_title')}</h2>
+      <p class="about-preview__subtitle">{t('about_subtitle')}</p>
       <p class="about-preview__desc text-pretty">{t('about_description')}</p>
       <Button variant="outline-gradient" size="md" href="/about" class="about-preview__cta-button">
         {t('about_read_more')}
@@ -236,6 +237,16 @@
     font-size: var(--fs-h1);
     font-weight: var(--fw-semibold);
     line-height: var(--lh-tight);
+  }
+
+  .about-preview__subtitle {
+    font-family: var(--font-script);
+    font-size: var(--fs-body-md);
+    font-weight: var(--fw-medium);
+    color: var(--color-gold-soft);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tracking-wide);
+    margin: 0;
   }
 
   .about-preview__desc {
