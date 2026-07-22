@@ -9,7 +9,6 @@
   import { highlightDetailPath } from '$lib/constants/routes';
   import { useLightbox } from '$lib/hooks/useLightbox.svelte';
   import type { LightboxImage } from '$lib/hooks/useLightbox.svelte';
-  import DOMPurify from 'dompurify';
   import Badge from '$lib/components/Badge.svelte';
   import Button from '$lib/components/Button.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
@@ -52,13 +51,6 @@
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   }
 
-  function sanitizeContent(html: string): string {
-    return DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'blockquote', 'a', 'img', 'hr', 'code', 'pre'],
-      ALLOWED_ATTR: ['href', 'src', 'alt', 'title'],
-    });
-  }
-
   function share(): void {
     if (navigator.share) {
       navigator.share({ title: highlight?.title ?? '', url: window.location.href });
@@ -76,9 +68,7 @@
     <meta property="og:title" content={highlight.seo_title || highlight.title} />
     <meta property="og:description" content={highlight.seo_description || highlight.short_description} />
     <meta property="og:type" content="article" />
-    {#if highlight.og_media}
-      <meta property="og:image" content={uploadUrl(highlight.og_media.filename)} />
-    {/if}
+    <meta property="og:image" content={getCoverUrl()} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={highlight.seo_title || highlight.title} />
     <meta name="twitter:description" content={highlight.seo_description || highlight.short_description} />
@@ -124,9 +114,6 @@
 
     <div class="container container--reading highlights-detail__content">
       <p class="lead">{highlight.short_description}</p>
-      <div class="rich-content">
-        {@html sanitizeContent(highlight.content)}
-      </div>
     </div>
 
     {#if highlight.youtube_url}
@@ -259,19 +246,6 @@
   .highlights-detail__content {
     padding: var(--sp-10) var(--sp-5);
   }
-
-  .rich-content {
-    margin-top: var(--sp-5);
-    font-size: var(--fs-body-lg);
-    line-height: var(--lh-relaxed);
-  }
-
-  .rich-content :global(h2) { font-family: var(--font-serif); font-size: var(--fs-h3); margin: var(--sp-5) 0 var(--sp-2); }
-  .rich-content :global(h3) { font-family: var(--font-serif); font-size: var(--fs-h4); margin: var(--sp-4) 0 var(--sp-2); }
-  .rich-content :global(blockquote) { border-left: 3px solid var(--color-gold); padding-left: var(--sp-4); margin: var(--sp-3) 0; color: var(--color-text-muted); font-style: italic; }
-  .rich-content :global(img) { max-width: 100%; border-radius: var(--radius-lg); margin: var(--sp-3) 0; }
-  .rich-content :global(a) { color: var(--color-accent); text-decoration: underline; }
-  .rich-content :global(ul), .rich-content :global(ol) { padding-left: var(--sp-5); margin: var(--sp-2) 0; }
 
   .highlights-detail__video {
     margin-bottom: var(--sp-10);
