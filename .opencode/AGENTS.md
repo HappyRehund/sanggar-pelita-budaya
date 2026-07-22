@@ -183,6 +183,19 @@ Portfolio create/delete, media reorder, organization reorder — all wrapped in 
 
 ---
 
+## Sub-Agent Delegations
+When another agent is more specialized for the task, delegate using the Task tool instead of solving it yourself.
+
+Prefer delegation for:
+
+- image analysis → vision
+- UI/UX evaluation → ui-review
+- frontend visual debugging → frontend-debug
+
+Use the returned analysis as evidence before producing the final answer.
+
+---
+
 ## Testing Strategy
 
 ### Local development
