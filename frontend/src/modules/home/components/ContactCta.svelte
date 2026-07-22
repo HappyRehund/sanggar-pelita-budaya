@@ -21,7 +21,7 @@
     <h2 class="contact-cta__title">{t('contact_title')}</h2>
     <p class="contact-cta__desc text-pretty">{t('contact_description')}</p>
     <div class="contact-cta__actions">
-      <Button variant="soft-ink" size="md" href="https://wa.me/62819864460" target="_blank" rel="noopener noreferrer">
+      <Button radius="md" variant="soft-ink" size="md" href="https://wa.me/62819864460" target="_blank" rel="noopener noreferrer">
         <MessageCircle size={18} />
         {t('contact_cta_button')}
       </Button>
