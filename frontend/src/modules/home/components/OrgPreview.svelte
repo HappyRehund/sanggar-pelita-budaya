@@ -66,7 +66,7 @@
 
 <section bind:this={sectionEl} class="section org-preview">
   <PatternDivider position="top" />
-  <div class="container">
+  <div class="container org-container">
     <SectionTitle eyebrow={t('org_eyebrow')} title={t('org_title')} description={t('org_description')} align="center" />
 
     {#if organizationStore.loading}
@@ -114,6 +114,14 @@
 </section>
 
 <style>
+  .org-container {
+    /* background-color: green; */
+    margin-top: var(--sp-8);
+    margin-bottom: var(--sp-8);
+    padding-top: var(--sp-2);
+    padding-bottom: var(--sp-2);
+
+  }
   .org-preview__grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
