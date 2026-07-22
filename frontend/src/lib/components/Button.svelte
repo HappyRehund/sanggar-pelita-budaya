@@ -13,6 +13,7 @@
     | 'outline-red'
     | 'outline-gold'
     | 'outline-ink'
+    | 'outline-ink-soft'
     | 'gradient'
     | 'outline-gradient';
   type Size = 'sm' | 'md' | 'lg';
@@ -221,6 +222,17 @@
     background-color: var(--color-ink);
     color: var(--color-white);
     border-color: var(--color-ink);
+  }
+
+  .btn--outline-ink-soft {
+    background-color: transparent;
+    color: var(--color-ink-soft);
+    border: 1px solid var(--color-ink-soft);
+  }
+  .btn--outline-ink-soft:not(:disabled):hover {
+    background-color: var(--color-ink-soft);
+    color: var(--color-white);
+    border-color: var(--color-ink-soft);
   }
 
   .btn--gradient {
