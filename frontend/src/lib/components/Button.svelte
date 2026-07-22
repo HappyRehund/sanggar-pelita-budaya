@@ -16,10 +16,12 @@
     | 'gradient'
     | 'outline-gradient';
   type Size = 'sm' | 'md' | 'lg';
+  type Radius = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
 
   interface CommonProps {
     variant?: Variant;
     size?: Size;
+    radius?: Radius;
     href?: string;
     full?: boolean;
     class?: string;
@@ -29,6 +31,7 @@
   let {
     variant = 'primary',
     size = 'md',
+    radius,
     href,
     full = false,
     class: className = '',
@@ -41,6 +44,7 @@
       'btn',
       `btn--${variant}`,
       `btn--${size}`,
+      radius ? `btn--radius-${radius}` : '',
       full ? 'btn--full' : '',
       className,
     ]
@@ -72,7 +76,7 @@
     font-weight: var(--fw-semibold);
     letter-spacing: var(--tracking-wide);
     text-decoration: none;
-    border-radius: var(--radius-md);
+    /* border-radius set via `radius` prop (no default) */
     transition:
       background-color var(--duration-fast) var(--ease-smooth),
       color var(--duration-fast) var(--ease-smooth),
@@ -319,4 +323,14 @@
     border-color: var(--color-accent);
     color: var(--color-accent);
   }
+
+  /* ---- Radius modifiers (override variant defaults when set) ---------- */
+  .btn--radius-xs  { border-radius: var(--radius-xs); }
+  .btn--radius-sm  { border-radius: var(--radius-sm); }
+  .btn--radius-md  { border-radius: var(--radius-md); }
+  .btn--radius-lg  { border-radius: var(--radius-lg); }
+  .btn--radius-xl  { border-radius: var(--radius-xl); }
+  .btn--radius-2xl { border-radius: var(--radius-2xl); }
+  .btn--radius-3xl { border-radius: var(--radius-3xl); }
+  .btn--radius-full { border-radius: var(--radius-full); }
 </style>
