@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { highlightsApi } from '$lib/api';
   import { t } from '$lib/i18n/index.svelte';
   import { notifications } from '$lib/stores/notification.svelte';
@@ -32,13 +32,18 @@
     youtube_url: '', seo_title: '', seo_description: '',
   });
   let coverMedia = $state<HighlightMedia | null>(null);
-  let galleryMedia = $state<HighlightMedia[]>([]);
+  let pendingCover = $state<File | null>(null);
+  let coverPreviewUrl = $state<string | null>(null);
   let slugTouched = $state(false);
 
   let editId = $state<number | null>(null);
 
   onMount(() => {
     loadList();
+  });
+
+  onDestroy(() => {
+    if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
   });
 
   async function loadList(): Promise<void> {
@@ -53,12 +58,18 @@
     }
   }
 
+  function clearCoverPreview(): void {
+    if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+    coverPreviewUrl = null;
+    pendingCover = null;
+  }
+
   function startCreate(): void {
     mode = 'create';
     editId = null;
     formData = { title: '', slug: '', category: 'activity', short_description: '', event_date: '', location: '', youtube_url: '', seo_title: '', seo_description: '' };
     coverMedia = null;
-    galleryMedia = [];
+    clearCoverPreview();
     slugTouched = false;
   }
 
@@ -69,7 +80,7 @@
     try {
       const full = await highlightsApi.getById(item.id);
       coverMedia = full.cover ?? null;
-      galleryMedia = full.gallery ?? [];
+      clearCoverPreview();
       formData = {
         title: full.title, slug: full.slug, category: full.category,
         short_description: full.short_description,
@@ -89,6 +100,7 @@
   function backToList(): void {
     mode = 'list';
     editId = null;
+    clearCoverPreview();
   }
 
   function onTitleInput(e: Event): void {
@@ -101,6 +113,29 @@
     slugTouched = true;
   }
 
+  function handleCoverSelect(files: File[]): void {
+    if (files.length === 0) return;
+    const file = files[0];
+    if (editId !== null) {
+      uploadCoverNow(file);
+    } else {
+      if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+      pendingCover = file;
+      coverPreviewUrl = URL.createObjectURL(file);
+    }
+  }
+
+  async function uploadCoverNow(file: File): Promise<void> {
+    if (editId === null) return;
+    try {
+      const media = await highlightsApi.uploadMedia(editId, file, 'cover');
+      coverMedia = media;
+      notifications.success(t('upload_success'));
+    } catch {
+      notifications.error(t('upload_failed'));
+    }
+  }
+
   async function handleSave(): Promise<void> {
     saving = true;
     try {
@@ -110,6 +145,9 @@
       } else {
         const created = await highlightsApi.create(formData);
         editId = created.id;
+        if (pendingCover) {
+          await highlightsApi.uploadMedia(editId, pendingCover, 'cover');
+        }
         notifications.success(t('toast_highlights_created'));
       }
       await loadList();
@@ -139,42 +177,11 @@
     }
   }
 
-  async function handleCoverUpload(files: File[]): Promise<void> {
-    if (!editId || files.length === 0) return;
-    try {
-      const media = await highlightsApi.uploadMedia(editId, files[0], 'cover');
-      coverMedia = media;
-      notifications.success(t('upload_success'));
-    } catch {
-      notifications.error(t('upload_failed'));
-    }
-  }
-
-  async function handleGalleryUpload(files: File[]): Promise<void> {
-    if (!editId || files.length === 0) return;
-    try {
-      for (const file of files) {
-        const media = await highlightsApi.uploadMedia(editId, file, 'gallery');
-        galleryMedia = [...galleryMedia, media];
-      }
-      notifications.success(t('upload_success'));
-    } catch {
-      notifications.error(t('upload_failed'));
-    }
-  }
-
-  async function deleteMedia(media: HighlightMedia): Promise<void> {
-    try {
-      await highlightsApi.deleteMedia(media.id);
-      galleryMedia = galleryMedia.filter((m) => m.id !== media.id);
-      if (coverMedia?.id === media.id) coverMedia = null;
-      notifications.success(t('toast_deleted'));
-    } catch {
-      notifications.error(t('toast_error'));
-    }
-  }
-
   async function deleteCover(): Promise<void> {
+    if (editId === null) {
+      clearCoverPreview();
+      return;
+    }
     if (!coverMedia) return;
     try {
       await highlightsApi.deleteMedia(coverMedia.id);
@@ -186,6 +193,7 @@
   }
 
   const filteredItems = $derived(search ? items.filter((i) => i.title.toLowerCase().includes(search.toLowerCase())) : items);
+  const coverSrc = $derived(coverPreviewUrl ?? (coverMedia ? uploadUrl(coverMedia.filename) : null));
 </script>
 
 {#if mode === 'list'}
@@ -271,36 +279,13 @@
         <div class="form-sidebar">
           <div class="form-section">
             <h3 class="form-section__title">{t('admin_highlights_field_cover')}</h3>
-            {#if editId === null}
-              <p class="form-hint">{t('save')} first to upload images.</p>
-            {:else}
-              {#if coverMedia}
-                <div class="media-preview">
-                  <img src={uploadUrl(coverMedia.filename)} alt="Cover" />
-                  <button onclick={deleteCover} aria-label={t('upload_remove')}><X size={14} /></button>
-                </div>
-              {/if}
-              <FileUpload label="" accept="image/jpeg,image/png,image/webp" onselect={handleCoverUpload} />
+            {#if coverSrc}
+              <div class="media-preview">
+                <img src={coverSrc} alt="Cover" />
+                <button onclick={deleteCover} aria-label={t('upload_remove')}><X size={14} /></button>
+              </div>
             {/if}
-          </div>
-
-          <div class="form-section">
-            <h3 class="form-section__title">{t('admin_highlights_field_gallery')}</h3>
-            {#if editId === null}
-              <p class="form-hint">{t('save')} first to upload images.</p>
-            {:else}
-              {#if galleryMedia.length > 0}
-                <div class="gallery-mini">
-                  {#each galleryMedia as media (media.id)}
-                    <div class="gallery-mini__item">
-                      <img src={uploadUrl(media.filename)} alt={media.alt_text || 'Gallery'} loading="lazy" />
-                      <button onclick={() => deleteMedia(media)} aria-label={t('upload_remove')}><X size={12} /></button>
-                    </div>
-                  {/each}
-                </div>
-              {/if}
-              <FileUpload label="" multiple accept="image/jpeg,image/png,image/webp" onselect={handleGalleryUpload} />
-            {/if}
+            <FileUpload label="" accept="image/jpeg,image/png,image/webp" onselect={handleCoverSelect} />
           </div>
 
           <div class="form-actions">
@@ -349,17 +334,11 @@
   .form-sidebar { display: flex; flex-direction: column; gap: var(--sp-6); }
   .form-section { padding: var(--sp-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
   .form-section__title { font-size: var(--fs-body-sm); font-weight: var(--fw-semibold); margin-bottom: var(--sp-3); }
-  .form-hint { font-size: var(--fs-caption); color: var(--color-text-subtle); }
   .form-actions { display: flex; flex-direction: column; gap: var(--sp-2); }
 
   .media-preview { position: relative; margin-bottom: var(--sp-3); }
   .media-preview img { width: 100%; border-radius: var(--radius-md); aspect-ratio: 4/3; object-fit: cover; }
   .media-preview button { position: absolute; top: 4px; right: 4px; display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; border-radius: var(--radius-full); background: rgba(26,22,18,0.7); color: var(--color-white); }
-
-  .gallery-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-2); margin-bottom: var(--sp-3); }
-  .gallery-mini__item { position: relative; }
-  .gallery-mini__item img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); }
-  .gallery-mini__item button { position: absolute; top: 2px; right: 2px; display: flex; align-items: center; justify-content: center; width: 1.25rem; height: 1.25rem; border-radius: var(--radius-full); background: rgba(26,22,18,0.7); color: var(--color-white); }
 
   @media (max-width: 880px) {
     .form-grid { grid-template-columns: 1fr; }
