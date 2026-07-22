@@ -2,7 +2,7 @@
 
 This page explains every field in the **Highlights** admin form (`/admin/highlights`) and how to fill it so a highlight renders well on the public site.
 
-Highlights are **auto-published** the moment you click **Save** — there is no draft state and no separate publish button. Fill the form, upload images, save, done.
+Highlights are **auto-published** the moment you click **Save** — there is no draft state and no separate publish button. Fill the form, pick an image, save, done. Each highlight has exactly **one image** (no gallery).
 
 ---
 
@@ -16,7 +16,7 @@ The page has two views:
 The form is split visually into:
 
 - **Main column (left)** — text fields
-- **Sidebar (right)** — cover image, gallery images, and the Save / Cancel buttons
+- **Sidebar (right)** — the single image, and the Save / Cancel buttons
 
 ---
 
@@ -79,22 +79,16 @@ The form is split visually into:
 
 ---
 
-## 3. Sidebar — Media
+## 3. Sidebar — Image
 
-Both media sections show a hint **"Save first to upload images."** when the highlight has never been saved. You must save once before uploads are accepted, because the server needs the highlight `id` to attach media to it.
+A highlight has **one image**. It is used as the card thumbnail, the hero on the public detail page, the social-share (`og:image`) fallback, and in the homepage Highlights collage. Clicking the hero on the detail page opens it in a lightbox.
 
-### 3.1 Gambar Sampul (Cover)
+### 3.1 Picking the image
 
-- **What it is:** The hero image used on cards and the top of the public page. Also used as the social-share (`og:image`) fallback.
-- **How to fill:** Single image upload. Accepted: `image/jpeg`, `image/png`, `image/webp`. Recommended aspect ratio **4:3**, minimum 800×600.
-- **Manage:** Click the `×` overlay to remove the current cover. Removing it doesn't delete the highlight; you can re-upload right away.
-
-### 3.2 Gambar Galeri (Gallery)
-
-- **What it is:** A set of additional photos shown below the body on the public detail page, and as a collage on the homepage.
-- **How to fill:** Multi-file upload (same accepted types as cover). Add as many as you like. Each tile has a `×` to delete just that photo.
-- **Tip:** Square (1:1) crops look best in the 3-column mini grid; the component uses `object-fit: cover`.
-- **Public reach:** Gallery images from all published highlights are pulled into the homepage **Highlights** collage section.
+- **In create mode:** pick the image before saving — it is staged client-side and uploaded together with the highlight when you click **Save**. A preview shows the selected file.
+- **In edit mode:** the current image is shown; picking a new file uploads it immediately to the existing highlight.
+- **Accepted types:** `image/jpeg`, `image/png`, `image/webp`. Recommended aspect ratio **4:3**, minimum 800×600.
+- **Remove:** click the `×` overlay on the preview. In create mode this just clears the staged file; in edit mode it deletes the saved image from the server.
 
 ---
 
@@ -104,7 +98,7 @@ Two buttons, in this order:
 
 | Button | What it does |
 | --- | --- |
-| **Simpan** (solid red) | Save the form. Creates the highlight (if new) or updates it (if editing), then returns to the list. The highlight is immediately public. |
+| **Simpan** (solid red) | Save the form. Creates the highlight (if new) or updates it (if editing); if a cover image was staged during create, it is uploaded in the same action. Then returns to the list. The highlight is immediately public. |
 | **Batal** (ghost) | Discard changes and return to the list. Does **not** save. |
 
 Both are disabled while a save is in flight (`saving = true`).
@@ -113,8 +107,8 @@ Both are disabled while a save is in flight (`saving = true`).
 
 ## 5. Save behaviour — what each path does
 
-- **Create flow:** `+` → fill form → *Simpan* → record is created and auto-published → list refreshes → you return to the list view. The first save assigns an `id`, after which you can upload cover and gallery images (edit the highlight again to add them).
-- **Edit flow:** pencil icon → form pre-fills from the API → edit → save → list refreshes → return to list.
+- **Create flow (one shot):** `+` → fill form → pick image → *Simpan* → the highlight is created, the staged image is uploaded, and you return to the list. No second step needed.
+- **Edit flow:** pencil icon → form pre-fills from the API (image preview shows the saved cover) → edit text and/or replace the image → save → list refreshes → return to list.
 - **Errors:** If the backend returns validation errors, the first error message is surfaced as a toast (see `handleSave`). Fix the offending field and re-save.
 
 ---
@@ -126,7 +120,6 @@ Both are disabled while a save is in flight (`saving = true`).
 - [ ] Category matches the story
 - [ ] Event date and location are correct (or intentionally blank)
 - [ ] Short description is ≤ 160 chars, doesn't duplicate the title, and reads well as the only body text
-- [ ] Cover image is at least 800×600, 4:3
-- [ ] Gallery has 3–8 photos if applicable
+- [ ] Image is at least 800×600, 4:3 (or intentionally left blank — the public site falls back to a placeholder)
 - [ ] YouTube link (if any) plays in an incognito tab
 - [ ] SEO title and description are filled (or intentionally left blank for fallbacks)
