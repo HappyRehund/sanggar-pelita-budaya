@@ -12,13 +12,14 @@
     if (sectionEl) return revealOnScroll(sectionEl, { y: 30, duration: 0.6 });
   });
 
-  const services = [
+  const services = $derived([
     { img: 'dance-performance', title: t('service_dance_performance_title'), desc: t('service_dance_performance_desc') },
     { img: 'dance-training', title: t('service_dance_training_title'), desc: t('service_dance_training_desc') },
     { img: 'costume-rental', title: t('service_costume_rental_title'), desc: t('service_costume_rental_desc') },
     { img: 'traditional-makeup', title: t('service_makeup_title'), desc: t('service_makeup_desc') },
     { img: 'stage-decoration', title: t('service_stage_decoration_title'), desc: t('service_stage_decoration_desc') },
-  ];
+  ]);
+  const count = services.length;
 
   let activeIndex = $state(0);
 
@@ -53,7 +54,7 @@
 
   $effect(() => {
     const newActive = activeIndex;
-    for (let i = 0; i < services.length; i++) {
+    for (let i = 0; i < count; i++) {
       const target = i === newActive ? 1 : 0;
 
       // Width: 200ms, delayed by FADE_OUT so it starts after fade-out finishes.
