@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { imageUrl, revealOnScroll } from '$lib/utils';
+  import { revealOnScroll } from '$lib/utils';
   import { SITE_CONTENT } from '$lib/constants';
   import Button from '$lib/components/Button.svelte';
   import { MessageCircle, MapPin } from '@lucide/svelte';
+  import contactCtaBg from '$assets/images/contact-cta/contact-cta-bg.webp';
 
   let sectionEl = $state<HTMLElement | null>(null);
 
@@ -12,7 +13,7 @@
     if (sectionEl) return revealOnScroll(sectionEl, { y: 30, duration: 0.7 });
   });
 
-  const bgImage = $derived(imageUrl('contact-cta', 1920, 800));
+  const bgImage = contactCtaBg;
   const mapsUrl = $derived(SITE_CONTENT.mapsUrl);
 </script>
 
@@ -38,7 +39,7 @@
 <style>
   .contact-cta {
     background-size: cover;
-    background-position: center;
+    background-position: center 40%;
     background-attachment: fixed;
     padding: var(--sp-16) 0;
     text-align: center;
