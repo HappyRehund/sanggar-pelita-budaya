@@ -37,16 +37,11 @@ export const highlightsApi = {
     if (query.category && query.category !== 'all') params.set('category', query.category);
     if (query.search) params.set('search', query.search);
     if (query.sort) params.set('sort', query.sort);
-    if (query.featured !== undefined) params.set('featured', String(query.featured));
-    if (query.published !== undefined) params.set('published', String(query.published));
     const qs = params.toString();
     return api.get<PaginatedResponse<HighlightListSummary>>(
       qs ? `${API.HIGHLIGHTS}?${qs}` : API.HIGHLIGHTS
     );
   },
-
-  featured: (limit = 6) =>
-    api.get<HighlightListSummary[]>(`${API.HIGHLIGHTS_FEATURED}?limit=${limit}`),
 
   galleryImages: () => api.get<HighlightMedia[]>(API.HIGHLIGHTS_GALLERY),
 
@@ -62,7 +57,7 @@ export const highlightsApi = {
 
   listMedia: (id: number) => api.get<HighlightMedia[]>(API.HIGHLIGHTS_MEDIA(id)),
 
-  uploadMedia: (id: number, file: File, type: 'cover' | 'gallery' | 'og', altText?: string) => {
+  uploadMedia: (id: number, file: File, type: 'cover' | 'gallery', altText?: string) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);

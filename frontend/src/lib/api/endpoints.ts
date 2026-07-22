@@ -16,7 +16,6 @@ export const API = {
 
   // Highlights
   HIGHLIGHTS: '/api/highlights',
-  HIGHLIGHTS_FEATURED: '/api/highlights/featured',
   HIGHLIGHTS_GALLERY: '/api/highlights/gallery',
   HIGHLIGHTS_SLUG: (slug: string) => `/api/highlights/slug/${slug}`,
   HIGHLIGHTS_DETAIL: (id: number) => `/api/highlights/${id}`,

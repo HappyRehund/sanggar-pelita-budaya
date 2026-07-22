@@ -6,7 +6,7 @@
   import { notifications } from '$lib/stores/notification.svelte';
   import { uploadUrl } from '$lib/utils';
   import type { DashboardData } from '$lib/types';
-  import { FolderOpen, Users, Award, Sparkles, CheckCircle, FileEdit, Plus } from '@lucide/svelte';
+  import { FolderOpen, Users, Award, Sparkles, Plus } from '@lucide/svelte';
 
   let data = $state<DashboardData | null>(null);
   let loading = $state(true);
@@ -26,8 +26,6 @@
     { icon: Award, label: t('admin_stat_achievements'), value: data.stats.achievements, color: 'gold' },
     { icon: Sparkles, label: t('admin_stat_activities'), value: data.stats.activities, color: 'red' },
     { icon: Users, label: t('admin_stat_members'), value: data.stats.organization_members, color: 'blue' },
-    { icon: CheckCircle, label: t('admin_stat_published'), value: data.stats.published_highlights, color: 'green' },
-    { icon: FileEdit, label: t('admin_stat_drafts'), value: data.stats.draft_highlights, color: 'gray' },
   ] : []);
 
   const quickActions = [

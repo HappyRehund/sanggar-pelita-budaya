@@ -19,7 +19,7 @@ export type Lang = 'id' | 'en';
 
 /* ---- Highlights ---------------------------------------------------- */
 export type HighlightCategory = 'achievement' | 'activity';
-export type MediaKind = 'cover' | 'gallery' | 'og';
+export type MediaKind = 'cover' | 'gallery';
 
 export interface HighlightMedia {
   id: number;
@@ -43,17 +43,12 @@ export interface Highlight {
   slug: string;
   category: HighlightCategory;
   short_description: string;
-  content: string;
   cover_media_id: number | null;
   cover?: HighlightMedia | null;
-  og_media_id: number | null;
-  og_media?: HighlightMedia | null;
   gallery?: HighlightMedia[];
   event_date: string | null;
   location: string | null;
   youtube_url: string | null;
-  featured: boolean;
-  published: boolean;
   seo_title: string | null;
   seo_description: string | null;
   created_at: string;
@@ -70,8 +65,6 @@ export interface HighlightListSummary {
   event_date: string | null;
   location: string | null;
   cover?: HighlightMedia | null;
-  featured: boolean;
-  published: boolean;
 }
 
 /* ---- Organization --------------------------------------------------- */
@@ -108,8 +101,6 @@ export interface DashboardStats {
   achievements: number;
   activities: number;
   organization_members: number;
-  published_highlights: number;
-  draft_highlights: number;
 }
 
 export interface RecentUpload {
@@ -155,6 +146,4 @@ export interface HighlightListQuery {
   category?: HighlightCategory | 'all';
   search?: string;
   sort?: HighlightSort;
-  featured?: boolean;
-  published?: boolean;
 }

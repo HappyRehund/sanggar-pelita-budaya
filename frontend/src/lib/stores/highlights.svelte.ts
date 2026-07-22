@@ -25,7 +25,6 @@ class HighlightsStore {
   sort = $state<HighlightSort>('newest');
   page = $state(1);
 
-  featured = $state<HighlightListSummary[]>([]);
   current = $state<Highlight | null>(null);
 
   async fetchList(): Promise<void> {
@@ -38,7 +37,6 @@ class HighlightsStore {
         category: this.category,
         search: this.search,
         sort: this.sort,
-        published: true,
       };
       const result = await highlightsApi.list(query);
       this.items = result.items;
@@ -47,14 +45,6 @@ class HighlightsStore {
       this.error = e instanceof Error ? e.message : 'Failed to load highlights';
     } finally {
       this.loading = false;
-    }
-  }
-
-  async fetchFeatured(limit = 6): Promise<void> {
-    try {
-      this.featured = await highlightsApi.featured(limit);
-    } catch {
-      this.featured = [];
     }
   }
 
@@ -102,7 +92,6 @@ class HighlightsStore {
     this.sort = 'newest';
     this.page = 1;
     this.items = [];
-    this.featured = [];
     this.current = null;
     this.error = null;
   }
