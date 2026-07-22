@@ -57,6 +57,20 @@ function initSchema(): void
         );
     ");
 
+    // Simplify highlights schema: drop content/featured/published/og_media_id columns.
+    // Destructive, guarded by schema-version marker so it only runs once.
+    $highlightsSimplifyV1 = $pdo->query("SELECT value FROM schema_meta WHERE key = 'highlights_simplify_v1'")->fetchColumn();
+    if ($highlightsSimplifyV1 === false) {
+        $pdo->exec('DROP TABLE IF EXISTS highlights;');
+        $pdo->exec('DROP TABLE IF EXISTS highlights_media;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_highlights_slug;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_highlights_category;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_highlights_published;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_highlights_featured;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_highlights_event_date;');
+        $pdo->exec('DROP INDEX IF EXISTS idx_media_highlight_id;');
+    }
+
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS highlights (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,20 +78,15 @@ function initSchema(): void
             slug TEXT UNIQUE NOT NULL,
             category TEXT NOT NULL CHECK(category IN ('achievement','activity')),
             short_description TEXT NOT NULL,
-            content TEXT NOT NULL DEFAULT '',
             cover_media_id INTEGER,
             event_date DATE,
             location TEXT,
             youtube_url TEXT,
-            featured INTEGER NOT NULL DEFAULT 0,
-            published INTEGER NOT NULL DEFAULT 0,
             seo_title TEXT,
             seo_description TEXT,
-            og_media_id INTEGER,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (cover_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL,
-            FOREIGN KEY (og_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL
+            FOREIGN KEY (cover_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL
         );
     ");
 
@@ -85,7 +94,7 @@ function initSchema(): void
         CREATE TABLE IF NOT EXISTS highlights_media (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             highlight_id INTEGER NOT NULL,
-            type TEXT NOT NULL CHECK(type IN ('cover','gallery','og')),
+            type TEXT NOT NULL CHECK(type IN ('cover','gallery')),
             filename TEXT NOT NULL,
             original_filename TEXT NOT NULL,
             mime_type TEXT NOT NULL,
@@ -99,6 +108,10 @@ function initSchema(): void
             FOREIGN KEY (highlight_id) REFERENCES highlights(id) ON DELETE CASCADE
         );
     ");
+
+    if ($highlightsSimplifyV1 === false) {
+        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('highlights_simplify_v1', '1');");
+    }
 
     // Recreate organization_members without the `published` column (no longer needed in admin).
     // Safe to wipe: no data to preserve. Guarded by schema-version marker so it only runs once.
@@ -155,8 +168,6 @@ function createIndexes(PDO $pdo): void
     $indexes = [
         'CREATE INDEX IF NOT EXISTS idx_highlights_slug ON highlights(slug);',
         'CREATE INDEX IF NOT EXISTS idx_highlights_category ON highlights(category);',
-        'CREATE INDEX IF NOT EXISTS idx_highlights_published ON highlights(published);',
-        'CREATE INDEX IF NOT EXISTS idx_highlights_featured ON highlights(featured);',
         'CREATE INDEX IF NOT EXISTS idx_highlights_event_date ON highlights(event_date);',
         'CREATE INDEX IF NOT EXISTS idx_org_display_order ON organization_members(display_order);',
         'CREATE UNIQUE INDEX IF NOT EXISTS idx_org_featured_slot ON organization_members(featured_slot) WHERE featured_slot IS NOT NULL;',

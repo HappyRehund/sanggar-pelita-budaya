@@ -25,16 +25,6 @@ class HighlightController
             'sort' => $query['sort'] ?? 'newest',
         ];
 
-        if (isset($query['published'])) {
-            $filters['published'] = filter_var($query['published'], FILTER_VALIDATE_BOOL);
-        } elseif (!is_authenticated()) {
-            $filters['published'] = true;
-        }
-
-        if (isset($query['featured'])) {
-            $filters['featured'] = filter_var($query['featured'], FILTER_VALIDATE_BOOL);
-        }
-
         $page = (int) ($query['page'] ?? 1);
         $perPage = (int) ($query['per_page'] ?? HIGHLIGHTS_PER_PAGE);
 
@@ -87,13 +77,6 @@ class HighlightController
         $id = (int) $params['id'];
         $this->highlightService->delete($id);
         success_response(null, 'Highlights deleted');
-    }
-
-    public function featured(array $params): void
-    {
-        $limit = (int) ($_GET['limit'] ?? FEATURED_HIGHLIGHTS_LIMIT);
-        $items = $this->highlightService->listFeatured($limit);
-        success_response($items, 'Featured highlights');
     }
 
     public function galleryImages(array $params): void
@@ -176,16 +159,12 @@ class HighlightController
             'slug' => trim($input['slug'] ?? ''),
             'category' => $input['category'] ?? '',
             'short_description' => trim($input['short_description'] ?? ''),
-            'content' => $input['content'] ?? '',
             'event_date' => $input['event_date'] ?? null,
             'location' => trim($input['location'] ?? ''),
             'youtube_url' => trim($input['youtube_url'] ?? ''),
-            'featured' => !empty($input['featured']) ? 1 : 0,
-            'published' => !empty($input['published']) ? 1 : 0,
             'seo_title' => trim($input['seo_title'] ?? '') ?: null,
             'seo_description' => trim($input['seo_description'] ?? '') ?: null,
             'cover_media_id' => isset($input['cover_media_id']) ? (int) $input['cover_media_id'] : null,
-            'og_media_id' => isset($input['og_media_id']) ? (int) $input['og_media_id'] : null,
         ];
     }
 }

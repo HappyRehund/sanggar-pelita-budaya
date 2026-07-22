@@ -97,7 +97,6 @@ route('GET', '/api/auth/me', [$authController, 'session']);
 
 /* ---- Highlights (public + admin) --------------------------------- */
 route('GET',    '/api/highlights',              [$highlightController, 'list']);
-route('GET',    '/api/highlights/featured',     [$highlightController, 'featured']);
 route('GET',    '/api/highlights/gallery',      [$highlightController, 'galleryImages']);
 route('GET',    '/api/highlights/slug/{slug}',  [$highlightController, 'getBySlug']);
 route('GET',    '/api/highlights/{id}',         [$highlightController, 'getById']);

@@ -15,13 +15,11 @@ class HighlightRepository
     {
         $stmt = $this->db->prepare("
             INSERT INTO highlights
-                (title, slug, category, short_description, content, cover_media_id,
-                 event_date, location, youtube_url, featured, published,
-                 seo_title, seo_description, og_media_id)
+                (title, slug, category, short_description, cover_media_id,
+                 event_date, location, youtube_url, seo_title, seo_description)
             VALUES
-                (:title, :slug, :category, :short_description, :content, :cover_media_id,
-                 :event_date, :location, :youtube_url, :featured, :published,
-                 :seo_title, :seo_description, :og_media_id)
+                (:title, :slug, :category, :short_description, :cover_media_id,
+                 :event_date, :location, :youtube_url, :seo_title, :seo_description)
         ");
 
         $this->bindHighlightFields($stmt, $data);
@@ -37,16 +35,12 @@ class HighlightRepository
                 slug = :slug,
                 category = :category,
                 short_description = :short_description,
-                content = :content,
                 cover_media_id = :cover_media_id,
                 event_date = :event_date,
                 location = :location,
                 youtube_url = :youtube_url,
-                featured = :featured,
-                published = :published,
                 seo_title = :seo_title,
                 seo_description = :seo_description,
-                og_media_id = :og_media_id,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = :id
         ");
@@ -95,7 +89,7 @@ class HighlightRepository
     {
         $stmt = $this->db->prepare(
             "SELECT * FROM highlights
-             WHERE category = ? AND id != ? AND published = 1
+             WHERE category = ? AND id != ?
              ORDER BY event_date DESC, created_at DESC
              LIMIT ?"
         );
@@ -106,25 +100,12 @@ class HighlightRepository
         return $stmt->fetchAll();
     }
 
-    public function findFeatured(int $limit = 6): array
-    {
-        $stmt = $this->db->prepare(
-            "SELECT * FROM highlights
-             WHERE featured = 1 AND published = 1
-             ORDER BY event_date DESC, created_at DESC
-             LIMIT ?"
-        );
-        $stmt->bindValue(1, $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
-    }
-
     public function findAllGalleryImages(): array
     {
         $stmt = $this->db->query(
             "SELECT hm.* FROM highlights_media hm
              INNER JOIN highlights h ON hm.highlight_id = h.id
-             WHERE h.published = 1 AND hm.type = 'gallery'
+             WHERE hm.type = 'gallery'
              ORDER BY hm.created_at DESC"
         );
         return $stmt->fetchAll();
@@ -166,22 +147,10 @@ class HighlightRepository
     public function countByCategory(string $category): int
     {
         $stmt = $this->db->prepare(
-            "SELECT COUNT(*) as count FROM highlights WHERE category = ? AND published = 1"
+            "SELECT COUNT(*) as count FROM highlights WHERE category = ?"
         );
         $stmt->execute([$category]);
         $row = $stmt->fetch();
-        return (int) $row['count'];
-    }
-
-    public function countPublished(): int
-    {
-        $row = $this->db->query("SELECT COUNT(*) as count FROM highlights WHERE published = 1")->fetch();
-        return (int) $row['count'];
-    }
-
-    public function countDrafts(): int
-    {
-        $row = $this->db->query("SELECT COUNT(*) as count FROM highlights WHERE published = 0")->fetch();
         return (int) $row['count'];
     }
 
@@ -191,28 +160,18 @@ class HighlightRepository
         $stmt->execute([$mediaId, $highlightId]);
     }
 
-    public function setOgMedia(int $highlightId, ?int $mediaId): void
-    {
-        $stmt = $this->db->prepare('UPDATE highlights SET og_media_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
-        $stmt->execute([$mediaId, $highlightId]);
-    }
-
     private function bindHighlightFields(PDOStatement $stmt, array $data): void
     {
         $stmt->bindValue(':title', $data['title']);
         $stmt->bindValue(':slug', $data['slug']);
         $stmt->bindValue(':category', $data['category']);
         $stmt->bindValue(':short_description', $data['short_description']);
-        $stmt->bindValue(':content', $data['content'] ?? '');
         $stmt->bindValue(':cover_media_id', $data['cover_media_id'] ?? null, PDO::PARAM_NULL);
         $stmt->bindValue(':event_date', $data['event_date'] ?: null);
         $stmt->bindValue(':location', $data['location'] ?? '');
         $stmt->bindValue(':youtube_url', $data['youtube_url'] ?? '');
-        $stmt->bindValue(':featured', $data['featured'] ?? 0, PDO::PARAM_INT);
-        $stmt->bindValue(':published', $data['published'] ?? 0, PDO::PARAM_INT);
         $stmt->bindValue(':seo_title', $data['seo_title'] ?? null);
         $stmt->bindValue(':seo_description', $data['seo_description'] ?? null);
-        $stmt->bindValue(':og_media_id', $data['og_media_id'] ?? null, PDO::PARAM_NULL);
     }
 
     private function buildWhereClause(array $filters): array
@@ -223,16 +182,6 @@ class HighlightRepository
         if (!empty($filters['category']) && $filters['category'] !== 'all') {
             $where[] = 'category = ?';
             $params[] = $filters['category'];
-        }
-
-        if (isset($filters['published'])) {
-            $where[] = 'published = ?';
-            $params[] = $filters['published'] ? 1 : 0;
-        }
-
-        if (isset($filters['featured'])) {
-            $where[] = 'featured = ?';
-            $params[] = $filters['featured'] ? 1 : 0;
         }
 
         if (!empty($filters['search'])) {

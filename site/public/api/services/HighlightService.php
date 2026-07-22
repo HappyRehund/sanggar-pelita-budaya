@@ -87,7 +87,6 @@ class HighlightService
         $highlight = formatHighlightRow($row);
         $media = $this->mediaRepo->findByHighlightId($id);
         $highlight['cover'] = $this->findMediaById($media, $row['cover_media_id']);
-        $highlight['og_media'] = $this->findMediaById($media, $row['og_media_id']);
         $highlight['gallery'] = $this->filterGallery($media);
         return $highlight;
     }
@@ -133,21 +132,6 @@ class HighlightService
             'items' => $items,
             'pagination' => buildPaginationMeta($page, $perPage, $total),
         ];
-    }
-
-    public function listFeatured(int $limit): array
-    {
-        $rows = $this->highlightRepo->findFeatured($limit);
-        $items = [];
-        foreach ($rows as $row) {
-            $item = formatHighlightRow($row);
-            $coverMedia = $row['cover_media_id'] !== null
-                ? $this->mediaRepo->findById((int) $row['cover_media_id'])
-                : null;
-            $item['cover'] = $coverMedia ? formatMediaRow($coverMedia) : null;
-            $items[] = $item;
-        }
-        return $items;
     }
 
     public function listGalleryImages(): array

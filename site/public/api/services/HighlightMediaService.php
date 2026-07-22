@@ -24,9 +24,9 @@ class HighlightMediaService
             not_found_response('Highlight not found');
         }
 
-        $validTypes = ['cover', 'gallery', 'og'];
+        $validTypes = ['cover', 'gallery'];
         if (!in_array($type, $validTypes, true)) {
-            validation_error_response(['type' => 'Media type must be cover, gallery, or og.']);
+            validation_error_response(['type' => 'Media type must be cover or gallery.']);
         }
 
         $stored = $this->uploadService->store($file, 'highlights');
@@ -53,8 +53,6 @@ class HighlightMediaService
 
             if ($type === 'cover') {
                 $this->highlightRepo->setCoverMedia($highlightId, $mediaId);
-            } elseif ($type === 'og') {
-                $this->highlightRepo->setOgMedia($highlightId, $mediaId);
             }
 
             $row = $this->mediaRepo->findById($mediaId);
@@ -80,8 +78,6 @@ class HighlightMediaService
 
             if ($media['type'] === 'cover') {
                 $this->highlightRepo->setCoverMedia($highlightId, null);
-            } elseif ($media['type'] === 'og') {
-                $this->highlightRepo->setOgMedia($highlightId, null);
             }
 
             $this->mediaRepo->delete($mediaId);

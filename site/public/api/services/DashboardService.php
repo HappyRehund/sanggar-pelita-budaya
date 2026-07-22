@@ -24,8 +24,6 @@ class DashboardService
             'achievements' => $this->highlightRepo->countByCategory('achievement'),
             'activities' => $this->highlightRepo->countByCategory('activity'),
             'organization_members' => $this->orgRepo->count(),
-            'published_highlights' => $this->highlightRepo->countPublished(),
-            'draft_highlights' => $this->highlightRepo->countDrafts(),
         ];
 
         $recentUploads = array_map(function ($row) {

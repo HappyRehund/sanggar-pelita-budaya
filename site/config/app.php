@@ -26,9 +26,7 @@ define('UPLOAD_FOLDERS', [
 ]);
 
 define('HIGHLIGHTS_PER_PAGE', 12);
-define('FEATURED_HIGHLIGHTS_LIMIT', 6);
 define('RELATED_HIGHLIGHTS_LIMIT', 4);
-define('HIGHLIGHTS_GALLERY_IMAGE_LIMIT', 10);
 
 $directories = [
     BASE_PATH . '/data',
