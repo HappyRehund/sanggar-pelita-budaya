@@ -19,7 +19,7 @@ export type Lang = 'id' | 'en';
 
 /* ---- Highlights ---------------------------------------------------- */
 export type HighlightCategory = 'achievement' | 'activity';
-export type MediaKind = 'cover' | 'gallery';
+export type MediaKind = 'cover';
 
 export interface HighlightMedia {
   id: number;
@@ -45,7 +45,6 @@ export interface Highlight {
   short_description: string;
   cover_media_id: number | null;
   cover?: HighlightMedia | null;
-  gallery?: HighlightMedia[];
   event_date: string | null;
   location: string | null;
   youtube_url: string | null;

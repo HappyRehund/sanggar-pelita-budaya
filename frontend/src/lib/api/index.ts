@@ -43,8 +43,6 @@ export const highlightsApi = {
     );
   },
 
-  galleryImages: () => api.get<HighlightMedia[]>(API.HIGHLIGHTS_GALLERY),
-
   getBySlug: (slug: string) => api.get<Highlight>(API.HIGHLIGHTS_SLUG(slug)),
 
   getById: (id: number) => api.get<Highlight>(API.HIGHLIGHTS_DETAIL(id)),
@@ -57,7 +55,7 @@ export const highlightsApi = {
 
   listMedia: (id: number) => api.get<HighlightMedia[]>(API.HIGHLIGHTS_MEDIA(id)),
 
-  uploadMedia: (id: number, file: File, type: 'cover' | 'gallery', altText?: string) => {
+  uploadMedia: (id: number, file: File, type: 'cover', altText?: string) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
@@ -66,9 +64,6 @@ export const highlightsApi = {
   },
 
   deleteMedia: (mediaId: number) => api.delete<null>(API.HIGHLIGHTS_MEDIA_DETAIL(mediaId)),
-
-  reorderMedia: (order: Record<string, number>) =>
-    api.put<null>(API.HIGHLIGHTS_MEDIA_REORDER, { order }),
 };
 
 /* ---- Organization ------------------------------------------------- */

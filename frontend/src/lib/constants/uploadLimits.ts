@@ -21,6 +21,4 @@ export const UPLOAD_FOLDERS = {
 } as const;
 
 export const HIGHLIGHTS_PER_PAGE = 12;
-export const FEATURED_HIGHLIGHTS_LIMIT = 6;
 export const RELATED_HIGHLIGHTS_LIMIT = 4;
-export const HIGHLIGHTS_GALLERY_IMAGE_LIMIT = 10;

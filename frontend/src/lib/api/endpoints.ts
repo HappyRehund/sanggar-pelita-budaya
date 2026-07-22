@@ -16,12 +16,10 @@ export const API = {
 
   // Highlights
   HIGHLIGHTS: '/api/highlights',
-  HIGHLIGHTS_GALLERY: '/api/highlights/gallery',
   HIGHLIGHTS_SLUG: (slug: string) => `/api/highlights/slug/${slug}`,
   HIGHLIGHTS_DETAIL: (id: number) => `/api/highlights/${id}`,
   HIGHLIGHTS_MEDIA: (id: number) => `/api/highlights/${id}/media`,
   HIGHLIGHTS_MEDIA_DETAIL: (id: number) => `/api/highlights/media/${id}`,
-  HIGHLIGHTS_MEDIA_REORDER: '/api/highlights/media/reorder',
 
   // Organization
   ORGANIZATION: '/api/organization',
