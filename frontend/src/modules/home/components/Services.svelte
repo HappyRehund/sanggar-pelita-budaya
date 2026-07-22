@@ -3,8 +3,13 @@
   import { Tween, prefersReducedMotion } from 'svelte/motion';
   import { cubicOut } from 'svelte/easing';
   import { t } from '$lib/i18n/index.svelte';
-  import { imageUrl, revealOnScroll } from '$lib/utils';
+  import { revealOnScroll } from '$lib/utils';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
+  import seniTari from '$assets/images/service-home/seni-tari.webp';
+  import kelasTari from '$assets/images/service-home/kelas-tari.webp';
+  import kostum from '$assets/images/service-home/kostum.webp';
+  import makeUp from '$assets/images/service-home/make-up.webp';
+  import dekorasi from '$assets/images/service-home/dekorasi.webp';
 
   let sectionEl = $state<HTMLElement | null>(null);
 
@@ -13,11 +18,11 @@
   });
 
   const services = $derived([
-    { img: 'dance-performance', title: t('service_dance_performance_title'), desc: t('service_dance_performance_desc') },
-    { img: 'dance-training', title: t('service_dance_training_title'), desc: t('service_dance_training_desc') },
-    { img: 'costume-rental', title: t('service_costume_rental_title'), desc: t('service_costume_rental_desc') },
-    { img: 'traditional-makeup', title: t('service_makeup_title'), desc: t('service_makeup_desc') },
-    { img: 'stage-decoration', title: t('service_stage_decoration_title'), desc: t('service_stage_decoration_desc') },
+    { img: seniTari, title: t('service_dance_performance_title'), desc: t('service_dance_performance_desc') },
+    { img: kelasTari, title: t('service_dance_training_title'), desc: t('service_dance_training_desc') },
+    { img: kostum, title: t('service_costume_rental_title'), desc: t('service_costume_rental_desc') },
+    { img: makeUp, title: t('service_makeup_title'), desc: t('service_makeup_desc') },
+    { img: dekorasi, title: t('service_stage_decoration_title'), desc: t('service_stage_decoration_desc') },
   ]);
   const count = services.length;
 
@@ -108,7 +113,7 @@
         aria-label={i === activeIndex ? `Currently expanded: ${service.title}` : `Expand: ${service.title}`}
       >
         <div class="service-card__media">
-          <img src={imageUrl(service.img, 1000, 700)} alt={service.title} loading="lazy" />
+          <img src={service.img} alt={service.title} loading="lazy" />
         </div>
         <div class="service-card__scrim"></div>
         <div class="service-card__body">
