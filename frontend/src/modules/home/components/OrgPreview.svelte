@@ -102,7 +102,7 @@
         {/each}
       </div>
       <div class="org-preview__cta">
-        <Button variant="soft-ink" size="md" href="/organization">
+        <Button variant="soft-ink" radius="md" size="md" href="/organization">
           {t('org_view_all')}
         </Button>
       </div>
