@@ -23,6 +23,7 @@
   let items = $state<HighlightListSummary[]>([]);
   let loading = $state(true);
   let search = $state('');
+  let searchInput = $state<HTMLInputElement | null>(null);
   let saving = $state(false);
   let deleteTarget = $state<HighlightListSummary | null>(null);
 
@@ -207,8 +208,10 @@
     </div>
 
     <div class="admin-search">
-      <Search size={16} class="admin-search__icon" />
-      <input type="search" placeholder={t('search_placeholder')} value={search} oninput={(e) => (search = (e.target as HTMLInputElement).value)} />
+      <button type="button" class="admin-search__icon" aria-label={t('search')} onclick={() => searchInput?.focus()}>
+        <Search size={16} />
+      </button>
+      <input bind:this={searchInput} type="search" placeholder={t('search_placeholder')} value={search} oninput={(e) => (search = (e.target as HTMLInputElement).value)} />
     </div>
 
     {#if loading}
@@ -314,7 +317,21 @@
   .back-btn:hover { color: var(--color-accent); }
 
   .admin-search { position: relative; margin-bottom: var(--sp-4); }
-  .admin-search__icon { position: absolute; left: var(--sp-3); top: 50%; transform: translateY(-50%); color: var(--color-text-subtle); }
+  .admin-search__icon {
+    position: absolute;
+    left: var(--sp-3);
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-text-subtle);
+    cursor: pointer;
+  }
+  .admin-search__icon:hover { color: var(--color-accent); }
   .admin-search input { width: 100%; padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-8); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); font-size: var(--fs-body-sm); }
   .admin-search input:focus { outline: none; border-color: var(--color-accent); }
 
