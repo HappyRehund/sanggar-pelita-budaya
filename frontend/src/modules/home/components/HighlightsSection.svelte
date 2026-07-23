@@ -5,24 +5,19 @@
   import { uploadUrl, imageUrl } from '$lib/utils';
   import { revealOnScroll, staggerReveal } from '$lib/utils';
   import { langStore } from '$lib/stores/lang.svelte';
-  import { useLightbox } from '$lib/hooks/useLightbox.svelte';
-  import type { LightboxImage } from '$lib/hooks/useLightbox.svelte';
+  import { categoryLabel } from '$lib/constants/categories';
   import type { HighlightListSummary } from '$lib/types';
   import SectionTitle from '$lib/components/SectionTitle.svelte';
   import EmptyState from '$lib/components/EmptyState.svelte';
-  import Lightbox from '$lib/components/Lightbox.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import Button from '$lib/components/Button.svelte';
   import PatternDivider from '$lib/components/PatternDivider.svelte';
-  import { ArrowRight } from '@lucide/svelte';
 
   const COLLAGE_LIMIT = 8;
 
   let highlights = $state<HighlightListSummary[]>([]);
   let loading = $state(true);
   let sectionEl = $state<HTMLElement | null>(null);
-
-  const lightbox = useLightbox();
 
   onMount(() => {
     let cleanups: (() => void)[] = [];
@@ -47,20 +42,16 @@
     return () => { cleanups.forEach((c) => c()); };
   });
 
-  function openLightbox(index: number): void {
-    const items: LightboxImage[] = highlights.map((h) => ({
-      src: h.cover ? uploadUrl(h.cover.filename) : imageUrl(`highlights-${h.slug}`, 400, 300),
-      alt: title(h),
-    }));
-    lightbox.open(items, index);
-  }
-
   function getImageSrc(item: HighlightListSummary): string {
     return item.cover ? uploadUrl(item.cover.filename) : imageUrl(`highlights-${item.slug}`, 400, 300);
   }
 
   function title(item: HighlightListSummary): string {
     return langStore.current === 'id' ? item.title_id : item.title_en;
+  }
+
+  function category(item: HighlightListSummary): string {
+    return categoryLabel(item.category, langStore.current);
   }
 </script>
 
@@ -78,20 +69,23 @@
     {:else if highlights.length > 0}
       <div class="highlights__collage">
         {#each highlights as item, i (item.id)}
-          <button
+          <a
             class="highlights__item"
             class:highlights__item--large={i === 0 || i === 5}
-            onclick={() => openLightbox(i)}
+            href="/highlights"
             aria-label={title(item)}
           >
             <img src={getImageSrc(item)} alt={title(item)} loading="lazy" />
-          </button>
+            <span class="highlights__overlay">
+              <span class="highlights__overlay-cat">{category(item)}</span>
+              <span class="highlights__overlay-title">{title(item)}</span>
+            </span>
+          </a>
         {/each}
       </div>
       <div class="highlights__cta">
-        <Button variant="secondary" size="md" href="/highlights">
+        <Button variant="outline-gradient" radius="xs" size="md" href="/highlights">
           {t('highlights_view_all')}
-          <ArrowRight size={16} />
         </Button>
       </div>
     {:else}
@@ -100,15 +94,6 @@
   </div>
   <PatternDivider position="bottom" />
 </section>
-
-<Lightbox
-  open={lightbox.isOpen}
-  images={lightbox.images}
-  index={lightbox.currentIndex}
-  onclose={lightbox.close}
-  onnext={lightbox.next}
-  onprev={lightbox.prev}
-/>
 
 <style>
   .highlights-container {
@@ -124,13 +109,13 @@
   }
 
   .highlights__item {
+    position: relative;
+    display: block;
     border: none;
     padding: 0;
     overflow: hidden;
     border-radius: var(--radius-lg);
-    cursor: pointer;
     background: var(--color-surface-alt);
-    transition: opacity var(--duration-fast) var(--ease-smooth);
   }
 
   .highlights__item--large {
@@ -149,8 +134,54 @@
     transform: scale(1.06);
   }
 
-  .highlights__item:hover {
-    opacity: 0.9;
+  /* Hover overlay — dark gradient with category + title, fades in on hover. */
+  .highlights__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--sp-1);
+    padding: var(--sp-4);
+    background: linear-gradient(
+      to top,
+      rgba(26, 22, 18, 0.88) 0%,
+      rgba(26, 22, 18, 0.5) 45%,
+      transparent 75%
+    );
+    opacity: 0;
+    transition: opacity var(--duration-short) var(--ease-smooth);
+    pointer-events: none;
+  }
+
+  .highlights__item:hover .highlights__overlay,
+  .highlights__item:focus-visible .highlights__overlay {
+    opacity: 1;
+  }
+
+  .highlights__overlay-cat {
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-widest);
+    color: var(--color-accent);
+  }
+
+  .highlights__overlay-title {
+    font-family: var(--font-serif);
+    font-size: var(--fs-h5);
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-tight);
+    color: var(--color-white);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .highlights__item--large .highlights__overlay-title {
+    font-size: var(--fs-h4);
   }
 
   .highlights__cta {
@@ -167,6 +198,9 @@
     .highlights__item--large {
       grid-row: span 1;
       grid-column: span 1;
+    }
+    .highlights__overlay-title {
+      font-size: var(--fs-body-sm);
     }
   }
 </style>
