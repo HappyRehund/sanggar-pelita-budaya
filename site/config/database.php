@@ -74,16 +74,20 @@ function initSchema(): void
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS highlights (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
+            title_en TEXT NOT NULL,
+            title_id TEXT NOT NULL,
             slug TEXT UNIQUE NOT NULL,
             category TEXT NOT NULL CHECK(category IN ('achievement','activity')),
-            short_description TEXT NOT NULL,
+            short_description_en TEXT NOT NULL,
+            short_description_id TEXT NOT NULL,
             cover_media_id INTEGER,
             event_date DATE,
             location TEXT,
             youtube_url TEXT,
-            seo_title TEXT,
-            seo_description TEXT,
+            seo_title_en TEXT,
+            seo_title_id TEXT,
+            seo_description_en TEXT,
+            seo_description_id TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (cover_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL
@@ -96,6 +100,74 @@ function initSchema(): void
     if ($highlightsSimplifyV2 === false) {
         $pdo->exec('DROP TABLE IF EXISTS highlights_media;');
         $pdo->exec('DROP INDEX IF EXISTS idx_media_highlight_id;');
+    }
+
+    // Migrate highlights to bilingual (EN + ID) content columns.
+    // Destructive, guarded by schema-version marker so it only runs once.
+    $highlightsBilingualV1 = $pdo->query("SELECT value FROM schema_meta WHERE key = 'highlights_bilingual_v1'")->fetchColumn();
+    if ($highlightsBilingualV1 === false) {
+        $hasLegacyTitle = false;
+        $cols = $pdo->query('PRAGMA table_info(highlights)');
+        foreach ($cols->fetchAll() as $col) {
+            if ($col['name'] === 'title') {
+                $hasLegacyTitle = true;
+                break;
+            }
+        }
+
+        if ($hasLegacyTitle) {
+            // Add bilingual columns (mirror existing data into both languages).
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN title_en TEXT;');
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN title_id TEXT;');
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN short_description_en TEXT;');
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN short_description_id TEXT;');
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN seo_title_en TEXT;');
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN seo_title_id TEXT;');
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN seo_description_en TEXT;');
+            $pdo->exec('ALTER TABLE highlights ADD COLUMN seo_description_id TEXT;');
+
+            // Backfill: copy existing single-language values into both EN and ID columns.
+            $pdo->exec('UPDATE highlights SET title_en = title, title_id = title WHERE title IS NOT NULL;');
+            $pdo->exec('UPDATE highlights SET short_description_en = short_description, short_description_id = short_description WHERE short_description IS NOT NULL;');
+            $pdo->exec('UPDATE highlights SET seo_title_en = seo_title, seo_title_id = seo_title;');
+            $pdo->exec('UPDATE highlights SET seo_description_en = seo_description, seo_description_id = seo_description;');
+
+            // Drop legacy single-language columns by recreating the table.
+            $pdo->exec('DROP TABLE IF EXISTS highlights_old;');
+            $pdo->exec('ALTER TABLE highlights RENAME TO highlights_old;');
+            $pdo->exec("
+                CREATE TABLE highlights (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title_en TEXT NOT NULL,
+                    title_id TEXT NOT NULL,
+                    slug TEXT UNIQUE NOT NULL,
+                    category TEXT NOT NULL CHECK(category IN ('achievement','activity')),
+                    short_description_en TEXT NOT NULL,
+                    short_description_id TEXT NOT NULL,
+                    cover_media_id INTEGER,
+                    event_date DATE,
+                    location TEXT,
+                    youtube_url TEXT,
+                    seo_title_en TEXT,
+                    seo_title_id TEXT,
+                    seo_description_en TEXT,
+                    seo_description_id TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (cover_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL
+                );
+            ");
+            $pdo->exec("
+                INSERT INTO highlights (id, title_en, title_id, slug, category, short_description_en, short_description_id,
+                    cover_media_id, event_date, location, youtube_url, seo_title_en, seo_title_id,
+                    seo_description_en, seo_description_id, created_at, updated_at)
+                SELECT id, title_en, title_id, slug, category, short_description_en, short_description_id,
+                    cover_media_id, event_date, location, youtube_url, seo_title_en, seo_title_id,
+                    seo_description_en, seo_description_id, created_at, updated_at
+                FROM highlights_old;
+            ");
+            $pdo->exec('DROP TABLE highlights_old;');
+        }
     }
 
     $pdo->exec("
@@ -123,6 +195,10 @@ function initSchema(): void
 
     if ($highlightsSimplifyV2 === false) {
         $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('highlights_simplify_v2', '1');");
+    }
+
+    if ($highlightsBilingualV1 === false) {
+        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('highlights_bilingual_v1', '1');");
     }
 
     // Recreate organization_members without the `published` column (no longer needed in admin).
