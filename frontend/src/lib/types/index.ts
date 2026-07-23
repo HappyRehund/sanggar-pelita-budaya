@@ -39,17 +39,21 @@ export interface HighlightMedia {
 
 export interface Highlight {
   id: number;
-  title: string;
+  title_en: string;
+  title_id: string;
   slug: string;
   category: HighlightCategory;
-  short_description: string;
+  short_description_en: string;
+  short_description_id: string;
   cover_media_id: number | null;
   cover?: HighlightMedia | null;
   event_date: string | null;
   location: string | null;
   youtube_url: string | null;
-  seo_title: string | null;
-  seo_description: string | null;
+  seo_title_en: string | null;
+  seo_title_id: string | null;
+  seo_description_en: string | null;
+  seo_description_id: string | null;
   created_at: string;
   updated_at: string;
   related?: HighlightListSummary[];
@@ -57,10 +61,12 @@ export interface Highlight {
 
 export interface HighlightListSummary {
   id: number;
-  title: string;
+  title_en: string;
+  title_id: string;
   slug: string;
   category: HighlightCategory;
-  short_description: string;
+  short_description_en: string;
+  short_description_id: string;
   event_date: string | null;
   location: string | null;
   cover?: HighlightMedia | null;
