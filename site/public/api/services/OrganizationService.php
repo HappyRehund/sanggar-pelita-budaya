@@ -63,16 +63,21 @@ class OrganizationService
             not_found_response('Organization member not found');
         }
 
-        $this->validateMemberFields($data, $id);
+        // PATCH: merge provided keys over the existing row so untouched
+        // fields (notably photo) are preserved. PUT: full replace via
+        // normalizeInput (which still omits photo, so merge keeps it too).
+        $merged = $this->mergeMemberData($existing, $data);
+
+        $this->validateMemberFields($merged, $id);
 
         $this->db->beginTransaction();
         try {
             // If assigning a featured slot, clear it from any other member first (unique constraint).
-            $newSlot = $data['featured_slot'] ?? null;
+            $newSlot = $merged['featured_slot'] ?? null;
             if ($newSlot !== null) {
                 $this->repo->clearSlot((int) $newSlot, $id);
             }
-            $this->repo->update($id, $data);
+            $this->repo->update($id, $merged);
             $row = $this->repo->findById($id);
             $this->db->commit();
             return formatOrganizationRow($row);
@@ -80,6 +85,34 @@ class OrganizationService
             $this->db->rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Merge a (possibly partial) update payload over the existing DB row.
+     * Only keys present in $patch override $existing. This guarantees that
+     * fields the client never sent (e.g. `photo` during a text-only edit)
+     * are preserved rather than being nulled out.
+     */
+    private function mergeMemberData(array $existing, array $patch): array
+    {
+        $defaults = [
+            'name' => $existing['name'] ?? '',
+            'position_en' => $existing['position_en'] ?? '',
+            'position_id' => $existing['position_id'] ?? '',
+            'photo' => $existing['photo'] ?? null,
+            'biography_en' => $existing['biography_en'] ?? null,
+            'biography_id' => $existing['biography_id'] ?? null,
+            'display_order' => (int) ($existing['display_order'] ?? 0),
+            'featured_slot' => $existing['featured_slot'] !== null ? (int) $existing['featured_slot'] : null,
+        ];
+
+        foreach ($patch as $key => $value) {
+            if (array_key_exists($key, $defaults)) {
+                $defaults[$key] = $value;
+            }
+        }
+
+        return $defaults;
     }
 
     public function delete(int $id): void

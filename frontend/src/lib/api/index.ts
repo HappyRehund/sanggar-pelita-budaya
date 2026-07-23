@@ -49,7 +49,7 @@ export const highlightsApi = {
 
   create: (data: Partial<Highlight>) => api.post<Highlight>(API.HIGHLIGHTS, data),
 
-  update: (id: number, data: Partial<Highlight>) => api.put<Highlight>(API.HIGHLIGHTS_DETAIL(id), data),
+  update: (id: number, data: Partial<Highlight>) => api.patch<Highlight>(API.HIGHLIGHTS_DETAIL(id), data),
 
   delete: (id: number) => api.delete<null>(API.HIGHLIGHTS_DETAIL(id)),
 
@@ -77,7 +77,7 @@ export const organizationApi = {
   create: (data: Partial<OrganizationMember>) => api.post<OrganizationMember>(API.ORGANIZATION, data),
 
   update: (id: number, data: Partial<OrganizationMember>) =>
-    api.put<OrganizationMember>(API.ORGANIZATION_DETAIL(id), data),
+    api.patch<OrganizationMember>(API.ORGANIZATION_DETAIL(id), data),
 
   delete: (id: number) => api.delete<null>(API.ORGANIZATION_DETAIL(id)),
 

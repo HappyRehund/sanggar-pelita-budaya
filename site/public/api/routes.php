@@ -46,7 +46,7 @@ function apply_cors(): void
     if (in_array($origin, CORS_ALLOWED_ORIGINS, true)) {
         header('Access-Control-Allow-Origin: ' . $origin);
         header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, X-CSRF-Token, Authorization');
         header('Access-Control-Max-Age: 86400');
     }
@@ -101,6 +101,7 @@ route('GET',    '/api/highlights/slug/{slug}',  [$highlightController, 'getBySlu
 route('GET',    '/api/highlights/{id}',         [$highlightController, 'getById']);
 route('POST',   '/api/highlights',              [$highlightController, 'create']);
 route('PUT',    '/api/highlights/{id}',         [$highlightController, 'update']);
+route('PATCH',  '/api/highlights/{id}',         [$highlightController, 'update']);
 route('DELETE', '/api/highlights/{id}',         [$highlightController, 'delete']);
 
 /* ---- Highlights Media -------------------------------------------- */
@@ -115,6 +116,7 @@ route('PUT',    '/api/organization/reorder',      [$organizationController, 'reo
 route('GET',    '/api/organization/{id}',         [$organizationController, 'getById']);
 route('POST',   '/api/organization',              [$organizationController, 'create']);
 route('PUT',    '/api/organization/{id}',         [$organizationController, 'update']);
+route('PATCH',  '/api/organization/{id}',         [$organizationController, 'update']);
 route('DELETE', '/api/organization/{id}',         [$organizationController, 'delete']);
 route('POST',   '/api/organization/{id}/photo',  [$organizationController, 'uploadPhoto']);
 

@@ -163,7 +163,8 @@ class HighlightRepository
         $stmt->bindValue(':category', $data['category']);
         $stmt->bindValue(':short_description_en', $data['short_description_en']);
         $stmt->bindValue(':short_description_id', $data['short_description_id']);
-        $stmt->bindValue(':cover_media_id', $data['cover_media_id'] ?? null, PDO::PARAM_NULL);
+        $coverMediaId = $data['cover_media_id'] ?? null;
+        $stmt->bindValue(':cover_media_id', $coverMediaId, $coverMediaId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(':event_date', $data['event_date'] ?: null);
         $stmt->bindValue(':location', $data['location'] ?? '');
         $stmt->bindValue(':youtube_url', $data['youtube_url'] ?? '');

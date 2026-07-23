@@ -40,11 +40,15 @@ class HighlightService
             not_found_response('Highlight not found');
         }
 
-        $this->validateHighlightFields($data, $id);
+        // PATCH: merge provided keys over the existing row so untouched
+        // fields (notably cover_media_id) are preserved. PUT: full replace.
+        $merged = $this->mergeHighlightData($existing, $data);
+
+        $this->validateHighlightFields($merged, $id);
 
         $this->db->beginTransaction();
         try {
-            $this->highlightRepo->update($id, $data);
+            $this->highlightRepo->update($id, $merged);
             $row = $this->highlightRepo->findById($id);
             $this->db->commit();
             return formatHighlightRow($row);
@@ -52,6 +56,40 @@ class HighlightService
             $this->db->rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Merge a (possibly partial) update payload over the existing DB row.
+     * Only keys present in $patch override $existing. Used by PATCH and
+     * also safe for PUT (PUT callers pass a full payload, so every key is
+     * present and overrides).
+     */
+    private function mergeHighlightData(array $existing, array $patch): array
+    {
+        $defaults = [
+            'title_en' => $existing['title_en'] ?? '',
+            'title_id' => $existing['title_id'] ?? '',
+            'slug' => $existing['slug'] ?? '',
+            'category' => $existing['category'] ?? '',
+            'short_description_en' => $existing['short_description_en'] ?? '',
+            'short_description_id' => $existing['short_description_id'] ?? '',
+            'cover_media_id' => $existing['cover_media_id'] !== null ? (int) $existing['cover_media_id'] : null,
+            'event_date' => $existing['event_date'] ?? null,
+            'location' => $existing['location'] ?? '',
+            'youtube_url' => $existing['youtube_url'] ?? '',
+            'seo_title_en' => $existing['seo_title_en'] ?? null,
+            'seo_title_id' => $existing['seo_title_id'] ?? null,
+            'seo_description_en' => $existing['seo_description_en'] ?? null,
+            'seo_description_id' => $existing['seo_description_id'] ?? null,
+        ];
+
+        foreach ($patch as $key => $value) {
+            if (array_key_exists($key, $defaults)) {
+                $defaults[$key] = $value;
+            }
+        }
+
+        return $defaults;
     }
 
     public function delete(int $id): void

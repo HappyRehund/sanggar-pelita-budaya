@@ -64,7 +64,12 @@ class HighlightController
 
         $id = (int) $params['id'];
         $input = $this->extractBody();
-        $input = $this->normalizeHighlightInput($input);
+        $isPatch = ($_SERVER['REQUEST_METHOD'] ?? 'PUT') === 'PATCH';
+        if ($isPatch) {
+            $input = $this->normalizeHighlightInputPartial($input);
+        } else {
+            $input = $this->normalizeHighlightInput($input);
+        }
         $highlight = $this->highlightService->update($id, $input);
         success_response($highlight, 'Highlights updated');
     }
@@ -149,5 +154,32 @@ class HighlightController
             'seo_description_id' => trim($input['seo_description_id'] ?? '') ?: null,
             'cover_media_id' => isset($input['cover_media_id']) ? (int) $input['cover_media_id'] : null,
         ];
+    }
+
+    /**
+     * PATCH normalization: only include keys that were actually provided
+     * in the request body. Missing keys are omitted so the service can
+     * merge the patch over the existing record without clobbering fields
+     * the client did not send (e.g. cover_media_id when only text fields
+     * are being edited).
+     */
+    private function normalizeHighlightInputPartial(array $input): array
+    {
+        $out = [];
+        if (array_key_exists('title_en', $input)) $out['title_en'] = trim($input['title_en']);
+        if (array_key_exists('title_id', $input)) $out['title_id'] = trim($input['title_id']);
+        if (array_key_exists('slug', $input)) $out['slug'] = trim($input['slug']);
+        if (array_key_exists('category', $input)) $out['category'] = $input['category'];
+        if (array_key_exists('short_description_en', $input)) $out['short_description_en'] = trim($input['short_description_en']);
+        if (array_key_exists('short_description_id', $input)) $out['short_description_id'] = trim($input['short_description_id']);
+        if (array_key_exists('event_date', $input)) $out['event_date'] = $input['event_date'];
+        if (array_key_exists('location', $input)) $out['location'] = trim($input['location']);
+        if (array_key_exists('youtube_url', $input)) $out['youtube_url'] = trim($input['youtube_url']);
+        if (array_key_exists('seo_title_en', $input)) $out['seo_title_en'] = trim($input['seo_title_en']) ?: null;
+        if (array_key_exists('seo_title_id', $input)) $out['seo_title_id'] = trim($input['seo_title_id']) ?: null;
+        if (array_key_exists('seo_description_en', $input)) $out['seo_description_en'] = trim($input['seo_description_en']) ?: null;
+        if (array_key_exists('seo_description_id', $input)) $out['seo_description_id'] = trim($input['seo_description_id']) ?: null;
+        if (array_key_exists('cover_media_id', $input)) $out['cover_media_id'] = $input['cover_media_id'] === null ? null : (int) $input['cover_media_id'];
+        return $out;
     }
 }
