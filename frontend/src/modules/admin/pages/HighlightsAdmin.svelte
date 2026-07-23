@@ -28,9 +28,9 @@
   let deleteTarget = $state<HighlightListSummary | null>(null);
 
   let formData = $state({
-    title: '', slug: '', category: 'activity' as HighlightCategory,
-    short_description: '', event_date: '', location: '',
-    youtube_url: '', seo_title: '', seo_description: '',
+    title_en: '', title_id: '', slug: '', category: 'activity' as HighlightCategory,
+    short_description_en: '', short_description_id: '', event_date: '', location: '',
+    youtube_url: '', seo_title_en: '', seo_title_id: '', seo_description_en: '', seo_description_id: '',
   });
   let coverMedia = $state<HighlightMedia | null>(null);
   let pendingCover = $state<File | null>(null);
@@ -68,7 +68,7 @@
   function startCreate(): void {
     mode = 'create';
     editId = null;
-    formData = { title: '', slug: '', category: 'activity', short_description: '', event_date: '', location: '', youtube_url: '', seo_title: '', seo_description: '' };
+    formData = { title_en: '', title_id: '', slug: '', category: 'activity', short_description_en: '', short_description_id: '', event_date: '', location: '', youtube_url: '', seo_title_en: '', seo_title_id: '', seo_description_en: '', seo_description_id: '' };
     coverMedia = null;
     clearCoverPreview();
     slugTouched = false;
@@ -83,11 +83,12 @@
       coverMedia = full.cover ?? null;
       clearCoverPreview();
       formData = {
-        title: full.title, slug: full.slug, category: full.category,
-        short_description: full.short_description,
+        title_en: full.title_en, title_id: full.title_id, slug: full.slug, category: full.category,
+        short_description_en: full.short_description_en, short_description_id: full.short_description_id,
         event_date: formatDateInput(full.event_date), location: full.location || '',
         youtube_url: full.youtube_url || '',
-        seo_title: full.seo_title || '', seo_description: full.seo_description || '',
+        seo_title_en: full.seo_title_en || '', seo_title_id: full.seo_title_id || '',
+        seo_description_en: full.seo_description_en || '', seo_description_id: full.seo_description_id || '',
       };
       slugTouched = true;
     } catch {
@@ -105,8 +106,8 @@
   }
 
   function onTitleInput(e: Event): void {
-    formData.title = (e.target as HTMLInputElement).value;
-    if (!slugTouched) formData.slug = slugify(formData.title);
+    formData.title_en = (e.target as HTMLInputElement).value;
+    if (!slugTouched) formData.slug = slugify(formData.title_en);
   }
 
   function onSlugInput(e: Event): void {
@@ -193,7 +194,7 @@
     }
   }
 
-  const filteredItems = $derived(search ? items.filter((i) => i.title.toLowerCase().includes(search.toLowerCase())) : items);
+  const filteredItems = $derived(search ? items.filter((i) => i.title_en.toLowerCase().includes(search.toLowerCase()) || i.title_id.toLowerCase().includes(search.toLowerCase())) : items);
   const coverSrc = $derived(coverPreviewUrl ?? (coverMedia ? uploadUrl(coverMedia.filename) : null));
 </script>
 
@@ -236,7 +237,7 @@
                 <td>
                   <img src={item.cover ? uploadUrl(item.cover.filename) : imageUrl(`h-${item.slug}`, 80, 60)} alt="" class="table-thumb" />
                 </td>
-                <td>{item.title}</td>
+                <td>{item.title_en}</td>
                 <td><Badge variant={item.category}>{categoryLabel(item.category, langStore.current)}</Badge></td>
                 <td>{item.location || '—'}</td>
                 <td>
@@ -264,19 +265,29 @@
     {:else}
       <div class="form-grid">
         <div class="form-main">
-          <Input label={t('admin_highlights_field_title')} value={formData.title} oninput={onTitleInput} placeholder="Traditional Dance Festival 2026" />
+          <div class="lang-block">
+            <span class="lang-block__label">EN</span>
+            <Input label={t('admin_highlights_field_title_en')} value={formData.title_en} oninput={onTitleInput} placeholder="Traditional Dance Festival 2026" />
+            <Textarea label={t('admin_highlights_field_short_description_en')} value={formData.short_description_en} oninput={(e) => (formData.short_description_en = (e.target as HTMLTextAreaElement).value)} />
+            <Input label={t('admin_highlights_field_seo_title_en')} value={formData.seo_title_en} oninput={(e) => (formData.seo_title_en = (e.target as HTMLInputElement).value)} />
+            <Input label={t('admin_highlights_field_seo_description_en')} value={formData.seo_description_en} oninput={(e) => (formData.seo_description_en = (e.target as HTMLInputElement).value)} />
+          </div>
+
+          <div class="lang-block">
+            <span class="lang-block__label">ID</span>
+            <Input label={t('admin_highlights_field_title_id')} value={formData.title_id} oninput={(e) => (formData.title_id = (e.target as HTMLInputElement).value)} placeholder="Festival Tari Tradisional 2026" />
+            <Textarea label={t('admin_highlights_field_short_description_id')} value={formData.short_description_id} oninput={(e) => (formData.short_description_id = (e.target as HTMLTextAreaElement).value)} />
+            <Input label={t('admin_highlights_field_seo_title_id')} value={formData.seo_title_id} oninput={(e) => (formData.seo_title_id = (e.target as HTMLInputElement).value)} />
+            <Input label={t('admin_highlights_field_seo_description_id')} value={formData.seo_description_id} oninput={(e) => (formData.seo_description_id = (e.target as HTMLInputElement).value)} />
+          </div>
+
           <Input label={t('admin_highlights_field_slug')} value={formData.slug} oninput={onSlugInput} placeholder="traditional-dance-festival-2026" hint={t('admin_highlights_field_slug')} />
           <div class="form-row">
             <Select label={t('admin_highlights_field_category')} value={formData.category} options={[{value:'achievement',label:t('category_achievement')},{value:'activity',label:t('category_activity')}]} onchange={(e) => (formData.category = (e.target as HTMLSelectElement).value as HighlightCategory)} />
             <Input label={t('admin_highlights_field_event_date')} type="date" value={formData.event_date} oninput={(e) => (formData.event_date = (e.target as HTMLInputElement).value)} />
           </div>
           <Input label={t('admin_highlights_field_location')} value={formData.location} oninput={(e) => (formData.location = (e.target as HTMLInputElement).value)} placeholder="Jakarta, Indonesia" />
-          <Textarea label={t('admin_highlights_field_short_description')} value={formData.short_description} oninput={(e) => (formData.short_description = (e.target as HTMLTextAreaElement).value)} />
           <Input label={t('admin_highlights_field_youtube')} value={formData.youtube_url} oninput={(e) => (formData.youtube_url = (e.target as HTMLInputElement).value)} placeholder="https://youtube.com/watch?v=..." />
-          <div class="form-row">
-            <Input label={t('admin_highlights_field_seo_title')} value={formData.seo_title} oninput={(e) => (formData.seo_title = (e.target as HTMLInputElement).value)} />
-            <Input label={t('admin_highlights_field_seo_description')} value={formData.seo_description} oninput={(e) => (formData.seo_description = (e.target as HTMLInputElement).value)} />
-          </div>
         </div>
 
         <div class="form-sidebar">
@@ -348,6 +359,8 @@
   .form-grid { display: grid; grid-template-columns: 1fr 20rem; gap: var(--sp-6); }
   .form-main { display: flex; flex-direction: column; gap: var(--sp-4); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .lang-block { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4); background: var(--color-surface-alt); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
+  .lang-block__label { font-size: var(--fs-caption); font-weight: var(--fw-semibold); color: var(--color-text-muted); letter-spacing: var(--tracking-widest); }
   .form-sidebar { display: flex; flex-direction: column; gap: var(--sp-6); }
   .form-section { padding: var(--sp-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); }
   .form-section__title { font-size: var(--fs-body-sm); font-weight: var(--fw-semibold); margin-bottom: var(--sp-3); }
