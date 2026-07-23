@@ -1,5 +1,5 @@
 <script lang="ts">
-  import dividerPattern from '$assets/pattern-divider/pattern-divider-1.webp';
+  import dividerPattern from '$assets/pattern-divider/pattern-divider-2.png';
 
   type Props = {
     position: 'top' | 'bottom';
