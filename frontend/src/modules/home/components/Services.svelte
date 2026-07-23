@@ -17,14 +17,26 @@
     if (sectionEl) return revealOnScroll(sectionEl, { y: 30, duration: 0.6 });
   });
 
-  const services = $derived([
-    { img: seniTari, title: t('service_dance_performance_title'), desc: t('service_dance_performance_desc') },
-    { img: kelasTari, title: t('service_dance_training_title'), desc: t('service_dance_training_desc') },
-    { img: kostum, title: t('service_costume_rental_title'), desc: t('service_costume_rental_desc') },
-    { img: makeUp, title: t('service_makeup_title'), desc: t('service_makeup_desc') },
-    { img: dekorasi, title: t('service_stage_decoration_title'), desc: t('service_stage_decoration_desc') },
-  ]);
-  const count = services.length;
+  // Static service structure (non-reactive): images + i18n key suffixes.
+  // The count and tween arrays derive from this so they don't read the
+  // reactive `services` derived at the top level (avoids
+  // state_referenced_locally warnings).
+  const SERVICE_DEFS = [
+    { img: seniTari, key: 'dance_performance' },
+    { img: kelasTari, key: 'dance_training' },
+    { img: kostum, key: 'costume_rental' },
+    { img: makeUp, key: 'makeup' },
+    { img: dekorasi, key: 'stage_decoration' },
+  ] as const;
+
+  const services = $derived(
+    SERVICE_DEFS.map((s) => ({
+      img: s.img,
+      title: t(`service_${s.key}_title`),
+      desc: t(`service_${s.key}_desc`),
+    }))
+  );
+  const count = SERVICE_DEFS.length;
 
   let activeIndex = $state(0);
 
@@ -43,17 +55,17 @@
   const MODE_FLIP = reduce ? 0 : 140; // start of phase 2
 
   // --p drives flex-grow (width tween)
-  const widthTween = services.map(() =>
+  const widthTween = SERVICE_DEFS.map(() =>
     new Tween(0, { duration: WIDTH, easing: cubicOut })
   );
   // --c drives opacity / image scale / brightness (content tween)
-  const fadeTween = services.map(() =>
+  const fadeTween = SERVICE_DEFS.map(() =>
     new Tween(0, { duration: FADE_IN, easing: cubicOut })
   );
   // modeTween drives data-active (writing-mode + layout flip).
   // Nearly-instant (0.001ms) so the flip is a hard cut, but delayed so it
   // only happens AFTER the content has fully faded out.
-  const modeTween = services.map(() =>
+  const modeTween = SERVICE_DEFS.map(() =>
     new Tween(0, { duration: 0.001, easing: cubicOut })
   );
 
