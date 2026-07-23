@@ -145,7 +145,7 @@
         {/each}
       </p>
       <p class="about-preview__desc text-pretty">{t('about_description')}</p>
-      <Button variant="outline-gradient" size="md" href="/about" class="about-preview__cta-button">
+      <Button variant="outline-gradient" size="md" radius="xs" href="/about" class="about-preview__cta-button">
         {t('about_read_more')}
       </Button>
     </div>
@@ -187,7 +187,7 @@
     margin-left: -180px;
     border: 0;
     padding: 2px;
-    /* border-radius: var(--radius-xl); */
+    border-radius: var(--radius-lg);
     overflow: hidden;
     cursor: pointer;
     background:
@@ -212,7 +212,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    /* border-radius: var(--radius-lg); */
+    border-radius: var(--radius-md);
     overflow: hidden;
     z-index: 1;
   }
