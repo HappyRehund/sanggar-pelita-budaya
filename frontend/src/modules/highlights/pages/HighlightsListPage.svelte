@@ -2,16 +2,16 @@
   import { onMount } from 'svelte';
   import { highlightsStore } from '$lib/stores/highlights.svelte';
   import { t } from '$lib/i18n/index.svelte';
-  import { formatDate, uploadUrl, imageUrl } from '$lib/utils';
+  import { uploadUrl, imageUrl } from '$lib/utils';
   import { langStore } from '$lib/stores/lang.svelte';
   import { categoryLabel } from '$lib/constants/categories';
-  import { highlightDetailPath } from '$lib/constants/routes';
   import { useSearch } from '$lib/hooks/useSearch.svelte';
-  import type { HighlightCategory, HighlightSort } from '$lib/types';
+  import type { HighlightCategory, HighlightSort, HighlightListSummary } from '$lib/types';
   import Badge from '$lib/components/Badge.svelte';
   import Pagination from '$lib/components/Pagination.svelte';
   import Skeleton from '$lib/components/Skeleton.svelte';
   import EmptyState from '$lib/components/EmptyState.svelte';
+  import HighlightLightbox from '$lib/components/HighlightLightbox.svelte';
   import { Search, ArrowUpDown } from '@lucide/svelte';
 
   const search = useSearch('', 400);
@@ -27,6 +27,9 @@
     { value: 'oldest', label: t('oldest') },
     { value: 'alphabetical', label: t('alphabetical') },
   ];
+
+  let lightboxOpen = $state(false);
+  let activeItem = $state<HighlightListSummary | null>(null);
 
   onMount(() => {
     highlightsStore.fetchList();
@@ -46,8 +49,14 @@
     return langStore.current === 'id' ? item.title_id : item.title_en;
   }
 
-  function description(item: { short_description_en: string; short_description_id: string }): string {
-    return langStore.current === 'id' ? item.short_description_id : item.short_description_en;
+  function openLightbox(item: HighlightListSummary): void {
+    activeItem = item;
+    lightboxOpen = true;
+  }
+
+  function closeLightbox(): void {
+    lightboxOpen = false;
+    activeItem = null;
   }
 </script>
 
@@ -121,7 +130,11 @@
     {:else if highlightsStore.items.length > 0}
       <div class="highlights-grid">
         {#each highlightsStore.items as item (item.id)}
-          <a href={highlightDetailPath(item.slug)} class="highlights-card">
+          <button
+            class="highlights-card"
+            onclick={() => openLightbox(item)}
+            aria-label={title(item)}
+          >
             <div class="highlights-card__image">
               <img src={getCover(item)} alt={title(item)} loading="lazy" />
               <div class="highlights-card__overlay"></div>
@@ -129,17 +142,8 @@
             </div>
             <div class="highlights-card__body">
               <h3 class="highlights-card__title">{title(item)}</h3>
-              <p class="highlights-card__desc">{description(item)}</p>
-              <div class="highlights-card__meta">
-                {#if item.event_date}
-                  <span>{formatDate(item.event_date, langStore.current, 'short')}</span>
-                {/if}
-                {#if item.location}
-                  <span>· {item.location}</span>
-                {/if}
-              </div>
             </div>
-          </a>
+          </button>
         {/each}
       </div>
 
@@ -155,6 +159,8 @@
     {/if}
   </div>
 </section>
+
+<HighlightLightbox open={lightboxOpen} item={activeItem} onclose={closeLightbox} />
 
 <style>
   .highlights-hero {
@@ -266,10 +272,15 @@
 
   .highlights-card {
     display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    padding: 0;
     border-radius: var(--radius-lg);
     overflow: hidden;
     background: var(--color-surface);
     box-shadow: var(--shadow-sm);
+    cursor: pointer;
     transition: box-shadow var(--duration-short) var(--ease-smooth), transform var(--duration-short) var(--ease-out);
   }
 
@@ -313,19 +324,7 @@
     font-family: var(--font-serif);
     font-size: var(--fs-h4);
     font-weight: var(--fw-semibold);
-    margin-bottom: var(--sp-1);
-  }
-
-  .highlights-card__desc {
-    font-size: var(--fs-body-sm);
-    color: var(--color-text-muted);
-    line-height: var(--lh-normal);
-    margin-bottom: var(--sp-2);
-  }
-
-  .highlights-card__meta {
-    font-size: var(--fs-caption);
-    color: var(--color-text-subtle);
+    margin-bottom: 0;
   }
 
   @media (max-width: 880px) {

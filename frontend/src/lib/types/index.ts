@@ -69,6 +69,8 @@ export interface HighlightListSummary {
   short_description_id: string;
   event_date: string | null;
   location: string | null;
+  youtube_url: string | null;
+  created_at: string;
   cover?: HighlightMedia | null;
 }
 

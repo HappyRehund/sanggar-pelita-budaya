@@ -270,5 +270,11 @@
   "empty_search": "No results found.",
   "admin_org_cancel_replace": "Cancel",
   "admin_org_replace_photo": "Replace photo",
-  "admin_org_current_photo": "Current photo"
+  "admin_org_current_photo": "Current photo",
+  "read_less": "Read Less",
+  "highlights_watch_performance": "Watch Performance",
+  "highlights_category_label": "Category",
+  "highlights_uploaded_at": "Uploaded at",
+  "highlights_event_date_label": "Event date",
+  "highlights_location_label": "Location"
 }

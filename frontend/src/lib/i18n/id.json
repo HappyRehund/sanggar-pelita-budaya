@@ -270,5 +270,11 @@
   "empty_search": "Tidak ada hasil ditemukan.",
   "admin_org_cancel_replace": "Batal",
   "admin_org_replace_photo": "Ganti foto",
-  "admin_org_current_photo": "Foto saat ini"
+  "admin_org_current_photo": "Foto saat ini",
+  "read_less": "Lihat lebih sedikit",
+  "highlights_watch_performance": "Lihat Penampilan",
+  "highlights_category_label": "Kategori",
+  "highlights_uploaded_at": "Tanggal unggah",
+  "highlights_event_date_label": "Tanggal acara",
+  "highlights_location_label": "Lokasi"
 }
