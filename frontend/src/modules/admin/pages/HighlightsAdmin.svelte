@@ -237,7 +237,7 @@
                 <td>
                   <img src={item.cover ? uploadUrl(item.cover.filename) : imageUrl(`h-${item.slug}`, 80, 60)} alt="" class="table-thumb" />
                 </td>
-                <td>{item.title_en}</td>
+                <td>{item.title_id}</td>
                 <td><Badge variant={item.category}>{categoryLabel(item.category, langStore.current)}</Badge></td>
                 <td>{item.location || '—'}</td>
                 <td>
