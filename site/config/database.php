@@ -133,8 +133,104 @@ function initSchema(): void
             $pdo->exec('UPDATE highlights SET seo_description_en = seo_description, seo_description_id = seo_description;');
 
             // Drop legacy single-language columns by recreating the table.
-            $pdo->exec('DROP TABLE IF EXISTS highlights_old;');
-            $pdo->exec('ALTER TABLE highlights RENAME TO highlights_old;');
+            // Disable FK enforcement and use legacy_alter_table=1 so SQLite
+            // neither fires FK triggers during the rename nor rewrites FK
+            // text on highlights_media to follow the highlights->highlights_old
+            // rename (which would leave a dangling ref after highlights_old
+            // is dropped).
+            $pdo->exec('PRAGMA foreign_keys = OFF;');
+            $pdo->exec('PRAGMA legacy_alter_table = 1;');
+            try {
+                $pdo->exec('DROP TABLE IF EXISTS highlights_old;');
+                $pdo->exec('ALTER TABLE highlights RENAME TO highlights_old;');
+                $pdo->exec("
+                    CREATE TABLE highlights (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title_en TEXT NOT NULL,
+                        title_id TEXT NOT NULL,
+                        slug TEXT UNIQUE NOT NULL,
+                        category TEXT NOT NULL CHECK(category IN ('achievement','activity')),
+                        short_description_en TEXT NOT NULL,
+                        short_description_id TEXT NOT NULL,
+                        cover_media_id INTEGER,
+                        event_date DATE,
+                        location TEXT,
+                        youtube_url TEXT,
+                        seo_title_en TEXT,
+                        seo_title_id TEXT,
+                        seo_description_en TEXT,
+                        seo_description_id TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (cover_media_id) REFERENCES highlights_media(id) ON DELETE SET NULL
+                    );
+                ");
+                $pdo->exec("
+                    INSERT INTO highlights (id, title_en, title_id, slug, category, short_description_en, short_description_id,
+                        cover_media_id, event_date, location, youtube_url, seo_title_en, seo_title_id,
+                        seo_description_en, seo_description_id, created_at, updated_at)
+                    SELECT id, title_en, title_id, slug, category, short_description_en, short_description_id,
+                        cover_media_id, event_date, location, youtube_url, seo_title_en, seo_title_id,
+                        seo_description_en, seo_description_id, created_at, updated_at
+                    FROM highlights_old;
+                ");
+                $pdo->exec('DROP TABLE highlights_old;');
+            } finally {
+                $pdo->exec('PRAGMA legacy_alter_table = 0;');
+                $pdo->exec('PRAGMA foreign_keys = ON;');
+            }
+        }
+    }
+
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS highlights_media (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            highlight_id INTEGER NOT NULL,
+            type TEXT NOT NULL CHECK(type IN ('cover')),
+            filename TEXT NOT NULL,
+            original_filename TEXT NOT NULL,
+            mime_type TEXT NOT NULL,
+            extension TEXT NOT NULL,
+            width INTEGER,
+            height INTEGER,
+            size_bytes INTEGER NOT NULL,
+            alt_text TEXT,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (highlight_id) REFERENCES highlights(id) ON DELETE CASCADE
+        );
+    ");
+
+    // Repair broken FK references caused by ALTER TABLE RENAME migrations.
+    //
+    // History:
+    //  - The bilingual migration renamed highlights -> highlights_old and
+    //    SQLite rewrote highlights_media's FK trigger to point at
+    //    highlights_old (then dropped) -> INSERT into highlights_media failed
+    //    with "no such table: main.highlights_old".
+    //  - Repair v1 renamed highlights_media -> highlights_media_broken and
+    //    recreated highlights_media. But that rename rewrote highlights's
+    //    FK text (cover_media_id REFERENCES highlights_media) to point at
+    //    highlights_media_broken (then dropped) -> UPDATE highlights failed
+    //    with "no such table: main.highlights_media_broken".
+    //
+    // Root cause: SQLite stores FK clauses as TEXT in sqlite_master and
+    // ALTER TABLE RENAME rewrites that text. legacy_alter_table=1 did not
+    // reliably prevent it here. The bulletproof fix is to DROP and
+    // CREATE both tables fresh (with FKs OFF so enforcement cannot fire
+    // mid-rebuild), copying data via temp tables. This guarantees both
+    // tables' FK text references the correct, existing counterpart.
+    $highlightsFkRepairV2 = $pdo->query("SELECT value FROM schema_meta WHERE key = 'highlights_fk_repair_v2'")->fetchColumn();
+    if ($highlightsFkRepairV2 === false) {
+        $pdo->exec('PRAGMA foreign_keys = OFF;');
+        try {
+            // Stage current data into temp tables.
+            $pdo->exec('DROP TABLE IF EXISTS _hl_stage;');
+            $pdo->exec('DROP TABLE IF EXISTS _hlm_stage;');
+            $pdo->exec('ALTER TABLE highlights RENAME TO _hl_stage;');
+            $pdo->exec('ALTER TABLE highlights_media RENAME TO _hlm_stage;');
+
+            // Recreate both with correct, mutually-consistent FK text.
             $pdo->exec("
                 CREATE TABLE highlights (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -158,36 +254,52 @@ function initSchema(): void
                 );
             ");
             $pdo->exec("
-                INSERT INTO highlights (id, title_en, title_id, slug, category, short_description_en, short_description_id,
-                    cover_media_id, event_date, location, youtube_url, seo_title_en, seo_title_id,
-                    seo_description_en, seo_description_id, created_at, updated_at)
-                SELECT id, title_en, title_id, slug, category, short_description_en, short_description_id,
-                    cover_media_id, event_date, location, youtube_url, seo_title_en, seo_title_id,
-                    seo_description_en, seo_description_id, created_at, updated_at
-                FROM highlights_old;
+                CREATE TABLE highlights_media (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    highlight_id INTEGER NOT NULL,
+                    type TEXT NOT NULL CHECK(type IN ('cover')),
+                    filename TEXT NOT NULL,
+                    original_filename TEXT NOT NULL,
+                    mime_type TEXT NOT NULL,
+                    extension TEXT NOT NULL,
+                    width INTEGER,
+                    height INTEGER,
+                    size_bytes INTEGER NOT NULL,
+                    alt_text TEXT,
+                    sort_order INTEGER NOT NULL DEFAULT 0,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (highlight_id) REFERENCES highlights(id) ON DELETE CASCADE
+                );
             ");
-            $pdo->exec('DROP TABLE highlights_old;');
-        }
-    }
 
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS highlights_media (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            highlight_id INTEGER NOT NULL,
-            type TEXT NOT NULL CHECK(type IN ('cover')),
-            filename TEXT NOT NULL,
-            original_filename TEXT NOT NULL,
-            mime_type TEXT NOT NULL,
-            extension TEXT NOT NULL,
-            width INTEGER,
-            height INTEGER,
-            size_bytes INTEGER NOT NULL,
-            alt_text TEXT,
-            sort_order INTEGER NOT NULL DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (highlight_id) REFERENCES highlights(id) ON DELETE CASCADE
-        );
-    ");
+            // Copy data back (order matters: media first so highlights'
+            // cover_media_id FK is satisfiable, though FKs are off anyway).
+            $hlmCols = $pdo->query('PRAGMA table_info(_hlm_stage)')->fetchAll();
+            $hlmHas = static fn(string $c): bool => in_array($c, array_column($hlmCols, 'name'), true);
+            $mediaSelect = implode(', ', array_filter(
+                ['id', 'highlight_id', 'type', 'filename', 'original_filename', 'mime_type', 'extension',
+                 'width', 'height', 'size_bytes', 'alt_text', 'sort_order', 'created_at'],
+                $hlmHas
+            ));
+            $pdo->exec("INSERT INTO highlights_media ($mediaSelect) SELECT $mediaSelect FROM _hlm_stage;");
+
+            $hlCols = $pdo->query('PRAGMA table_info(_hl_stage)')->fetchAll();
+            $hlHas = static fn(string $c): bool => in_array($c, array_column($hlCols, 'name'), true);
+            $hlSelect = implode(', ', array_filter(
+                ['id', 'title_en', 'title_id', 'slug', 'category', 'short_description_en', 'short_description_id',
+                 'cover_media_id', 'event_date', 'location', 'youtube_url', 'seo_title_en', 'seo_title_id',
+                 'seo_description_en', 'seo_description_id', 'created_at', 'updated_at'],
+                $hlHas
+            ));
+            $pdo->exec("INSERT INTO highlights ($hlSelect) SELECT $hlSelect FROM _hl_stage;");
+
+            $pdo->exec('DROP TABLE _hl_stage;');
+            $pdo->exec('DROP TABLE _hlm_stage;');
+        } finally {
+            $pdo->exec('PRAGMA foreign_keys = ON;');
+        }
+        $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('highlights_fk_repair_v2', '1');");
+    }
 
     if ($highlightsSimplifyV1 === false) {
         $pdo->exec("INSERT INTO schema_meta (key, value) VALUES ('highlights_simplify_v1', '1');");
