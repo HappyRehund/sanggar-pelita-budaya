@@ -41,6 +41,14 @@
   function getCover(item: { cover?: { filename: string } | null; slug: string }): string {
     return item.cover ? uploadUrl(item.cover.filename) : imageUrl(`highlights-${item.slug}`, 600, 400);
   }
+
+  function title(item: { title_en: string; title_id: string }): string {
+    return langStore.current === 'id' ? item.title_id : item.title_en;
+  }
+
+  function description(item: { short_description_en: string; short_description_id: string }): string {
+    return langStore.current === 'id' ? item.short_description_id : item.short_description_en;
+  }
 </script>
 
 <svelte:head>
@@ -115,13 +123,13 @@
         {#each highlightsStore.items as item (item.id)}
           <a href={highlightDetailPath(item.slug)} class="highlights-card">
             <div class="highlights-card__image">
-              <img src={getCover(item)} alt={item.title} loading="lazy" />
+              <img src={getCover(item)} alt={title(item)} loading="lazy" />
               <div class="highlights-card__overlay"></div>
               <Badge variant={item.category}>{categoryLabel(item.category, langStore.current)}</Badge>
             </div>
             <div class="highlights-card__body">
-              <h3 class="highlights-card__title">{item.title}</h3>
-              <p class="highlights-card__desc">{item.short_description}</p>
+              <h3 class="highlights-card__title">{title(item)}</h3>
+              <p class="highlights-card__desc">{description(item)}</p>
               <div class="highlights-card__meta">
                 {#if item.event_date}
                   <span>{formatDate(item.event_date, langStore.current, 'short')}</span>

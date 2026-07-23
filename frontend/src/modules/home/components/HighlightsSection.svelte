@@ -4,6 +4,7 @@
   import { t } from '$lib/i18n/index.svelte';
   import { uploadUrl, imageUrl } from '$lib/utils';
   import { revealOnScroll, staggerReveal } from '$lib/utils';
+  import { langStore } from '$lib/stores/lang.svelte';
   import { useLightbox } from '$lib/hooks/useLightbox.svelte';
   import type { LightboxImage } from '$lib/hooks/useLightbox.svelte';
   import type { HighlightListSummary } from '$lib/types';
@@ -49,13 +50,17 @@
   function openLightbox(index: number): void {
     const items: LightboxImage[] = highlights.map((h) => ({
       src: h.cover ? uploadUrl(h.cover.filename) : imageUrl(`highlights-${h.slug}`, 400, 300),
-      alt: h.title,
+      alt: title(h),
     }));
     lightbox.open(items, index);
   }
 
   function getImageSrc(item: HighlightListSummary): string {
     return item.cover ? uploadUrl(item.cover.filename) : imageUrl(`highlights-${item.slug}`, 400, 300);
+  }
+
+  function title(item: HighlightListSummary): string {
+    return langStore.current === 'id' ? item.title_id : item.title_en;
   }
 </script>
 
@@ -77,9 +82,9 @@
             class="highlights__item"
             class:highlights__item--large={i === 0 || i === 5}
             onclick={() => openLightbox(i)}
-            aria-label={item.title}
+            aria-label={title(item)}
           >
-            <img src={getImageSrc(item)} alt={item.title} loading="lazy" />
+            <img src={getImageSrc(item)} alt={title(item)} loading="lazy" />
           </button>
         {/each}
       </div>

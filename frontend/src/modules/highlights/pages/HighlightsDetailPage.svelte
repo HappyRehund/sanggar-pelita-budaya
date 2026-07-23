@@ -38,7 +38,7 @@
     if (!highlight?.cover) return [];
     return [{
       src: uploadUrl(highlight.cover.filename),
-      alt: highlight.title,
+      alt: title(highlight),
     }];
   }
 
@@ -54,25 +54,43 @@
 
   function share(): void {
     if (navigator.share) {
-      navigator.share({ title: highlight?.title ?? '', url: window.location.href });
+      navigator.share({ title: highlight ? title(highlight) : '', url: window.location.href });
     } else {
       navigator.clipboard?.writeText(window.location.href);
     }
+  }
+
+  function title(h: { title_en: string; title_id: string }): string {
+    return langStore.current === 'id' ? h.title_id : h.title_en;
+  }
+
+  function description(h: { short_description_en: string; short_description_id: string }): string {
+    return langStore.current === 'id' ? h.short_description_id : h.short_description_en;
+  }
+
+  function seoTitle(h: { seo_title_en: string | null; seo_title_id: string | null; title_en: string; title_id: string }): string {
+    const localized = langStore.current === 'id' ? h.seo_title_id : h.seo_title_en;
+    return localized || title(h);
+  }
+
+  function seoDescription(h: { seo_description_en: string | null; seo_description_id: string | null; short_description_en: string; short_description_id: string }): string {
+    const localized = langStore.current === 'id' ? h.seo_description_id : h.seo_description_en;
+    return localized || description(h);
   }
 </script>
 
 <svelte:head>
   {#if highlight}
-    <title>{highlight.seo_title || highlight.title} — {t('site_name')}</title>
-    <meta name="description" content={highlight.seo_description || highlight.short_description} />
+    <title>{seoTitle(highlight)} — {t('site_name')}</title>
+    <meta name="description" content={seoDescription(highlight)} />
     <link rel="canonical" href={`/highlights/${highlight.slug}`} />
-    <meta property="og:title" content={highlight.seo_title || highlight.title} />
-    <meta property="og:description" content={highlight.seo_description || highlight.short_description} />
+    <meta property="og:title" content={seoTitle(highlight)} />
+    <meta property="og:description" content={seoDescription(highlight)} />
     <meta property="og:type" content="article" />
     <meta property="og:image" content={getCoverUrl()} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={highlight.seo_title || highlight.title} />
-    <meta name="twitter:description" content={highlight.seo_description || highlight.short_description} />
+    <meta name="twitter:title" content={seoTitle(highlight)} />
+    <meta name="twitter:description" content={seoDescription(highlight)} />
   {/if}
 </svelte:head>
 
@@ -88,12 +106,12 @@
   <article class="highlights-detail">
     <div class="highlights-detail__hero">
       <button class="highlights-detail__hero-btn" onclick={openCoverLightbox} aria-label={t('highlights_detail_view_image')}>
-        <img src={getCoverUrl()} alt={highlight.title} class="highlights-detail__hero-img" />
+        <img src={getCoverUrl()} alt={title(highlight)} class="highlights-detail__hero-img" />
       </button>
       <div class="highlights-detail__hero-overlay"></div>
       <div class="container highlights-detail__hero-content">
         <Badge variant={highlight.category}>{categoryLabel(highlight.category, langStore.current)}</Badge>
-        <h1 class="highlights-detail__title">{highlight.title}</h1>
+        <h1 class="highlights-detail__title">{title(highlight)}</h1>
         <div class="highlights-detail__meta">
           {#if highlight.event_date}
             <span class="highlights-detail__meta-item">
@@ -116,7 +134,7 @@
     </div>
 
     <div class="container container--reading highlights-detail__content">
-      <p class="lead">{highlight.short_description}</p>
+      <p class="lead">{description(highlight)}</p>
     </div>
 
     {#if highlight.youtube_url}
@@ -140,11 +158,11 @@
                 <div class="related-card__image">
                   <img
                     src={item.cover ? uploadUrl(item.cover.filename) : imageUrl(`highlights-${item.slug}`, 400, 300)}
-                    alt={item.title}
+                    alt={title(item)}
                     loading="lazy"
                   />
                 </div>
-                <h3 class="related-card__title">{item.title}</h3>
+                <h3 class="related-card__title">{title(item)}</h3>
                 <Badge variant={item.category}>{categoryLabel(item.category, langStore.current)}</Badge>
               </a>
             {/each}
