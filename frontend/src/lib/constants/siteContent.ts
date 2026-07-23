@@ -14,7 +14,8 @@ export const SITE_CONTENT = {
   /** Social profile URLs. Falsy entries are filtered out by the Footer. */
   socials: {
     facebook: '',
-    instagram: '',
-    youtube: '',
+    instagram: 'https://www.instagram.com/sspelitabudaya_official/',
+    youtube: 'https://www.youtube.com/@Sspelitabudaya',
+    tiktok: 'https://www.tiktok.com/@pelitabudaya_official',
   },
 } as const;
