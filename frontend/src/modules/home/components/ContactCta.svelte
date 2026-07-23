@@ -26,12 +26,6 @@
         <MessageCircle size={18} />
         {t('contact_cta_button')}
       </Button>
-      {#if mapsUrl}
-        <Button variant="gradient" size="md" href={mapsUrl}>
-          <MapPin size={18} />
-          {t('contact_cta_maps')}
-        </Button>
-      {/if}
     </div>
   </div>
 </section>

@@ -9,7 +9,7 @@ export const SITE_CONTENT = {
   heroPrimaryCtaUrl: '/highlights',
 
   /** Google Maps link shown in Footer and Home ContactCta section. */
-  mapsUrl: '',
+  mapsUrl: 'https://maps.app.goo.gl/4TBRYV4UF2jj6VfK7',
 
   /** Social profile URLs. Falsy entries are filtered out by the Footer. */
   socials: {

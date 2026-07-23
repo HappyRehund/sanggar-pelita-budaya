@@ -110,7 +110,6 @@
         <ul class="footer__contact">
           {#if address}
             <li>
-              <MapPin size={16} />
               <span>{address}</span>
             </li>
           {/if}
@@ -245,7 +244,7 @@
     align-items: center;
     gap: var(--sp-1);
     font-size: var(--fs-body-sm);
-    color: var(--color-gold);
+    color: var(--color-gold-soft);
     margin-top: var(--sp-2);
   }
 
