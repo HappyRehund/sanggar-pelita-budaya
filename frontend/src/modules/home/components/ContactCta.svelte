@@ -2,9 +2,8 @@
   import { onMount } from 'svelte';
   import { t } from '$lib/i18n/index.svelte';
   import { revealOnScroll } from '$lib/utils';
-  import { SITE_CONTENT } from '$lib/constants';
   import Button from '$lib/components/Button.svelte';
-  import { MessageCircle, MapPin } from '@lucide/svelte';
+  import { MessageCircle } from '@lucide/svelte';
   import contactCtaBg from '$assets/images/contact-cta/contact-cta-bg.webp';
 
   let sectionEl = $state<HTMLElement | null>(null);
@@ -14,7 +13,6 @@
   });
 
   const bgImage = contactCtaBg;
-  const mapsUrl = $derived(SITE_CONTENT.mapsUrl);
 </script>
 
 <section bind:this={sectionEl} class="contact-cta" style:background-image={`linear-gradient(rgba(26,22,18,0.75), rgba(26,22,18,0.75)), url(${bgImage})`}>
