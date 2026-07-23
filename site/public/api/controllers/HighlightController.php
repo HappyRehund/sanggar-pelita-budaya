@@ -134,15 +134,19 @@ class HighlightController
     private function normalizeHighlightInput(array $input): array
     {
         return [
-            'title' => trim($input['title'] ?? ''),
+            'title_en' => trim($input['title_en'] ?? ''),
+            'title_id' => trim($input['title_id'] ?? ''),
             'slug' => trim($input['slug'] ?? ''),
             'category' => $input['category'] ?? '',
-            'short_description' => trim($input['short_description'] ?? ''),
+            'short_description_en' => trim($input['short_description_en'] ?? ''),
+            'short_description_id' => trim($input['short_description_id'] ?? ''),
             'event_date' => $input['event_date'] ?? null,
             'location' => trim($input['location'] ?? ''),
             'youtube_url' => trim($input['youtube_url'] ?? ''),
-            'seo_title' => trim($input['seo_title'] ?? '') ?: null,
-            'seo_description' => trim($input['seo_description'] ?? '') ?: null,
+            'seo_title_en' => trim($input['seo_title_en'] ?? '') ?: null,
+            'seo_title_id' => trim($input['seo_title_id'] ?? '') ?: null,
+            'seo_description_en' => trim($input['seo_description_en'] ?? '') ?: null,
+            'seo_description_id' => trim($input['seo_description_id'] ?? '') ?: null,
             'cover_media_id' => isset($input['cover_media_id']) ? (int) $input['cover_media_id'] : null,
         ];
     }

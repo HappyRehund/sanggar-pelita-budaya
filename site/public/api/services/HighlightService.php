@@ -136,12 +136,14 @@ class HighlightService
     private function validateHighlightFields(array $data, ?int $ignoreId): void
     {
         $validator = new ValidationService();
-        $validator->required('title', $data['title'] ?? null);
+        $validator->required('title_en', $data['title_en'] ?? null);
+        $validator->required('title_id', $data['title_id'] ?? null);
         $validator->required('slug', $data['slug'] ?? null);
         $validator->slug('slug', $data['slug'] ?? '');
         $validator->required('category', $data['category'] ?? null);
         $validator->inEnum('category', $data['category'] ?? '', ['achievement', 'activity']);
-        $validator->required('short_description', $data['short_description'] ?? null);
+        $validator->required('short_description_en', $data['short_description_en'] ?? null);
+        $validator->required('short_description_id', $data['short_description_id'] ?? null);
         $validator->optionalUrl('youtube_url', $data['youtube_url'] ?? null);
         $validator->date('event_date', $data['event_date'] ?? null);
 

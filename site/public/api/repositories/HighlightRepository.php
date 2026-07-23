@@ -15,11 +15,13 @@ class HighlightRepository
     {
         $stmt = $this->db->prepare("
             INSERT INTO highlights
-                (title, slug, category, short_description, cover_media_id,
-                 event_date, location, youtube_url, seo_title, seo_description)
+                (title_en, title_id, slug, category, short_description_en, short_description_id,
+                 cover_media_id, event_date, location, youtube_url,
+                 seo_title_en, seo_title_id, seo_description_en, seo_description_id)
             VALUES
-                (:title, :slug, :category, :short_description, :cover_media_id,
-                 :event_date, :location, :youtube_url, :seo_title, :seo_description)
+                (:title_en, :title_id, :slug, :category, :short_description_en, :short_description_id,
+                 :cover_media_id, :event_date, :location, :youtube_url,
+                 :seo_title_en, :seo_title_id, :seo_description_en, :seo_description_id)
         ");
 
         $this->bindHighlightFields($stmt, $data);
@@ -31,16 +33,20 @@ class HighlightRepository
     {
         $stmt = $this->db->prepare("
             UPDATE highlights SET
-                title = :title,
+                title_en = :title_en,
+                title_id = :title_id,
                 slug = :slug,
                 category = :category,
-                short_description = :short_description,
+                short_description_en = :short_description_en,
+                short_description_id = :short_description_id,
                 cover_media_id = :cover_media_id,
                 event_date = :event_date,
                 location = :location,
                 youtube_url = :youtube_url,
-                seo_title = :seo_title,
-                seo_description = :seo_description,
+                seo_title_en = :seo_title_en,
+                seo_title_id = :seo_title_id,
+                seo_description_en = :seo_description_en,
+                seo_description_id = :seo_description_id,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = :id
         ");
@@ -151,16 +157,20 @@ class HighlightRepository
 
     private function bindHighlightFields(PDOStatement $stmt, array $data): void
     {
-        $stmt->bindValue(':title', $data['title']);
+        $stmt->bindValue(':title_en', $data['title_en']);
+        $stmt->bindValue(':title_id', $data['title_id']);
         $stmt->bindValue(':slug', $data['slug']);
         $stmt->bindValue(':category', $data['category']);
-        $stmt->bindValue(':short_description', $data['short_description']);
+        $stmt->bindValue(':short_description_en', $data['short_description_en']);
+        $stmt->bindValue(':short_description_id', $data['short_description_id']);
         $stmt->bindValue(':cover_media_id', $data['cover_media_id'] ?? null, PDO::PARAM_NULL);
         $stmt->bindValue(':event_date', $data['event_date'] ?: null);
         $stmt->bindValue(':location', $data['location'] ?? '');
         $stmt->bindValue(':youtube_url', $data['youtube_url'] ?? '');
-        $stmt->bindValue(':seo_title', $data['seo_title'] ?? null);
-        $stmt->bindValue(':seo_description', $data['seo_description'] ?? null);
+        $stmt->bindValue(':seo_title_en', $data['seo_title_en'] ?? null);
+        $stmt->bindValue(':seo_title_id', $data['seo_title_id'] ?? null);
+        $stmt->bindValue(':seo_description_en', $data['seo_description_en'] ?? null);
+        $stmt->bindValue(':seo_description_id', $data['seo_description_id'] ?? null);
     }
 
     private function buildWhereClause(array $filters): array
@@ -175,7 +185,9 @@ class HighlightRepository
 
         if (!empty($filters['search'])) {
             $term = '%' . $filters['search'] . '%';
-            $where[] = '(title LIKE ? OR short_description LIKE ? OR location LIKE ? OR category LIKE ?)';
+            $where[] = '(title_en LIKE ? OR title_id LIKE ? OR short_description_en LIKE ? OR short_description_id LIKE ? OR location LIKE ? OR category LIKE ?)';
+            $params[] = $term;
+            $params[] = $term;
             $params[] = $term;
             $params[] = $term;
             $params[] = $term;
@@ -189,7 +201,7 @@ class HighlightRepository
     {
         return match ($sort) {
             'oldest' => 'ORDER BY event_date ASC, created_at ASC',
-            'alphabetical' => 'ORDER BY title ASC',
+            'alphabetical' => 'ORDER BY title_en ASC',
             default => 'ORDER BY event_date DESC, created_at DESC',
         };
     }
